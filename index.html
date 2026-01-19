@@ -30,35 +30,15 @@
         .video-section { background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)); border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; height: calc(100% - 140px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
         .video-container { width: 100%; height: 100%; position: relative; background: #000; }
         .video-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
-        
-        /* ADICIONADO: Estilo do botão de som */
-        .btn-som {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            z-index: 101;
-            background: rgba(0, 230, 118, 0.9);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-        .btn-som:hover { transform: scale(1.05); background: #00ff88; }
-
         .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #888; }
         .video-placeholder i { font-size: 64px; margin-bottom: 20px; color: #555; opacity: 0.5; }
         .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; display: flex; flex-direction: column; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2); }
         .announcements-ticker { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
         .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 16px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08)); border-radius: 8px; font-size: 29px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 5px solid #2196f3; }
-        .ticker-item.active { animation: slideInOut 5s ease-in-out; }
+        
+        /* ALTERADO: Aumentado de 5s para 10s */
+        .ticker-item.active { animation: slideInOut 10s ease-in-out; }
+        
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 10% { transform: translateX(0); opacity: 1; } 90% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
         .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; border: 2px solid rgba(255, 82, 82, 0.3); height: 100%; position: relative; overflow: hidden; }
         .faltometro-title { font-size: 36px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid rgba(0, 230, 118, 0.3); letter-spacing: 2px; }
@@ -112,9 +92,6 @@
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
-                <button id="btnSom" class="btn-som" onclick="ativarSom()">
-                    <i class="fas fa-volume-up"></i> ATIVAR SOM
-                </button>
                 <div class="video-container" id="videoContainer"></div>
             </section>
             <section class="announcements-section">
@@ -174,24 +151,14 @@
             avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 NOVEMBRO AZUL"]
         };
 
-        // Funções de Utilidade
         function extrairVideoId(url) {
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
             const match = url.match(regExp);
             return (match && match[7].length === 11) ? match[7] : null;
         }
 
-        // Playlist de Vídeo Otimizada
         let currentVideoIndex = 0;
         let videoInterval;
-        let videoMudo = true; // ADICIONADO: Variável de estado do som
-
-        // ADICIONADO: Função para ativar o som clicando no botão
-        function ativarSom() {
-            videoMudo = false;
-            carregarVideoAtual();
-            document.getElementById('btnSom').style.display = 'none';
-        }
 
         function carregarVideoAtual() {
             const container = document.getElementById('videoContainer');
@@ -200,10 +167,9 @@
 
             const videoId = extrairVideoId(urls[currentVideoIndex]);
             if (videoId) {
-                // MODIFICADO: mute depende da variável videoMudo
                 container.innerHTML = `
                     <iframe class="video-iframe" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         frameborder="0"></iframe>`;
             } else {
@@ -227,7 +193,6 @@
             document.getElementById('videoContainer').innerHTML = `<div class="video-placeholder"><i class="fas fa-video-slash"></i><p>Sem vídeos configurados</p></div>`;
         }
 
-        // Relógio e Interface
         function atualizarRelogio() {
             const now = new Date();
             document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
@@ -245,7 +210,7 @@
             document.getElementById('totalFaltas').textContent = lista.reduce((s, e) => s + e.faltas, 0);
         }
 
-        // Avisos
+        // Avisos - MODIFICADO PARA FICAR MAIS LENTO
         let currentAviso = 0;
         function iniciarCarrosselAvisos() {
             const container = document.getElementById('tickerContainer');
@@ -257,12 +222,13 @@
                 items.forEach(i => i.classList.remove('active'));
                 items[currentAviso].classList.add('active');
                 currentAviso = (currentAviso + 1) % items.length;
-                setTimeout(showNext, 5000);
+                
+                // ALTERADO: Aumentado de 5000 para 10000 (10 segundos)
+                setTimeout(showNext, 10000); 
             }
             showNext();
         }
 
-        // Admin e Persistência
         function salvarDados() { localStorage.setItem('sistemaSaude', JSON.stringify(dadosSistema)); }
         function carregarDados() {
             const saved = localStorage.getItem('sistemaSaude');
@@ -270,7 +236,6 @@
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
         }
 
-        // Funções do Painel Admin
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() {
             if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin') {
@@ -320,7 +285,6 @@
 
         function adicionarAviso() { dadosSistema.avisos.push('Novo aviso'); salvarDados(); mostrarSecao('avisos'); }
 
-        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             carregarDados();
             atualizarRelogio();
