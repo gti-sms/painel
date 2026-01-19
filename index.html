@@ -6,122 +6,87 @@
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* MANTIDO: Estilos base originais */
+        /* MANTIDO: Estilos Base e Visual Original */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
-        html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
-        body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
-        body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(0, 230, 118, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%); pointer-events: none; }
-        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; box-shadow: 0 -3px 20px rgba(0, 230, 118, 0.5); animation: pulseGlow 3s ease-in-out infinite; }
-        @keyframes pulseGlow { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+        html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; background: #0a1929; color: white; }
         
-        /* Botão Admin */
-        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(0, 200, 100, 0.3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.4s; border: 2px solid rgba(0, 230, 118, 0.4); backdrop-filter: blur(10px); }
-        .admin-gear:hover { transform: scale(1.15) rotate(180deg); background: rgba(0, 230, 118, 0.4); }
-        .admin-gear i { font-size: 20px; color: rgba(255, 255, 255, 0.95); }
+        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; box-shadow: 0 -3px 20px rgba(0, 230, 118, 0.5); }
+        
+        /* Botão Admin Discreto para TV */
+        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(0, 230, 118, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 1px solid rgba(0, 230, 118, 0.2); }
 
-        /* Header */
-        .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
-        .header-left { display: flex; align-items: center; gap: 15px; }
+        .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
         .header-logo { font-size: 38px; color: #00e676; animation: heartbeat 2s ease-in-out infinite; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 10% { transform: scale(1.1); } 20% { transform: scale(1); } }
-        .header-text h1 { font-size: 34px; font-weight: 700; margin-bottom: 4px; }
-        .header-subtitle { font-size: 22px; opacity: 0.95; }
-        .datetime-container { text-align: right; background: rgba(0, 0, 0, 0.25); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); }
-        .header-date { font-size: 14px; opacity: 0.9; margin-bottom: 2px; }
+        .header-text h1 { font-size: 34px; font-weight: 700; }
+        .datetime-container { text-align: right; background: rgba(0, 0, 0, 0.25); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); }
         .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; }
 
-        /* Layout Principal */
-        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 75px - 4px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; overflow: hidden; }
+        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 79px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; }
         .left-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
         
-        /* Seção de Vídeo */
-        .video-section { background: #000; border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; height: calc(100% - 140px); }
-        .video-container { width: 100%; height: 100%; position: relative; }
-        .video-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+        /* Seção Vídeo e Botão de Som */
+        .video-section { background: #000; border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; }
+        .video-container { width: 100%; height: 100%; }
+        .video-iframe { width: 100%; height: 100%; border: none; }
 
-        /* ALTERADO: Botão de Som Discreto (Esquerda Baixo) */
         .btn-som-discreto {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            z-index: 105;
-            background: rgba(0, 0, 0, 0.4);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            backdrop-filter: blur(4px);
-        }
-        .btn-som-discreto:hover {
-            background: rgba(0, 230, 118, 0.6);
-            color: white;
-            transform: scale(1.1);
+            position: absolute; bottom: 15px; left: 15px; z-index: 105;
+            background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Seção de Avisos (Carrossel) */
-        .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; }
-        .announcements-ticker { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
-        .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 20px; border-radius: 8px; font-size: 32px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 8px solid #2196f3; background: rgba(255,255,255,0.05); }
-        
-        /* ALTERADO: Carrossel para 20 segundos e entrada mais lenta */
-        .ticker-item.active { animation: slideInOut 20s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        @keyframes slideInOut { 
-            0% { transform: translateX(100%); opacity: 0; } 
-            15% { transform: translateX(0); opacity: 1; } /* Entrada mais lenta (15% do tempo) */
-            85% { transform: translateX(0); opacity: 1; } 
-            100% { transform: translateX(-100%); opacity: 0; } 
-        }
+        /* Carrossel de 20 Segundos */
+        .announcements-section { background: rgba(33, 150, 243, 0.1); border-radius: 16px; padding: 12px; flex: 1; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; position: relative; }
+        .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 20px; font-size: 32px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 8px solid #2196f3; will-change: transform, opacity; }
+        .ticker-item.active { animation: slideInOut 20s cubic-bezier(0.25, 1, 0.5, 1); }
+        @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* Faltômetro (Direita) */
-        .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); height: 100%; }
-        .faltometro-title { font-size: 36px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; letter-spacing: 2px; }
-        .total-faltas { background: linear-gradient(135deg, #d32f2f 0%, #f44336 50%, #e53935 100%); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 15px; border: 2px solid rgba(255, 255, 255, 0.2); }
+        /* Faltômetro */
+        .right-column { background: #0d1b2a; border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); display: flex; flex-direction: column; }
+        .faltometro-title { font-size: 34px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; }
+        .total-faltas { background: #f44336; border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.2); }
         .total-value { font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace; }
-        .especialidades-container { display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
-        .especialidade-item { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .especialidade-nome { font-size: 20px; font-weight: 600; }
-        .especialidade-faltas { font-size: 32px; font-weight: 800; color: #ff5252; font-family: 'Courier New', monospace; }
+        .especialidade-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Login e Admin */
-        #loginScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .login-container { background: #1976d2; border-radius: 20px; padding: 40px; width: 400px; text-align: center; }
-        .login-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; }
-        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f4; z-index: 1000; color: #333; }
-        .admin-header { background: #1565c0; color: white; padding: 20px; display: flex; justify-content: space-between; }
-        .admin-content { padding: 30px; }
-        .admin-input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .admin-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background: #00e676; color: white; font-weight: bold; }
+        /* LOGIN E PAINEL ADMIN (RESTURADOS INTEGRALMENTE) */
+        #loginScreen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .login-box { background: #1565c0; padding: 40px; border-radius: 20px; width: 400px; text-align: center; }
+        
+        #adminPanel { display: none; position: fixed; inset: 0; background: #f8f9fa; z-index: 2001; color: #333; }
+        .admin-header { background: #1565c0; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-container { display: grid; grid-template-columns: 250px 1fr; height: calc(100% - 80px); }
+        .admin-sidebar { background: white; border-right: 1px solid #ddd; padding: 20px 0; }
+        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: bold; border-bottom: 1px solid #eee; }
+        .sidebar-item.active { background: #1565c0; color: white; }
+        .admin-content { padding: 30px; overflow-y: auto; }
+        .admin-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; }
+        .btn-danger { background: #f44336; }
     </style>
 </head>
 <body>
     <div class="footer-line"></div>
-    <div class="admin-gear" onclick="openLogin()"><i class="fas fa-cog"></i></div>
+    <div class="admin-gear" onclick="document.getElementById('loginScreen').style.display='flex'"><i class="fas fa-cog"></i></div>
 
     <header class="main-header">
-        <div class="header-left">
+        <div style="display:flex; align-items:center">
             <div class="header-logo"><i class="fas fa-heartbeat"></i></div>
             <div class="header-text">
                 <h1>Secretaria Municipal de Saúde</h1>
-                <div class="header-subtitle" id="headerSubtitle">PMPF - UBS Adirbal Corralo</div>
+                <div id="headerSubtitle" style="font-size:22px; opacity:0.9">PMPF - UBS Adirbal Corralo</div>
             </div>
         </div>
         <div class="datetime-container">
-            <div class="header-date" id="currentDate"></div>
-            <div class="header-time" id="currentTime"></div>
+            <div id="currentDate" style="font-size:14px"></div>
+            <div id="currentTime" class="header-time"></div>
         </div>
     </header>
 
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
-                <button id="btnSom" class="btn-som-discreto" onclick="toggleSom()" title="Ativar/Desativar Som">
+                <button class="btn-som-discreto" onclick="toggleSom()">
                     <i class="fas fa-volume-mute" id="iconSom"></i>
                 </button>
                 <div class="video-container" id="videoContainer"></div>
@@ -133,137 +98,139 @@
         <div class="right-column">
             <h2 class="faltometro-title">FALTÔMETRO</h2>
             <div class="total-faltas">
-                <div class="total-label">TOTAL DE FALTAS</div>
+                <div style="font-size:20px; font-weight:bold">TOTAL DE FALTAS</div>
                 <div class="total-value" id="totalFaltas">0</div>
             </div>
-            <div class="especialidades-container" id="especialidadesList"></div>
+            <div id="especialidadesList"></div>
         </div>
     </main>
 
     <div id="loginScreen">
-        <div class="login-container">
-            <h2 style="margin-bottom:20px">Admin</h2>
-            <input type="password" id="password" class="login-input" placeholder="Senha">
+        <div class="login-box">
+            <h2 style="color:white; margin-bottom:20px">Admin</h2>
+            <input type="password" id="pass" class="admin-input" placeholder="Senha">
             <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
         </div>
     </div>
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h2>Configurações</h2>
-            <button class="admin-btn" onclick="logout()" style="background:#f44336">Sair</button>
+            <h2>Painel de Gestão - TV</h2>
+            <button class="admin-btn btn-danger" onclick="location.reload()">Sair e Salvar</button>
         </div>
-        <div class="admin-content" id="adminContent"></div>
+        <div class="admin-container">
+            <div class="admin-sidebar">
+                <div class="sidebar-item active" onclick="mostrarSecao('unidade')">Unidade</div>
+                <div class="sidebar-item" onclick="mostrarSecao('faltometro')">Faltômetro</div>
+                <div class="sidebar-item" onclick="mostrarSecao('avisos')">Avisos</div>
+                <div class="sidebar-item" onclick="mostrarSecao('video')">Vídeos</div>
+            </div>
+            <div class="admin-content" id="adminContent"></div>
+        </div>
     </div>
 
     <script>
-        // Dados e Estado
-        let dadosSistema = {
-            unidade: { nome: "UBS Adirbal Corralo", videoUrls: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"], especialidades: [{nome: "Clínico Geral", faltas: 42}] },
-            avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 ATENÇÃO AOS HORÁRIOS DE ATENDIMENTO"]
+        let dados = {
+            unidade: "UBS Adirbal Corralo",
+            videos: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+            avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 NOVEMBRO AZUL"],
+            especialidades: [{nome: "Clínico Geral", faltas: 42}, {nome: "Pediatria", faltas: 10}]
         };
-        let videoMudo = true;
-        let currentVideoIndex = 0;
 
-        // Funções de Vídeo
-        function extrairVideoId(url) {
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[7].length === 11) ? match[7] : null;
+        let videoMudo = true;
+        let videoIdx = 0;
+
+        function extrairID(url) {
+            const m = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/);
+            return (m && m[7].length === 11) ? m[7] : null;
         }
 
         function toggleSom() {
             videoMudo = !videoMudo;
-            const icon = document.getElementById('iconSom');
-            icon.className = videoMudo ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            carregarVideoAtual();
+            document.getElementById('iconSom').className = videoMudo ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            loadVideo();
         }
 
-        function carregarVideoAtual() {
-            const container = document.getElementById('videoContainer');
-            const urls = dadosSistema.unidade.videoUrls;
-            if (!urls.length) return;
-            const videoId = extrairVideoId(urls[currentVideoIndex]);
-            container.innerHTML = `<iframe class="video-iframe" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&enablejsapi=1" allow="autoplay" frameborder="0"></iframe>`;
+        function loadVideo() {
+            const id = extrairID(dados.videos[videoIdx]);
+            document.getElementById('videoContainer').innerHTML = 
+                `<iframe class="video-iframe" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=${videoMudo?1:0}&controls=0&loop=1&playlist=${id}" allow="autoplay" frameborder="0"></iframe>`;
         }
 
-        function iniciarPlaylist() {
-            carregarVideoAtual();
-            setInterval(() => {
-                currentVideoIndex = (currentVideoIndex + 1) % dadosSistema.unidade.videoUrls.length;
-                carregarVideoAtual();
-            }, 30000); // Muda o vídeo a cada 30s
+        function updateDisplay() {
+            document.getElementById('headerSubtitle').textContent = `PMPF - ${dados.unidade}`;
+            document.getElementById('especialidadesList').innerHTML = dados.especialidades.map(e => 
+                `<div class="especialidade-item"><span>${e.nome}</span><strong style="color:#ff5252; font-size:26px">${e.faltas}</strong></div>`).join('');
+            document.getElementById('totalFaltas').textContent = dados.especialidades.reduce((a,b) => a + b.faltas, 0);
         }
 
-        // ALTERADO: Relógio e Carrossel (20 segundos)
-        function atualizarRelogio() {
-            const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        let currentAviso = 0;
-        function iniciarCarrossel() {
+        function startCarrossel() {
             const container = document.getElementById('tickerContainer');
-            container.innerHTML = dadosSistema.avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
+            container.innerHTML = dados.avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
-            
-            function rotate() {
+            let idx = 0;
+            const rotate = () => {
                 items.forEach(i => i.classList.remove('active'));
-                if(items[currentAviso]) items[currentAviso].classList.add('active');
-                currentAviso = (currentAviso + 1) % items.length;
-                setTimeout(rotate, 20000); // 20 segundos
-            }
+                if(items[idx]) items[idx].classList.add('active');
+                idx = (idx + 1) % items.length;
+                setTimeout(rotate, 20000);
+            };
             rotate();
         }
 
-        function atualizarFaltometro() {
-            const container = document.getElementById('especialidadesList');
-            container.innerHTML = dadosSistema.unidade.especialidades.map(e => `<div class="especialidade-item"><div class="especialidade-nome">${e.nome}</div><div class="especialidade-faltas">${e.faltas}</div></div>`).join('');
-            document.getElementById('totalFaltas').textContent = dadosSistema.unidade.especialidades.reduce((a,b) => a + b.faltas, 0);
-        }
+        // Funções do Painel Admin (RESTAURADAS)
+        function login() { if(document.getElementById('pass').value === 'admin') { document.getElementById('adminPanel').style.display='block'; mostrarSecao('unidade'); } }
 
-        // Funções Admin
-        function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
-        function login() { 
-            if(document.getElementById('password').value === 'admin') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                mostrarAdmin();
+        function mostrarSecao(s) {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            const content = document.getElementById('adminContent');
+            
+            if(s === 'unidade') {
+                content.innerHTML = `<h3>Nome da Unidade</h3><input id="u-nome" class="admin-input" value="${dados.unidade}"><button class="admin-btn" onclick="dados.unidade=document.getElementById('u-nome').value;salvar()">Salvar</button>`;
+            } else if(s === 'faltometro') {
+                content.innerHTML = `<h3>Faltômetro</h3><div id="f-list"></div><button class="admin-btn" onclick="addEsp()">+ Especialidade</button>`;
+                renderFaltas();
+            } else if(s === 'avisos') {
+                content.innerHTML = `<h3>Avisos</h3><div id="a-list"></div><button class="admin-btn" onclick="addAviso()">+ Aviso</button>`;
+                renderAvisos();
+            } else if(s === 'video') {
+                content.innerHTML = `<h3>Vídeos (Link YouTube)</h3><textarea id="v-list" class="admin-input" style="height:100px">${dados.videos.join('\n')}</textarea><button class="admin-btn" onclick="dados.videos=document.getElementById('v-list').value.split('\\n').filter(l=>l.trim());salvar()">Salvar</button>`;
             }
         }
-        function logout() { location.reload(); }
-        
-        function mostrarAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <h3>Nome da Unidade</h3>
-                <input id="editNome" class="admin-input" value="${dadosSistema.unidade.nome}">
-                <h3>Vídeos (URLs YouTube - uma por linha)</h3>
-                <textarea id="editVideos" class="admin-input" style="height:100px">${dadosSistema.unidade.videoUrls.join('\n')}</textarea>
-                <button class="admin-btn" onclick="salvarAdmin()">Salvar Todas as Alterações</button>
-            `;
+
+        function renderFaltas() {
+            document.getElementById('f-list').innerHTML = dados.especialidades.map((e,i) => `
+                <div style="display:flex; gap:10px; margin-bottom:10px">
+                    <input class="admin-input" value="${e.nome}" onchange="dados.especialidades[${i}].nome=this.value;salvar()">
+                    <input type="number" class="admin-input" style="width:100px" value="${e.faltas}" onchange="dados.especialidades[${i}].faltas=parseInt(this.value);salvar()">
+                    <button class="admin-btn btn-danger" onclick="dados.especialidades.splice(${i},1);salvar();mostrarSecao('faltometro')">X</button>
+                </div>`).join('');
         }
 
-        function salvarAdmin() {
-            dadosSistema.unidade.nome = document.getElementById('editNome').value;
-            dadosSistema.unidade.videoUrls = document.getElementById('editVideos').value.split('\n').filter(u => u.trim());
-            localStorage.setItem('sistemaSaude', JSON.stringify(dadosSistema));
-            location.reload();
+        function renderAvisos() {
+            document.getElementById('a-list').innerHTML = dados.avisos.map((a,i) => `
+                <div style="display:flex; gap:10px; margin-bottom:10px">
+                    <input class="admin-input" value="${a}" onchange="dados.avisos[${i}].value;salvar()">
+                    <button class="admin-btn btn-danger" onclick="dados.avisos.splice(${i},1);salvar();mostrarSecao('avisos')">X</button>
+                </div>`).join('');
         }
 
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('sistemaSaude');
-            if(saved) dadosSistema = JSON.parse(saved);
-            
-            document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
-            atualizarRelogio();
-            setInterval(atualizarRelogio, 1000);
-            atualizarFaltometro();
-            iniciarPlaylist();
-            iniciarCarrossel();
-        });
+        function addEsp() { dados.especialidades.push({nome: "Nova", faltas: 0}); salvar(); mostrarSecao('faltometro'); }
+        function addAviso() { dados.avisos.push("Novo aviso"); salvar(); mostrarSecao('avisos'); }
+        function salvar() { localStorage.setItem('cfg_saude', JSON.stringify(dados)); updateDisplay(); }
+
+        window.onload = () => {
+            const s = localStorage.getItem('cfg_saude');
+            if(s) dados = JSON.parse(s);
+            updateDisplay();
+            loadVideo();
+            startCarrossel();
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+            }, 1000);
+        };
     </script>
 </body>
 </html>
