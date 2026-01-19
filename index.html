@@ -166,9 +166,10 @@
 
             const videoId = extrairVideoId(urls[currentVideoIndex]);
             if (videoId) {
+                // ALTERADO: mute=0 para habilitar o som
                 container.innerHTML = `
                     <iframe class="video-iframe" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         frameborder="0"></iframe>`;
             } else {
@@ -235,7 +236,7 @@
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
         }
 
-        // Funções do Painel Admin (Resumidas para funcionamento)
+        // Funções do Painel Admin
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() {
             if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin') {
