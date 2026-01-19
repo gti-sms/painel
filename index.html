@@ -6,7 +6,7 @@
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* MANTIDO: Todos os seus estilos originais foram preservados para não alterar o visual */
+        /* MANTIDO: Todos os seus estilos originais */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -30,6 +30,29 @@
         .video-section { background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)); border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; height: calc(100% - 140px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
         .video-container { width: 100%; height: 100%; position: relative; background: #000; }
         .video-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+        
+        /* ADICIONADO: Estilo do botão de som */
+        .btn-som {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 101;
+            background: rgba(0, 230, 118, 0.9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        .btn-som:hover { transform: scale(1.05); background: #00ff88; }
+
         .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #888; }
         .video-placeholder i { font-size: 64px; margin-bottom: 20px; color: #555; opacity: 0.5; }
         .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; display: flex; flex-direction: column; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2); }
@@ -89,6 +112,9 @@
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
+                <button id="btnSom" class="btn-som" onclick="ativarSom()">
+                    <i class="fas fa-volume-up"></i> ATIVAR SOM
+                </button>
                 <div class="video-container" id="videoContainer"></div>
             </section>
             <section class="announcements-section">
@@ -158,6 +184,14 @@
         // Playlist de Vídeo Otimizada
         let currentVideoIndex = 0;
         let videoInterval;
+        let videoMudo = true; // ADICIONADO: Variável de estado do som
+
+        // ADICIONADO: Função para ativar o som clicando no botão
+        function ativarSom() {
+            videoMudo = false;
+            carregarVideoAtual();
+            document.getElementById('btnSom').style.display = 'none';
+        }
 
         function carregarVideoAtual() {
             const container = document.getElementById('videoContainer');
@@ -166,10 +200,10 @@
 
             const videoId = extrairVideoId(urls[currentVideoIndex]);
             if (videoId) {
-                // ALTERADO: mute=0 para habilitar o som
+                // MODIFICADO: mute depende da variável videoMudo
                 container.innerHTML = `
                     <iframe class="video-iframe" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         frameborder="0"></iframe>`;
             } else {
