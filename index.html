@@ -6,88 +6,114 @@
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* MANTIDO: Estilos Base e Visual Original */
+        /* MANTIDO: Todos os seus estilos originais */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
-        html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; background: #0a1929; color: white; }
-        
-        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; box-shadow: 0 -3px 20px rgba(0, 230, 118, 0.5); }
-        
-        /* Botão Admin Discreto para TV */
-        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(0, 230, 118, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 1px solid rgba(0, 230, 118, 0.2); }
-
-        .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
-        .header-logo { font-size: 38px; color: #00e676; animation: heartbeat 2s ease-in-out infinite; }
+        html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
+        body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
+        body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(0, 230, 118, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%); pointer-events: none; }
+        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; box-shadow: 0 -3px 20px rgba(0, 230, 118, 0.5); animation: pulseGlow 3s ease-in-out infinite; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(0, 200, 100, 0.3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border: 2px solid rgba(0, 230, 118, 0.4); box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); }
+        .admin-gear:hover { background: linear-gradient(135deg, rgba(0, 230, 118, 0.4), rgba(0, 255, 136, 0.5)); transform: scale(1.15) rotate(180deg); border: 2px solid rgba(0, 230, 118, 0.8); box-shadow: 0 6px 25px rgba(0, 230, 118, 0.5), 0 0 40px rgba(0, 230, 118, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.3); }
+        .admin-gear i { font-size: 20px; color: rgba(255, 255, 255, 0.95); }
+        .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-logo { font-size: 38px; color: #00e676; filter: drop-shadow(0 2px 8px rgba(0, 230, 118, 0.5)); animation: heartbeat 2s ease-in-out infinite; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 10% { transform: scale(1.1); } 20% { transform: scale(1); } }
-        .header-text h1 { font-size: 34px; font-weight: 700; }
-        .datetime-container { text-align: right; background: rgba(0, 0, 0, 0.25); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); }
-        .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; }
-
-        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 79px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; }
+        .header-text h1 { font-size: 34px; font-weight: 700; margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); letter-spacing: 0.5px; }
+        .header-subtitle { font-size: 22px; opacity: 0.95; font-weight: 500; }
+        .datetime-container { text-align: right; background: rgba(0, 0, 0, 0.25); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); display: flex; flex-direction: column; justify-content: center; }
+        .header-date { font-size: 14px; opacity: 0.9; margin-bottom: 2px; font-weight: 500; line-height: 1.1; }
+        .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; text-shadow: 0 0 15px rgba(0, 230, 118, 0.6); letter-spacing: 1px; line-height: 1; margin-top: -2px; }
+        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 75px - 4px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; overflow: hidden; }
         .left-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        .video-section { background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)); border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; height: calc(100% - 140px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
+        .video-container { width: 100%; height: 100%; position: relative; background: #000; }
+        .video-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         
-        /* Seção Vídeo e Botão de Som */
-        .video-section { background: #000; border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; }
-        .video-container { width: 100%; height: 100%; }
-        .video-iframe { width: 100%; height: 100%; border: none; }
-
-        .btn-som-discreto {
-            position: absolute; bottom: 15px; left: 15px; z-index: 105;
-            background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        /* ADICIONADO: Estilo do botão de som */
+        .btn-som {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 101;
+            background: rgba(0, 230, 118, 0.9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
         }
+        .btn-som:hover { transform: scale(1.05); background: #00ff88; }
 
-        /* Carrossel de 20 Segundos */
-        .announcements-section { background: rgba(33, 150, 243, 0.1); border-radius: 16px; padding: 12px; flex: 1; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; position: relative; }
-        .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 20px; font-size: 32px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 8px solid #2196f3; will-change: transform, opacity; }
-        .ticker-item.active { animation: slideInOut 20s cubic-bezier(0.25, 1, 0.5, 1); }
-        @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
-
-        /* Faltômetro */
-        .right-column { background: #0d1b2a; border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); display: flex; flex-direction: column; }
-        .faltometro-title { font-size: 34px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; }
-        .total-faltas { background: #f44336; border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.2); }
+        .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #888; }
+        .video-placeholder i { font-size: 64px; margin-bottom: 20px; color: #555; opacity: 0.5; }
+        .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; display: flex; flex-direction: column; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2); }
+        .announcements-ticker { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
+        .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 16px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08)); border-radius: 8px; font-size: 29px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 5px solid #2196f3; }
+        .ticker-item.active { animation: slideInOut 5s ease-in-out; }
+        @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 10% { transform: translateX(0); opacity: 1; } 90% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
+        .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; border: 2px solid rgba(255, 82, 82, 0.3); height: 100%; position: relative; overflow: hidden; }
+        .faltometro-title { font-size: 36px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid rgba(0, 230, 118, 0.3); letter-spacing: 2px; }
+        .total-faltas { background: linear-gradient(135deg, #d32f2f 0%, #f44336 50%, #e53935 100%); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px; border: 2px solid rgba(255, 255, 255, 0.25); animation: pulseTotal 2s infinite; }
+        @keyframes pulseTotal { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .total-label { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
         .total-value { font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace; }
-        .especialidade-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); }
+        .especialidades-container { flex: 1; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; scrollbar-width: none; }
+        .especialidades-container::-webkit-scrollbar { display: none; }
+        .especialidade-item { background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05)); border-radius: 6px; padding: 5px 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.1); min-height: 32px; transition: all 0.3s ease; }
+        .especialidade-nome { font-size: 19px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .especialidade-faltas { font-size: 30px; font-weight: 800; color: #ff5252; min-width: 45px; text-align: right; font-family: 'Courier New', monospace; }
 
-        /* LOGIN E PAINEL ADMIN (RESTURADOS INTEGRALMENTE) */
-        #loginScreen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
-        .login-box { background: #1565c0; padding: 40px; border-radius: 20px; width: 400px; text-align: center; }
-        
-        #adminPanel { display: none; position: fixed; inset: 0; background: #f8f9fa; z-index: 2001; color: #333; }
-        .admin-header { background: #1565c0; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .admin-container { display: grid; grid-template-columns: 250px 1fr; height: calc(100% - 80px); }
-        .admin-sidebar { background: white; border-right: 1px solid #ddd; padding: 20px 0; }
-        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: bold; border-bottom: 1px solid #eee; }
-        .sidebar-item.active { background: #1565c0; color: white; }
-        .admin-content { padding: 30px; overflow-y: auto; }
-        .admin-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; }
-        .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; }
-        .btn-danger { background: #f44336; }
+        /* Login e Admin */
+        #loginScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 2000; justify-content: center; align-items: center; }
+        .login-container { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); border-radius: 20px; padding: 50px; width: 450px; text-align: center; border: 3px solid #00e676; }
+        .login-input { width: 100%; padding: 18px; margin: 12px 0; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 12px; color: white; font-size: 17px; }
+        .login-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #00e676, #00c853); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8f9fa; z-index: 1000; color: #333; }
+        .admin-header { background: #1565c0; color: white; padding: 18px 35px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #00e676; }
+        .admin-container { display: grid; grid-template-columns: 280px 1fr; height: calc(100% - 80px); }
+        .admin-sidebar { background: white; border-right: 2px solid #e0e0e0; padding: 25px 0; }
+        .sidebar-item { padding: 18px 30px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-weight: 600; }
+        .sidebar-item.active { background: #1565c0; color: white; border-left: 4px solid #00e676; }
+        .admin-content { padding: 35px; overflow-y: auto; background: #f8f9fa; }
+        .admin-section { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .admin-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; }
+        .admin-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; background: #00e676; color: white; }
+        .admin-btn-danger { background: #f44336; }
+        .admin-btn-secondary { background: #2196f3; }
     </style>
 </head>
 <body>
     <div class="footer-line"></div>
-    <div class="admin-gear" onclick="document.getElementById('loginScreen').style.display='flex'"><i class="fas fa-cog"></i></div>
+    <div class="admin-gear" onclick="openLogin()"><i class="fas fa-cog"></i></div>
 
     <header class="main-header">
-        <div style="display:flex; align-items:center">
+        <div class="header-left">
             <div class="header-logo"><i class="fas fa-heartbeat"></i></div>
             <div class="header-text">
                 <h1>Secretaria Municipal de Saúde</h1>
-                <div id="headerSubtitle" style="font-size:22px; opacity:0.9">PMPF - UBS Adirbal Corralo</div>
+                <div class="header-subtitle" id="headerSubtitle">PMPF - UBS Adirbal Corralo</div>
             </div>
         </div>
         <div class="datetime-container">
-            <div id="currentDate" style="font-size:14px"></div>
-            <div id="currentTime" class="header-time"></div>
+            <div class="header-date" id="currentDate"></div>
+            <div class="header-time" id="currentTime"></div>
         </div>
     </header>
 
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
-                <button class="btn-som-discreto" onclick="toggleSom()">
-                    <i class="fas fa-volume-mute" id="iconSom"></i>
+                <button id="btnSom" class="btn-som" onclick="ativarSom()">
+                    <i class="fas fa-volume-up"></i> ATIVAR SOM
                 </button>
                 <div class="video-container" id="videoContainer"></div>
             </section>
@@ -98,25 +124,30 @@
         <div class="right-column">
             <h2 class="faltometro-title">FALTÔMETRO</h2>
             <div class="total-faltas">
-                <div style="font-size:20px; font-weight:bold">TOTAL DE FALTAS</div>
+                <div class="total-label">TOTAL DE FALTAS</div>
                 <div class="total-value" id="totalFaltas">0</div>
             </div>
-            <div id="especialidadesList"></div>
+            <div class="especialidades-container" id="especialidadesList"></div>
         </div>
     </main>
 
     <div id="loginScreen">
-        <div class="login-box">
-            <h2 style="color:white; margin-bottom:20px">Admin</h2>
-            <input type="password" id="pass" class="admin-input" placeholder="Senha">
-            <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
+        <div class="login-container">
+            <h1 style="color:white; margin-bottom:20px;">Acesso Administrativo</h1>
+            <input type="text" id="username" class="login-input" placeholder="Usuário" value="admin">
+            <input type="password" id="password" class="login-input" placeholder="Senha" value="admin">
+            <button class="login-btn" onclick="login()">Entrar</button>
+            <div id="loginError" style="color: #ff5252; margin-top: 10px; display: none;">Erro no login</div>
         </div>
     </div>
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h2>Painel de Gestão - TV</h2>
-            <button class="admin-btn btn-danger" onclick="location.reload()">Sair e Salvar</button>
+            <h1>Painel Administrativo</h1>
+            <div>
+                <button class="admin-btn admin-btn-secondary" onclick="voltarParaPublico()">Ver Público</button>
+                <button class="admin-btn admin-btn-danger" onclick="logout()">Sair</button>
+            </div>
         </div>
         <div class="admin-container">
             <div class="admin-sidebar">
@@ -130,107 +161,174 @@
     </div>
 
     <script>
-        let dados = {
-            unidade: "UBS Adirbal Corralo",
-            videos: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
-            avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 NOVEMBRO AZUL"],
-            especialidades: [{nome: "Clínico Geral", faltas: 42}, {nome: "Pediatria", faltas: 10}]
+        // Dados Iniciais
+        let dadosSistema = {
+            unidade: {
+                nome: "UBS Adirbal Corralo",
+                videoUrls: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+                especialidades: [
+                    { nome: "Clínico Geral", faltas: 42 },
+                    { nome: "Pediatria", faltas: 35 }
+                ]
+            },
+            avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 NOVEMBRO AZUL"]
         };
 
-        let videoMudo = true;
-        let videoIdx = 0;
-
-        function extrairID(url) {
-            const m = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/);
-            return (m && m[7].length === 11) ? m[7] : null;
+        // Funções de Utilidade
+        function extrairVideoId(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length === 11) ? match[7] : null;
         }
 
-        function toggleSom() {
-            videoMudo = !videoMudo;
-            document.getElementById('iconSom').className = videoMudo ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            loadVideo();
+        // Playlist de Vídeo Otimizada
+        let currentVideoIndex = 0;
+        let videoInterval;
+        let videoMudo = true; // ADICIONADO: Variável de estado do som
+
+        // ADICIONADO: Função para ativar o som clicando no botão
+        function ativarSom() {
+            videoMudo = false;
+            carregarVideoAtual();
+            document.getElementById('btnSom').style.display = 'none';
         }
 
-        function loadVideo() {
-            const id = extrairID(dados.videos[videoIdx]);
-            document.getElementById('videoContainer').innerHTML = 
-                `<iframe class="video-iframe" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=${videoMudo?1:0}&controls=0&loop=1&playlist=${id}" allow="autoplay" frameborder="0"></iframe>`;
-        }
+        function carregarVideoAtual() {
+            const container = document.getElementById('videoContainer');
+            const urls = dadosSistema.unidade.videoUrls || [];
+            if (urls.length === 0) return mostrarPlaceholderVideo();
 
-        function updateDisplay() {
-            document.getElementById('headerSubtitle').textContent = `PMPF - ${dados.unidade}`;
-            document.getElementById('especialidadesList').innerHTML = dados.especialidades.map(e => 
-                `<div class="especialidade-item"><span>${e.nome}</span><strong style="color:#ff5252; font-size:26px">${e.faltas}</strong></div>`).join('');
-            document.getElementById('totalFaltas').textContent = dados.especialidades.reduce((a,b) => a + b.faltas, 0);
-        }
-
-        function startCarrossel() {
-            const container = document.getElementById('tickerContainer');
-            container.innerHTML = dados.avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
-            const items = container.querySelectorAll('.ticker-item');
-            let idx = 0;
-            const rotate = () => {
-                items.forEach(i => i.classList.remove('active'));
-                if(items[idx]) items[idx].classList.add('active');
-                idx = (idx + 1) % items.length;
-                setTimeout(rotate, 20000);
-            };
-            rotate();
-        }
-
-        // Funções do Painel Admin (RESTAURADAS)
-        function login() { if(document.getElementById('pass').value === 'admin') { document.getElementById('adminPanel').style.display='block'; mostrarSecao('unidade'); } }
-
-        function mostrarSecao(s) {
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            const content = document.getElementById('adminContent');
-            
-            if(s === 'unidade') {
-                content.innerHTML = `<h3>Nome da Unidade</h3><input id="u-nome" class="admin-input" value="${dados.unidade}"><button class="admin-btn" onclick="dados.unidade=document.getElementById('u-nome').value;salvar()">Salvar</button>`;
-            } else if(s === 'faltometro') {
-                content.innerHTML = `<h3>Faltômetro</h3><div id="f-list"></div><button class="admin-btn" onclick="addEsp()">+ Especialidade</button>`;
-                renderFaltas();
-            } else if(s === 'avisos') {
-                content.innerHTML = `<h3>Avisos</h3><div id="a-list"></div><button class="admin-btn" onclick="addAviso()">+ Aviso</button>`;
-                renderAvisos();
-            } else if(s === 'video') {
-                content.innerHTML = `<h3>Vídeos (Link YouTube)</h3><textarea id="v-list" class="admin-input" style="height:100px">${dados.videos.join('\n')}</textarea><button class="admin-btn" onclick="dados.videos=document.getElementById('v-list').value.split('\\n').filter(l=>l.trim());salvar()">Salvar</button>`;
+            const videoId = extrairVideoId(urls[currentVideoIndex]);
+            if (videoId) {
+                // MODIFICADO: mute depende da variável videoMudo
+                container.innerHTML = `
+                    <iframe class="video-iframe" 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        frameborder="0"></iframe>`;
+            } else {
+                mostrarPlaceholderVideo();
             }
         }
 
-        function renderFaltas() {
-            document.getElementById('f-list').innerHTML = dados.especialidades.map((e,i) => `
-                <div style="display:flex; gap:10px; margin-bottom:10px">
-                    <input class="admin-input" value="${e.nome}" onchange="dados.especialidades[${i}].nome=this.value;salvar()">
-                    <input type="number" class="admin-input" style="width:100px" value="${e.faltas}" onchange="dados.especialidades[${i}].faltas=parseInt(this.value);salvar()">
-                    <button class="admin-btn btn-danger" onclick="dados.especialidades.splice(${i},1);salvar();mostrarSecao('faltometro')">X</button>
+        function iniciarVideoPlaylist() {
+            if (videoInterval) clearInterval(videoInterval);
+            carregarVideoAtual();
+            videoInterval = setInterval(() => {
+                const urls = dadosSistema.unidade.videoUrls || [];
+                if (urls.length > 0) {
+                    currentVideoIndex = (currentVideoIndex + 1) % urls.length;
+                    carregarVideoAtual();
+                }
+            }, 30000);
+        }
+
+        function mostrarPlaceholderVideo() {
+            document.getElementById('videoContainer').innerHTML = `<div class="video-placeholder"><i class="fas fa-video-slash"></i><p>Sem vídeos configurados</p></div>`;
+        }
+
+        // Relógio e Interface
+        function atualizarRelogio() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function atualizarFaltometro() {
+            const container = document.getElementById('especialidadesList');
+            const lista = dadosSistema.unidade.especialidades;
+            container.innerHTML = lista.map(esp => `
+                <div class="especialidade-item">
+                    <div class="especialidade-nome">${esp.nome}</div>
+                    <div class="especialidade-faltas">${esp.faltas}</div>
+                </div>`).join('');
+            document.getElementById('totalFaltas').textContent = lista.reduce((s, e) => s + e.faltas, 0);
+        }
+
+        // Avisos
+        let currentAviso = 0;
+        function iniciarCarrosselAvisos() {
+            const container = document.getElementById('tickerContainer');
+            container.innerHTML = dadosSistema.avisos.map(aviso => `<div class="ticker-item">${aviso}</div>`).join('');
+            const items = container.querySelectorAll('.ticker-item');
+            if (items.length === 0) return;
+            
+            function showNext() {
+                items.forEach(i => i.classList.remove('active'));
+                items[currentAviso].classList.add('active');
+                currentAviso = (currentAviso + 1) % items.length;
+                setTimeout(showNext, 5000);
+            }
+            showNext();
+        }
+
+        // Admin e Persistência
+        function salvarDados() { localStorage.setItem('sistemaSaude', JSON.stringify(dadosSistema)); }
+        function carregarDados() {
+            const saved = localStorage.getItem('sistemaSaude');
+            if (saved) dadosSistema = JSON.parse(saved);
+            document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
+        }
+
+        // Funções do Painel Admin
+        function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
+        function login() {
+            if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                mostrarSecao('unidade');
+            }
+        }
+        function logout() { location.reload(); }
+        function voltarParaPublico() { document.getElementById('adminPanel').style.display = 'none'; }
+
+        function mostrarSecao(secao) {
+            const content = document.getElementById('adminContent');
+            if (secao === 'unidade') {
+                content.innerHTML = `<div class="admin-section"><h2>Unidade</h2><input id="unome" class="admin-input" value="${dadosSistema.unidade.nome}"><button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('unome').value;salvarDados();alert('Salvo')">Salvar</button></div>`;
+            } else if (secao === 'video') {
+                content.innerHTML = `<div class="admin-section"><h2>Vídeos (1 por linha)</h2><textarea id="vurls" class="admin-input" style="height:150px">${dadosSistema.unidade.videoUrls.join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.unidade.videoUrls=document.getElementById('vurls').value.split('\\n').filter(l=>l.trim());salvarDados();iniciarVideoPlaylist();alert('Salvo')">Atualizar Vídeos</button></div>`;
+            } else if (secao === 'faltometro') {
+                content.innerHTML = `<div class="admin-section"><h2>Faltômetro</h2><div id="f-list"></div><button class="admin-btn" onclick="adicionarEsp()">Adicionar</button></div>`;
+                renderAdminFaltometro();
+            } else if (secao === 'avisos') {
+                content.innerHTML = `<div class="admin-section"><h2>Avisos</h2><div id="a-list"></div><button class="admin-btn" onclick="adicionarAviso()">Adicionar</button></div>`;
+                renderAdminAvisos();
+            }
+        }
+
+        function renderAdminFaltometro() {
+            const div = document.getElementById('f-list');
+            div.innerHTML = dadosSistema.unidade.especialidades.map((e, i) => `
+                <div style="display:flex; gap:10px; margin-bottom:5px">
+                    <input class="admin-input" value="${e.nome}" onchange="dadosSistema.unidade.especialidades[${i}].nome=this.value;salvarDados()">
+                    <input type="number" class="admin-input" style="width:80px" value="${e.faltas}" onchange="dadosSistema.unidade.especialidades[${i}].faltas=parseInt(this.value);salvarDados()">
+                    <button class="admin-btn admin-btn-danger" onclick="dadosSistema.unidade.especialidades.splice(${i},1);salvarDados();mostrarSecao('faltometro')">X</button>
                 </div>`).join('');
         }
 
-        function renderAvisos() {
-            document.getElementById('a-list').innerHTML = dados.avisos.map((a,i) => `
-                <div style="display:flex; gap:10px; margin-bottom:10px">
-                    <input class="admin-input" value="${a}" onchange="dados.avisos[${i}].value;salvar()">
-                    <button class="admin-btn btn-danger" onclick="dados.avisos.splice(${i},1);salvar();mostrarSecao('avisos')">X</button>
+        function adicionarEsp() { dadosSistema.unidade.especialidades.push({nome:'Nova', faltas:0}); salvarDados(); mostrarSecao('faltometro'); }
+
+        function renderAdminAvisos() {
+            const div = document.getElementById('a-list');
+            div.innerHTML = dadosSistema.avisos.map((a, i) => `
+                <div style="display:flex; gap:10px; margin-bottom:5px">
+                    <input class="admin-input" value="${a}" onchange="dadosSistema.avisos[${i}]=this.value;salvarDados()">
+                    <button class="admin-btn admin-btn-danger" onclick="dadosSistema.avisos.splice(${i},1);salvarDados();mostrarSecao('avisos')">X</button>
                 </div>`).join('');
         }
 
-        function addEsp() { dados.especialidades.push({nome: "Nova", faltas: 0}); salvar(); mostrarSecao('faltometro'); }
-        function addAviso() { dados.avisos.push("Novo aviso"); salvar(); mostrarSecao('avisos'); }
-        function salvar() { localStorage.setItem('cfg_saude', JSON.stringify(dados)); updateDisplay(); }
+        function adicionarAviso() { dadosSistema.avisos.push('Novo aviso'); salvarDados(); mostrarSecao('avisos'); }
 
-        window.onload = () => {
-            const s = localStorage.getItem('cfg_saude');
-            if(s) dados = JSON.parse(s);
-            updateDisplay();
-            loadVideo();
-            startCarrossel();
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-                document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
-            }, 1000);
-        };
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+            atualizarRelogio();
+            setInterval(atualizarRelogio, 1000);
+            iniciarVideoPlaylist();
+            atualizarFaltometro();
+            iniciarCarrosselAvisos();
+        });
     </script>
 </body>
 </html>
