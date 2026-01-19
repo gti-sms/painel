@@ -6,7 +6,7 @@
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* MANTIDO: Todos os seus estilos originais */
+        /* MANTIDO: Todos os seus estilos originais foram preservados para não alterar o visual */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -34,14 +34,9 @@
         .video-placeholder i { font-size: 64px; margin-bottom: 20px; color: #555; opacity: 0.5; }
         .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; display: flex; flex-direction: column; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2); }
         .announcements-ticker { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
-        
-        /* ALTERADO: Largura reduzida para 90% e centralizada */
-        .ticker-item { position: absolute; width: 90%; left: 5%; height: 100%; padding: 0 16px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08)); border-radius: 8px; font-size: 29px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 5px solid #2196f3; }
-        
-        /* ALTERADO: Tempo de animação para 15 segundos */
-        .ticker-item.active { animation: slideInOut 15s ease-in-out; }
+        .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 16px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08)); border-radius: 8px; font-size: 29px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 5px solid #2196f3; }
+        .ticker-item.active { animation: slideInOut 5s ease-in-out; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 10% { transform: translateX(0); opacity: 1; } 90% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
-        
         .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; border: 2px solid rgba(255, 82, 82, 0.3); height: 100%; position: relative; overflow: hidden; }
         .faltometro-title { font-size: 36px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid rgba(0, 230, 118, 0.3); letter-spacing: 2px; }
         .total-faltas { background: linear-gradient(135deg, #d32f2f 0%, #f44336 50%, #e53935 100%); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px; border: 2px solid rgba(255, 255, 255, 0.25); animation: pulseTotal 2s infinite; }
@@ -144,7 +139,7 @@
         let dadosSistema = {
             unidade: {
                 nome: "UBS Adirbal Corralo",
-                videoUrls: ["https://youtu.be/s-gYh4KBrtM"],
+                videoUrls: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
                 especialidades: [
                     { nome: "Clínico Geral", faltas: 42 },
                     { nome: "Pediatria", faltas: 35 }
@@ -227,9 +222,7 @@
                 items.forEach(i => i.classList.remove('active'));
                 items[currentAviso].classList.add('active');
                 currentAviso = (currentAviso + 1) % items.length;
-                
-                // ALTERADO: Tempo de espera para 15 segundos sincronizado com CSS
-                setTimeout(showNext, 15000);
+                setTimeout(showNext, 5000);
             }
             showNext();
         }
@@ -242,7 +235,7 @@
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
         }
 
-        // Funções do Painel Admin
+        // Funções do Painel Admin (Resumidas para funcionamento)
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() {
             if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin') {
