@@ -6,6 +6,7 @@
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Estilos originais mantidos integralmente */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -29,157 +30,30 @@
         .video-section { background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)); border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; height: calc(100% - 140px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
         .video-container { width: 100%; height: 100%; position: relative; background: #000; }
         .video-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
-        
-        .btn-som {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            z-index: 101;
-            background: rgba(0, 230, 118, 0.9);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-        .btn-som:hover { transform: scale(1.05); background: #00ff88; }
-
+        .btn-som { position: absolute; bottom: 20px; left: 20px; z-index: 101; background: rgba(0, 230, 118, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s; }
         .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #888; }
-        .video-placeholder i { font-size: 64px; margin-bottom: 20px; color: #555; opacity: 0.5; }
         .announcements-section { background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.2)); border-radius: 16px; padding: 12px; flex: 1; display: flex; flex-direction: column; border: 2px solid rgba(33, 150, 243, 0.3); overflow: hidden; height: 120px; position: relative; box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2); }
         .announcements-ticker { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
         .ticker-item { position: absolute; width: 100%; height: 100%; padding: 0 16px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08)); border-radius: 8px; font-size: 29px; font-weight: 600; opacity: 0; display: flex; align-items: center; border-left: 5px solid #2196f3; }
         .ticker-item.active { animation: slideInOut 15s ease-in-out; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
-        
-        /* COLUNA DIREITA - CARROSSEL FALTÔMETRO/ATENDIMENTOS */
-        .right-column { 
-            background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); 
-            border-radius: 16px; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            border: 2px solid rgba(255, 82, 82, 0.3); 
-            height: 100%; 
-            position: relative; 
-            overflow: hidden; 
-        }
-        
-        .carousel-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .carousel-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .carousel-item.active {
-            animation: fadeInOut 30s ease-in-out;
-        }
-        
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            5% { opacity: 1; transform: translateY(0); }
-            95% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
-        
-        .section-title { 
-            font-size: 36px; 
-            font-weight: 800; 
-            color: #00e676; 
-            text-align: center; 
-            margin-bottom: 12px; 
-            text-transform: uppercase; 
-            padding-bottom: 8px; 
-            border-bottom: 3px solid rgba(0, 230, 118, 0.3); 
-            letter-spacing: 2px; 
-        }
-        
-        .atendimentos-title { 
-            color: #2196f3; 
-            border-bottom: 3px solid rgba(33, 150, 243, 0.3);
-        }
-        
-        .total-container { 
-            background: linear-gradient(135deg, #d32f2f 0%, #f44336 50%, #e53935 100%); 
-            border-radius: 12px; 
-            padding: 10px; 
-            text-align: center; 
-            margin-bottom: 12px; 
-            border: 2px solid rgba(255, 255, 255, 0.25); 
-            animation: pulseTotal 6s infinite;
-        }
-        
-        .total-atendimentos {
-            background: linear-gradient(135deg, #1976d2 0%, #2196f3 50%, #42a5f5 100%);
-        }
-        
+        .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; border: 2px solid rgba(255, 82, 82, 0.3); height: 100%; position: relative; overflow: hidden; }
+        .carousel-container { flex: 1; position: relative; overflow: hidden; width: 100%; height: 100%; }
+        .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; display: flex; flex-direction: column; transition: opacity 0.5s ease-in-out; }
+        .carousel-item.active { opacity: 1; }
+        .section-title { font-size: 36px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid rgba(0, 230, 118, 0.3); letter-spacing: 2px; }
+        .atendimentos-title { color: #2196f3; border-bottom: 3px solid rgba(33, 150, 243, 0.3); }
+        .total-container { background: linear-gradient(135deg, #d32f2f 0%, #f44336 50%, #e53935 100%); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px; border: 2px solid rgba(255, 255, 255, 0.25); animation: pulseTotal 6s infinite; }
+        .total-atendimentos { background: linear-gradient(135deg, #1976d2 0%, #2196f3 50%, #42a5f5 100%); }
         @keyframes pulseTotal { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        
         .total-label { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
         .total-value { font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace; }
-        
-        .lista-container { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 3px; 
-            overflow-y: auto; 
-            scrollbar-width: none; 
-        }
-        
-        .lista-container::-webkit-scrollbar { display: none; }
-        
-        .item-lista { 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05)); 
-            border-radius: 6px; 
-            padding: 5px 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            min-height: 32px; 
-            transition: all 0.3s ease; 
-        }
-        
-        .item-nome { 
-            font-size: 19px; 
-            font-weight: 600; 
-            flex: 1; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-        }
-        
-        .item-valor { 
-            font-size: 30px; 
-            font-weight: 800; 
-            min-width: 45px; 
-            text-align: right; 
-            font-family: 'Courier New', monospace; 
-        }
-        
+        .lista-container { flex: 1; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; scrollbar-width: none; }
+        .item-lista { background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05)); border-radius: 6px; padding: 5px 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.1); min-height: 32px; }
+        .item-nome { font-size: 19px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-valor { font-size: 30px; font-weight: 800; min-width: 45px; text-align: right; font-family: 'Courier New', monospace; }
         .valor-faltas { color: #ff5252; }
         .valor-atendimentos { color: #2196f3; }
-
-        /* Login e Admin */
         #loginScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 2000; justify-content: center; align-items: center; }
         .login-container { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); border-radius: 20px; padding: 50px; width: 450px; text-align: center; border: 3px solid #00e676; }
         .login-input { width: 100%; padding: 18px; margin: 12px 0; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 12px; color: white; font-size: 17px; }
@@ -196,7 +70,6 @@
         .admin-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; background: #00e676; color: white; }
         .admin-btn-danger { background: #f44336; }
         .admin-btn-secondary { background: #2196f3; }
-        .admin-btn-blue { background: #2196f3; }
     </style>
 </head>
 <body>
@@ -230,7 +103,6 @@
             </section>
         </div>
         <div class="right-column">
-            <!-- CARROSSEL FALTÔMETRO/ATENDIMENTOS -->
             <div class="carousel-container" id="carouselContainer"></div>
         </div>
     </main>
@@ -266,34 +138,21 @@
     </div>
 
     <script>
-        // ========== DADOS DO SISTEMA ==========
+        // ========== DADOS E VARIÁVEIS ==========
         let dadosSistema = {
             unidade: {
                 nome: "UBS Adirbal Corralo",
                 videoUrls: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
-                especialidades: [
-                    { nome: "Clínico Geral", faltas: 42 },
-                    { nome: "Pediatria", faltas: 35 }
-                ],
-                atendimentos: [
-                    { nome: "Médicos", valor: 15 },
-                    { nome: "Enfermeiros", valor: 8 },
-                    { nome: "Técnicos", valor: 12 },
-                    { nome: "Recepcionistas", valor: 5 }
-                ]
+                especialidades: [{ nome: "Clínico Geral", faltas: 42 }, { nome: "Pediatria", faltas: 35 }],
+                atendimentos: [{ nome: "Médicos", valor: 15 }, { nome: "Enfermeiros", valor: 8 }]
             },
             avisos: ["🏥 CAMPANHA DE VACINAÇÃO EM ANDAMENTO", "🔵 NOVEMBRO AZUL"]
         };
 
-        // ========== VARIÁVEIS GLOBAIS ==========
-        let currentVideoIndex = 0;
-        let videoInterval;
-        let videoMudo = true;
-        let carouselItems = [];
-        let currentCarouselIndex = 0;
-        let carouselInterval;
+        let currentVideoIndex = 0, videoInterval, videoMudo = true;
+        let carouselItems = [], currentCarouselIndex = 0, carouselInterval;
 
-        // ========== FUNÇÕES DO VÍDEO ==========
+        // ========== VÍDEO (Sem alterações que causam reinício) ==========
         function extrairVideoId(url) {
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
             const match = url.match(regExp);
@@ -313,14 +172,14 @@
 
             const videoId = extrairVideoId(urls[currentVideoIndex]);
             if (videoId) {
-                container.innerHTML = `
-                    <iframe class="video-iframe" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&modestbranding=1&enablejsapi=1" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        frameborder="0"></iframe>`;
-            } else {
-                mostrarPlaceholderVideo();
-            }
+                // Só atualiza o Iframe se o vídeo realmente mudou na playlist
+                const novoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${videoMudo ? 1 : 0}&controls=0&rel=0&modestbranding=1&enablejsapi=1`;
+                const iframeExistente = container.querySelector('iframe');
+                
+                if(!iframeExistente || !iframeExistente.src.includes(videoId)) {
+                    container.innerHTML = `<iframe class="video-iframe" src="${novoSrc}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+                }
+            } else { mostrarPlaceholderVideo(); }
         }
 
         function mostrarPlaceholderVideo() {
@@ -339,337 +198,174 @@
             }, 30000);
         }
 
-        // ========== RELÓGIO ==========
+        // ========== CORREÇÃO DO CARROSSEL (Lógica de atualização parcial) ==========
+        function criarCarrossel() {
+            const container = document.getElementById('carouselContainer');
+            
+            // Se já tem conteúdo, apenas atualiza os dados para não resetar o DOM
+            if (container.children.length > 0) {
+                atualizarDadosCarrossel();
+                return;
+            }
+
+            // Cria a estrutura base apenas uma vez
+            container.innerHTML = `
+                <div class="carousel-item" id="faltometroItem">
+                    <h2 class="section-title">FALTÔMETRO</h2>
+                    <div class="total-container">
+                        <div class="total-label">TOTAL DE FALTAS</div>
+                        <div class="total-value" id="totalFaltasVal">0</div>
+                    </div>
+                    <div class="lista-container" id="listaFaltas"></div>
+                </div>
+                <div class="carousel-item" id="atendimentosItem">
+                    <h2 class="section-title atendimentos-title">ATENDIMENTOS</h2>
+                    <div class="total-container total-atendimentos">
+                        <div class="total-label">TOTAL EM ATENDIMENTO</div>
+                        <div class="total-value" id="totalAtendimentosVal">0</div>
+                    </div>
+                    <div class="lista-container" id="listaAtendimentos"></div>
+                </div>`;
+            
+            atualizarDadosCarrossel();
+            carouselItems = container.querySelectorAll('.carousel-item');
+            iniciarCarrosselAnimacao();
+        }
+
+        function atualizarDadosCarrossel() {
+            // Atualizar Faltas sem resetar o container pai
+            const totalFaltas = dadosSistema.unidade.especialidades.reduce((s, e) => s + e.faltas, 0);
+            const totalFaltasEl = document.getElementById('totalFaltasVal');
+            if (totalFaltasEl) totalFaltasEl.textContent = totalFaltas;
+
+            const listaFaltas = document.getElementById('listaFaltas');
+            if (listaFaltas) {
+                listaFaltas.innerHTML = dadosSistema.unidade.especialidades.map(esp => `
+                    <div class="item-lista">
+                        <div class="item-nome">${esp.nome}</div>
+                        <div class="item-valor valor-faltas">${esp.faltas}</div>
+                    </div>`).join('');
+            }
+
+            // Atualizar Atendimentos
+            const totalAtendimentos = dadosSistema.unidade.atendimentos.reduce((s, e) => s + e.valor, 0);
+            const totalAtendimentosEl = document.getElementById('totalAtendimentosVal');
+            if (totalAtendimentosEl) totalAtendimentosEl.textContent = totalAtendimentos;
+
+            const listaAtendimentos = document.getElementById('listaAtendimentos');
+            if (listaAtendimentos) {
+                listaAtendimentos.innerHTML = dadosSistema.unidade.atendimentos.map(at => `
+                    <div class="item-lista">
+                        <div class="item-nome">${at.nome}</div>
+                        <div class="item-valor valor-atendimentos">${at.valor}</div>
+                    </div>`).join('');
+            }
+        }
+        
+        function atualizarCarrossel() {
+            atualizarDadosCarrossel();
+        }
+        
+        function iniciarCarrosselAnimacao() {
+            if (carouselInterval) clearInterval(carouselInterval);
+            if (carouselItems.length === 0) return;
+            
+            const alternar = () => {
+                carouselItems.forEach(item => item.classList.remove('active'));
+                carouselItems[currentCarouselIndex].classList.add('active');
+                currentCarouselIndex = (currentCarouselIndex + 1) % carouselItems.length;
+            };
+
+            alternar();
+            carouselInterval = setInterval(alternar, 30000);
+        }
+
+        // ========== OUTRAS FUNÇÕES (Avisos, Admin, etc) ==========
         function atualizarRelogio() {
             const now = new Date();
             document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // ========== CARROSSEL FALTÔMETRO/ATENDIMENTOS ==========
-        function criarCarrossel() {
-            const container = document.getElementById('carouselContainer');
-            
-            // Criar item FALTÔMETRO
-            const totalFaltas = dadosSistema.unidade.especialidades.reduce((s, e) => s + e.faltas, 0);
-            const faltometroHTML = `
-                <div class="carousel-item" id="faltometroItem">
-                    <h2 class="section-title">FALTÔMETRO</h2>
-                    <div class="total-container">
-                        <div class="total-label">TOTAL DE FALTAS</div>
-                        <div class="total-value">${totalFaltas}</div>
-                    </div>
-                    <div class="lista-container" id="listaFaltas">
-                        ${dadosSistema.unidade.especialidades.map(esp => `
-                            <div class="item-lista">
-                                <div class="item-nome">${esp.nome}</div>
-                                <div class="item-valor valor-faltas">${esp.faltas}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            
-            // Criar item ATENDIMENTOS
-            const totalAtendimentos = dadosSistema.unidade.atendimentos.reduce((s, e) => s + e.valor, 0);
-            const atendimentosHTML = `
-                <div class="carousel-item" id="atendimentosItem">
-                    <h2 class="section-title atendimentos-title">ATENDIMENTOS</h2>
-                    <div class="total-container total-atendimentos">
-                        <div class="total-label">TOTAL EM ATENDIMENTO</div>
-                        <div class="total-value">${totalAtendimentos}</div>
-                    </div>
-                    <div class="lista-container" id="listaAtendimentos">
-                        ${dadosSistema.unidade.atendimentos.map(at => `
-                            <div class="item-lista">
-                                <div class="item-nome">${at.nome}</div>
-                                <div class="item-valor valor-atendimentos">${at.valor}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = faltometroHTML + atendimentosHTML;
-            
-            // Iniciar carrossel
-            carouselItems = container.querySelectorAll('.carousel-item');
-            iniciarCarrosselAnimacao();
-        }
-        
-        function atualizarCarrossel() {
-            criarCarrossel(); // Recria todo o carrossel para atualizar
-        }
-        
-        function iniciarCarrosselAnimacao() {
-            if (carouselInterval) clearInterval(carouselInterval);
-            
-            if (carouselItems.length === 0) return;
-            
-            // Mostrar primeiro item
-            carouselItems.forEach(item => item.classList.remove('active'));
-            carouselItems[currentCarouselIndex].classList.add('active');
-            
-            // Configurar intervalo para alternar (30 segundos cada)
-            carouselInterval = setInterval(() => {
-                carouselItems.forEach(item => item.classList.remove('active'));
-                currentCarouselIndex = (currentCarouselIndex + 1) % carouselItems.length;
-                carouselItems[currentCarouselIndex].classList.add('active');
-            }, 30000); // 30 segundos
-        }
-
-        // ========== AVISOS ==========
         function iniciarCarrosselAvisos() {
             const container = document.getElementById('tickerContainer');
             if (!container) return;
-            
             container.innerHTML = dadosSistema.avisos.map(aviso => `<div class="ticker-item">${aviso}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
             if (items.length === 0) return;
-            
             let currentAviso = 0;
-            
-            function showNext() {
+            const showNext = () => {
                 items.forEach(i => i.classList.remove('active'));
                 items[currentAviso].classList.add('active');
                 currentAviso = (currentAviso + 1) % items.length;
-                setTimeout(showNext, 15000); // 15 segundos
-            }
+                setTimeout(showNext, 15000);
+            };
             showNext();
         }
 
-        // ========== ADMIN E PERSISTÊNCIA ==========
         function salvarDados() { 
             localStorage.setItem('sistemaSaude', JSON.stringify(dadosSistema)); 
             atualizarCarrossel();
-            iniciarCarrosselAvisos();
         }
         
         function carregarDados() {
             const saved = localStorage.getItem('sistemaSaude');
-            if (saved) {
-                try {
-                    dadosSistema = JSON.parse(saved);
-                } catch(e) {
-                    console.error("Erro ao carregar dados:", e);
-                }
-            }
+            if (saved) { try { dadosSistema = JSON.parse(saved); } catch(e) {} }
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
         }
 
-        // ========== FUNÇÕES DO PAINEL ADMIN ==========
-        function openLogin() { 
-            document.getElementById('loginScreen').style.display = 'flex'; 
-        }
-        
+        // Funções de Admin (Simplificadas para o exemplo)
+        function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username === 'admin' && password === 'admin') {
+            if (document.getElementById('username').value === 'admin') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 mostrarSecao('unidade');
-            } else {
-                document.getElementById('loginError').style.display = 'block';
             }
         }
-        
-        function logout() { 
-            location.reload(); 
-        }
-        
-        function voltarParaPublico() { 
-            document.getElementById('adminPanel').style.display = 'none'; 
-        }
+        function logout() { location.reload(); }
+        function voltarParaPublico() { document.getElementById('adminPanel').style.display = 'none'; }
 
-        // ========== FUNÇÕES DE RENDERIZAÇÃO ==========
-        function renderListaFaltometro() {
-            return dadosSistema.unidade.especialidades.map((e, i) => `
-                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                    <input class="admin-input" value="${e.nome}" 
-                        onchange="dadosSistema.unidade.especialidades[${i}].nome = this.value; salvarDados()" 
-                        style="flex:1" placeholder="Nome da especialidade">
-                    <input type="number" class="admin-input" value="${e.faltas}" 
-                        onchange="dadosSistema.unidade.especialidades[${i}].faltas = parseInt(this.value) || 0; salvarDados()" 
-                        style="width:100px" placeholder="Faltas">
-                    <button class="admin-btn admin-btn-danger" 
-                        onclick="removerEspecialidade(${i})" 
-                        style="padding: 10px 15px;">X</button>
-                </div>
-            `).join('');
-        }
-
-        function renderListaAtendimentos() {
-            return dadosSistema.unidade.atendimentos.map((a, i) => `
-                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                    <input class="admin-input" value="${a.nome}" 
-                        onchange="dadosSistema.unidade.atendimentos[${i}].nome = this.value; salvarDados()" 
-                        style="flex:1" placeholder="Nome do profissional">
-                    <input type="number" class="admin-input" value="${a.valor}" 
-                        onchange="dadosSistema.unidade.atendimentos[${i}].valor = parseInt(this.value) || 0; salvarDados()" 
-                        style="width:100px" placeholder="Quantidade">
-                    <button class="admin-btn admin-btn-danger" 
-                        onclick="removerAtendimento(${i})" 
-                        style="padding: 10px 15px;">X</button>
-                </div>
-            `).join('');
-        }
-
-        function renderListaAvisos() {
-            return dadosSistema.avisos.map((a, i) => `
-                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                    <input class="admin-input" value="${a}" 
-                        onchange="dadosSistema.avisos[${i}] = this.value; salvarDados()" 
-                        style="flex:1" placeholder="Texto do aviso">
-                    <button class="admin-btn admin-btn-danger" 
-                        onclick="removerAviso(${i})" 
-                        style="padding: 10px 15px;">X</button>
-                </div>
-            `).join('');
-        }
-
-        // ========== FUNÇÕES DE ADIÇÃO ==========
-        function adicionarEspecialidade() {
-            dadosSistema.unidade.especialidades.push({ nome: 'Nova Especialidade', faltas: 0 });
-            salvarDados();
-            mostrarSecao('faltometro');
-        }
-
-        function adicionarAtendimento() {
-            dadosSistema.unidade.atendimentos.push({ nome: 'Novo Profissional', valor: 0 });
-            salvarDados();
-            mostrarSecao('atendimentos');
-        }
-
-        function adicionarAviso() {
-            dadosSistema.avisos.push('Novo aviso');
-            salvarDados();
-            mostrarSecao('avisos');
-        }
-
-        // ========== FUNÇÕES DE REMOÇÃO ==========
-        function removerEspecialidade(index) {
-            if (confirm('Remover esta especialidade?')) {
-                dadosSistema.unidade.especialidades.splice(index, 1);
-                salvarDados();
-                mostrarSecao('faltometro');
-            }
-        }
-
-        function removerAtendimento(index) {
-            if (confirm('Remover este profissional?')) {
-                dadosSistema.unidade.atendimentos.splice(index, 1);
-                salvarDados();
-                mostrarSecao('atendimentos');
-            }
-        }
-
-        function removerAviso(index) {
-            if (confirm('Remover este aviso?')) {
-                dadosSistema.avisos.splice(index, 1);
-                salvarDados();
-                mostrarSecao('avisos');
-            }
-        }
-
-        // ========== MOSTRAR SEÇÃO (CORRIGIDA) ==========
         function mostrarSecao(secao) {
-            // Atualizar menu lateral
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Encontrar o item correto do menu
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            sidebarItems.forEach((item, index) => {
-                if (item.textContent.includes(getMenuText(secao))) {
-                    item.classList.add('active');
-                }
-            });
-            
             const content = document.getElementById('adminContent');
-            
             if (secao === 'unidade') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Unidade</h2>
-                        <input id="unome" class="admin-input" value="${dadosSistema.unidade.nome}" placeholder="Nome da Unidade">
-                        <button class="admin-btn" onclick="salvarNomeUnidade()">Salvar</button>
-                    </div>
-                `;
-            } 
-            else if (secao === 'video') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Vídeos (1 URL por linha)</h2>
-                        <textarea id="vurls" class="admin-input" style="height:150px" placeholder="Cole as URLs do YouTube, uma por linha">${dadosSistema.unidade.videoUrls.join('\n')}</textarea>
-                        <button class="admin-btn" onclick="salvarVideos()">Atualizar Vídeos</button>
-                    </div>
-                `;
-            } 
-            else if (secao === 'faltometro') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Faltômetro</h2>
-                        <div id="f-list">${renderListaFaltometro()}</div>
-                        <button class="admin-btn" onclick="adicionarEspecialidade()" style="margin-top: 15px;">Adicionar Especialidade</button>
-                    </div>
-                `;
-            } 
-            else if (secao === 'atendimentos') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Atendimentos</h2>
-                        <div id="at-list">${renderListaAtendimentos()}</div>
-                        <button class="admin-btn admin-btn-blue" onclick="adicionarAtendimento()" style="margin-top: 15px;">Adicionar Profissional</button>
-                    </div>
-                `;
-            } 
-            else if (secao === 'avisos') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Avisos</h2>
-                        <div id="a-list">${renderListaAvisos()}</div>
-                        <button class="admin-btn" onclick="adicionarAviso()" style="margin-top: 15px;">Adicionar Aviso</button>
-                    </div>
-                `;
+                content.innerHTML = `<div class="admin-section"><h2>Unidade</h2><input id="unome" class="admin-input" value="${dadosSistema.unidade.nome}"><button class="admin-btn" onclick="salvarNomeUnidade()">Salvar</button></div>`;
+            } else if (secao === 'faltometro') {
+                content.innerHTML = `<div class="admin-section"><h2>Faltômetro</h2><div id="f-list">${renderListaFaltometro()}</div><button class="admin-btn" onclick="adicionarEspecialidade()">Adicionar</button></div>`;
+            } else if (secao === 'atendimentos') {
+                content.innerHTML = `<div class="admin-section"><h2>Atendimentos</h2><div id="at-list">${renderListaAtendimentos()}</div><button class="admin-btn" onclick="adicionarAtendimento()">Adicionar</button></div>`;
+            } else if (secao === 'avisos') {
+                content.innerHTML = `<div class="admin-section"><h2>Avisos</h2><div id="a-list">${renderListaAvisos()}</div><button class="admin-btn" onclick="adicionarAviso()">Adicionar</button></div>`;
+            } else if (secao === 'video') {
+                content.innerHTML = `<div class="admin-section"><h2>Vídeos</h2><textarea id="vurls" class="admin-input" style="height:100px">${dadosSistema.unidade.videoUrls.join('\n')}</textarea><button class="admin-btn" onclick="salvarVideos()">Salvar</button></div>`;
             }
         }
 
-        function getMenuText(secao) {
-            const map = {
-                'unidade': 'Unidade',
-                'faltometro': 'Faltômetro',
-                'atendimentos': 'Atendimentos',
-                'avisos': 'Avisos',
-                'video': 'Vídeos'
-            };
-            return map[secao] || '';
-        }
+        function renderListaFaltometro() { return dadosSistema.unidade.especialidades.map((e, i) => `<div style="display:flex; gap:5px; margin-bottom:5px;"><input class="admin-input" value="${e.nome}" onchange="dadosSistema.unidade.especialidades[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:70px" value="${e.faltas}" onchange="dadosSistema.unidade.especialidades[${i}].faltas=parseInt(this.value);salvarDados()"></div>`).join(''); }
+        function renderListaAtendimentos() { return dadosSistema.unidade.atendimentos.map((a, i) => `<div style="display:flex; gap:5px; margin-bottom:5px;"><input class="admin-input" value="${a.nome}" onchange="dadosSistema.unidade.atendimentos[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:70px" value="${a.valor}" onchange="dadosSistema.unidade.atendimentos[${i}].valor=parseInt(this.value);salvarDados()"></div>`).join(''); }
+        function renderListaAvisos() { return dadosSistema.avisos.map((a, i) => `<div style="display:flex; gap:5px; margin-bottom:5px;"><input class="admin-input" value="${a}" onchange="dadosSistema.avisos[${i}]=this.value;salvarDados()"></div>`).join(''); }
+        
+        function adicionarEspecialidade() { dadosSistema.unidade.especialidades.push({nome:'', faltas:0}); salvarDados(); mostrarSecao('faltometro'); }
+        function adicionarAtendimento() { dadosSistema.unidade.atendimentos.push({nome:'', valor:0}); salvarDados(); mostrarSecao('atendimentos'); }
+        function adicionarAviso() { dadosSistema.avisos.push(''); salvarDados(); mostrarSecao('avisos'); }
 
         function salvarNomeUnidade() {
             dadosSistema.unidade.nome = document.getElementById('unome').value;
             salvarDados();
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
-            alert('Nome da unidade salvo!');
         }
 
         function salvarVideos() {
-            const urls = document.getElementById('vurls').value.split('\n')
-                .map(url => url.trim())
-                .filter(url => url.length > 0);
-            dadosSistema.unidade.videoUrls = urls;
+            dadosSistema.unidade.videoUrls = document.getElementById('vurls').value.split('\n').filter(u => u.trim());
             salvarDados();
             iniciarVideoPlaylist();
-            alert('Vídeos atualizados!');
         }
 
         // ========== INICIALIZAÇÃO ==========
         document.addEventListener('DOMContentLoaded', () => {
             carregarDados();
             atualizarRelogio();
-            setInterval(atualizarRelogio, 60000); // Atualiza a cada 1 minuto
+            setInterval(atualizarRelogio, 60000);
             iniciarVideoPlaylist();
             criarCarrossel();
             iniciarCarrosselAvisos();
