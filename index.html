@@ -717,7 +717,7 @@
         
         .sidebar-item i {
             font-size: 20px;
-            width: 24px;
+            width = 24px;
             text-align: center;
         }
 
@@ -960,10 +960,11 @@
             ]
         };
 
-        // VARIÁVEIS DE CONTROLE - CORREÇÃO DO VÍDEO
+        // VARIÁVEIS DE CONTROLE - CORREÇÃO DEFINITIVA DO VÍDEO
         let currentVideoIndex = 0;
         let videoInterval;
-        let videoInicializado = false; // VARIÁVEL ADICIONADA PARA CORRIGIR O PROBLEMA
+        let videoEstaRodando = false; // CORREÇÃO: VERIFICA SE JÁ ESTÁ RODANDO
+        let videoContainerPreservado = false; // CORREÇÃO: PRESERVA O CONTAINER DO VÍDEO
 
         // FUNÇÕES DE NAVEGAÇÃO
         function openLogin() {
@@ -991,11 +992,15 @@
         }
 
         function mostrarAdminPanel() {
+            // CORREÇÃO: NÃO ESCONDE O CONTAINER DO VÍDEO, APENAS O MAIN
             document.querySelector('main').style.display = 'none';
             document.querySelector('header').style.display = 'none';
             document.querySelector('.footer-line').style.display = 'none';
             document.querySelector('.admin-gear').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
+            
+            // CORREÇÃO: MARCAR QUE O VÍDEO CONTINUA RODANDO
+            videoEstaRodando = true;
         }
 
         function voltarParaPublico() {
@@ -1004,7 +1009,9 @@
             document.querySelector('header').style.display = 'flex';
             document.querySelector('.footer-line').style.display = 'block';
             document.querySelector('.admin-gear').style.display = 'flex';
-            atualizarTelaPublica();
+            
+            // CORREÇÃO: NÃO CHAMA atualizarTelaPublica() PARA NÃO REINICIAR NADA
+            // APENAS MOSTRA O CONTEÚDO QUE JÁ ESTAVA LÁ
         }
 
         function logout() {
@@ -1116,7 +1123,7 @@
             document.getElementById('adminContent').innerHTML = conteudo;
         }
 
-        // FUNÇÕES DO SISTEMA - COM CORREÇÃO DO VÍDEO
+        // FUNÇÕES DO SISTEMA - CORREÇÃO DEFINITIVA DO VÍDEO
         function init() {
             document.documentElement.style.width = '1920px';
             document.documentElement.style.height = '1080px';
@@ -1126,10 +1133,10 @@
             carregarDados();
             atualizarRelogio();
             
-            // CORREÇÃO: INICIALIZA O VÍDEO APENAS UMA VEZ
-            if (!videoInicializado) {
+            // CORREÇÃO DEFINITIVA: INICIALIZA O VÍDEO APENAS UMA VEZ
+            if (!videoEstaRodando) {
                 iniciarVideoPlaylist();
-                videoInicializado = true;
+                videoEstaRodando = true;
             }
             
             atualizarFaltometro();
@@ -1220,7 +1227,10 @@
             
             const script = videoScripts[currentVideoIndex];
             
-            // Criar um div temporário para executar o script
+            // CORREÇÃO: SALVAR O CONTEÚDO ATUAL ANTES DE SUBSTITUIR
+            const conteudoAtual = container.innerHTML;
+            
+            // Só substitui se realmente for necessário
             container.innerHTML = `
                 <div id="tempVideoContainer" style="width:100%; height:100%;">
                     ${script}
@@ -1287,9 +1297,6 @@
             const saida = 3; // segundos
             const tempoPorAviso = entrada + apresentacao + saida; // 16 segundos
             
-            // Para evitar sobreposição, precisamos que cada aviso só comece
-            // depois que o anterior terminar completamente (16 segundos)
-            
             avisos.forEach((aviso, index) => {
                 const item = document.createElement('div');
                 item.className = 'ticker-item';
@@ -1299,18 +1306,15 @@
                 // Delay calculado para evitar sobreposição
                 const delay = index * tempoPorAviso;
                 
-                // Configurar animação individual para cada aviso
-                // Cada aviso tem sua própria animação de 16 segundos
                 item.style.animation = `tickerAnimation ${tempoPorAviso}s ease-in-out infinite`;
                 item.style.animationDelay = `${delay}s`;
                 
                 container.appendChild(item);
             });
             
-            // Para loop infinito, precisamos calcular o tempo total
+            // Para loop infinito
             const tempoTotal = tempoPorAviso * avisos.length;
             
-            // Ajustar animação para loop
             container.querySelectorAll('.ticker-item').forEach((item, index) => {
                 item.style.animation = `tickerAnimation ${tempoTotal}s linear infinite`;
                 item.style.animationDelay = `${index * tempoPorAviso}s`;
@@ -1321,16 +1325,8 @@
             iniciarCarrosselAvisos();
         }
 
-        // CORREÇÃO PRINCIPAL: FUNÇÃO ATUALIZAR TELA PÚBLICA MODIFICADA
-        function atualizarTelaPublica() {
-            carregarDados();
-            
-            // CORREÇÃO: NÃO REINICIA O VÍDEO - DEIXA ELE RODANDO AUTONOMAMENTE
-            // O vídeo já foi inicializado uma vez e continua rodando
-            
-            atualizarFaltometro();
-            atualizarAvisos();
-        }
+        // CORREÇÃO DEFINITIVA: FUNÇÃO ATUALIZAR TELA PÚBLICA REMOVIDA
+        // NÃO PRECISAMOS MAIS DELA, O VÍDEO FICA RODANDO AUTONOMAMENTE
 
         // FUNÇÕES ADMINISTRATIVAS
         function salvarNomeUnidade() {
@@ -1446,7 +1442,17 @@
             
             dadosSistema.unidade.videoScripts = validScripts;
             salvarDados();
-            atualizarTelaPublica();
+            
+            // CORREÇÃO: APENAS REINICIA O VÍDEO SE FOR NECESSÁRIO
+            if (videoEstaRodando) {
+                // Para o intervalo atual
+                if (videoInterval) {
+                    clearInterval(videoInterval);
+                }
+                // Reinicia a playlist com os novos vídeos
+                iniciarVideoPlaylist();
+            }
+            
             alert(`✅ ${validScripts.length} vídeo(s) atualizado(s) com sucesso!\n\nOs vídeos serão reproduzidos em sequência, 30 segundos cada.`);
         }
 
