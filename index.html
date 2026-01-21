@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistema de Saúde - Passo Fundo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
     <style>
-        /* ESTILOS ORIGINAIS INTEGRALMENTE MANTIDOS */
+        /* MANTIDOS TODOS OS SEUS ESTILOS ORIGINAIS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -44,9 +48,8 @@
         .lista-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
         .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         
-        /* AJUSTE DE FONTES SOLICITADO */
         .item-nome { font-size: 18px; font-weight: 600; max-width: 70%; line-height: 1.2; }
-        .item-valor { font-size: 22px; font-weight: 800; font-family: 'Courier New', monospace; }
+        .item-valor { font-size: 42px; font-weight: 800; font-family: 'Courier New', monospace; }
 
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 120px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
@@ -113,7 +116,7 @@
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h1>Configurações do Sistema</h1>
+            <h1 id="adminIdTitle">Configurações (ID: Carregando...)</h1>
             <button class="admin-btn admin-btn-danger" onclick="logout()">Sair e Salvar</button>
         </div>
         <div class="admin-container">
@@ -130,6 +133,25 @@
     </div>
 
     <script>
+        // --- CONFIGURAÇÃO FIREBASE (Substitua pelos dados do seu Console) ---
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "seu-projeto.firebaseapp.com",
+            databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Identificação por ID na URL (?id=unidade1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const unidadeID = urlParams.get('id') || 'geral';
+        document.getElementById('adminIdTitle').textContent = `Configurações (ID: ${unidadeID})`;
+
         // DADOS DO SISTEMA
         let dadosSistema = {
             unidade: {
@@ -145,15 +167,23 @@
         let isMuted = true;
         let carouselIndex = 0;
 
+        // SALVAR NO FIREBASE
         function salvarDados() { 
-            localStorage.setItem('sistemaSaudeDados', JSON.stringify(dadosSistema)); 
-            atualizarCarrosselDados();
+            db.ref('paineis/' + unidadeID).set(dadosSistema);
         }
         
-        function carregarDados() {
-            const salvo = localStorage.getItem('sistemaSaudeDados');
-            if(salvo) dadosSistema = JSON.parse(salvo);
-            document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
+        // CARREGAR E OUVIR MUDANÇAS EM TEMPO REAL
+        function carregarDadosFirebase() {
+            db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    dadosSistema = data;
+                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
+                    atualizarCarrosselDados();
+                    carregarVideo();
+                    iniciarAvisos();
+                }
+            });
         }
 
         function atualizarRelogio() {
@@ -170,7 +200,8 @@
 
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
-            const ids = dadosSistema.unidade.videoUrls.map(url => extrairID(url)).filter(id => id !== null);
+            const videoUrls = dadosSistema.unidade.videoUrls || [];
+            const ids = videoUrls.map(url => extrairID(url)).filter(id => id !== null);
             
             if(ids.length > 0) {
                 const primeiroId = ids[0];
@@ -185,49 +216,46 @@
 
         function ativarSom() {
             isMuted = false;
-            const ids = dadosSistema.unidade.videoUrls.map(url => extrairID(url)).filter(id => id !== null);
-            if(ids.length > 0) {
-                const primeiroId = ids[0];
-                const playlistIds = ids.join(',');
-                const container = document.getElementById('videoContainer');
-                container.innerHTML = `<iframe class="video-iframe" src="https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=0&loop=1&playlist=${playlistIds}&controls=0" allow="autoplay"></iframe>`;
-                document.getElementById('btnSom').style.display = 'none';
-            }
+            carregarVideo();
+            document.getElementById('btnSom').style.display = 'none';
         }
 
         function atualizarCarrosselDados() {
-            const totalF = dadosSistema.unidade.especialidades.reduce((a, b) => a + b.faltas, 0);
+            const especialidades = dadosSistema.unidade.especialidades || [];
+            const totalF = especialidades.reduce((a, b) => a + (parseInt(b.faltas) || 0), 0);
             document.getElementById('itemFaltometro').innerHTML = `
                 <h2 class="section-title">FALTÔMETRO</h2>
                 <div class="total-container">
                     <div style="font-size: 20px;">TOTAL DE FALTAS</div>
                     <div class="total-value">${totalF}</div>
                 </div>
-                <div class="lista-container">${dadosSistema.unidade.especialidades.map(e => `
+                <div class="lista-container">${especialidades.map(e => `
                     <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ff5252">${e.faltas}</span></div>
                 `).join('')}</div>
             `;
 
-            const totalA = dadosSistema.unidade.atendimentos.reduce((a, b) => a + b.valor, 0);
+            const atendimentos = dadosSistema.unidade.atendimentos || [];
+            const totalA = atendimentos.reduce((a, b) => a + (parseInt(b.valor) || 0), 0);
             document.getElementById('itemAtendimentos').innerHTML = `
                 <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
                 <div class="total-container total-atendimentos">
                     <div style="font-size: 20px;">EM ATENDIMENTO</div>
                     <div class="total-value">${totalA}</div>
                 </div>
-                <div class="lista-container">${dadosSistema.unidade.atendimentos.map(e => `
+                <div class="lista-container">${atendimentos.map(e => `
                     <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#2196f3">${e.valor}</span></div>
                 `).join('')}</div>
             `;
 
-            const totalS = dadosSistema.unidade.smsMunicipal.reduce((a, b) => a + b.valor, 0);
+            const smsMunicipal = dadosSistema.unidade.smsMunicipal || [];
+            const totalS = smsMunicipal.reduce((a, b) => a + (parseInt(b.valor) || 0), 0);
             document.getElementById('itemSMS').innerHTML = `
                 <h2 class="section-title sms-title">PRODUÇÃO MUNICIPAL</h2>
                 <div class="total-container total-sms">
                     <div style="font-size: 20px;">TOTAL GERAL</div>
                     <div class="total-value">${totalS}</div>
                 </div>
-                <div class="lista-container">${dadosSistema.unidade.smsMunicipal.map(e => `
+                <div class="lista-container">${smsMunicipal.map(e => `
                     <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ba68c8">${e.valor}</span></div>
                 `).join('')}</div>
             `;
@@ -235,6 +263,7 @@
 
         function iniciarAnimacaoCarrossel() {
             const slides = document.querySelectorAll('.carousel-item');
+            if(slides.length === 0) return;
             setInterval(() => {
                 slides.forEach(s => s.classList.remove('active'));
                 carouselIndex = (carouselIndex + 1) % slides.length;
@@ -242,18 +271,24 @@
             }, 15000);
         }
 
+        let avisoInterval;
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
-            container.innerHTML = dadosSistema.avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
+            const avisos = dadosSistema.avisos || [];
+            container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
+            if(items.length === 0) return;
+            
             let idx = 0;
+            if(avisoInterval) clearInterval(avisoInterval);
+            
             const mostrar = () => {
                 items.forEach(i => i.classList.remove('active'));
                 if(items[idx]) items[idx].classList.add('active');
                 idx = (idx + 1) % items.length;
-                setTimeout(mostrar, 15000);
             };
             mostrar();
+            avisoInterval = setInterval(mostrar, 15000);
         }
 
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
@@ -268,7 +303,7 @@
             }
         }
         
-        function logout() { salvarDados(); location.reload(); }
+        function logout() { salvarDados(); document.getElementById('adminPanel').style.display = 'none'; }
 
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
@@ -291,15 +326,14 @@
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2>Avisos (Um por linha)</h2>
-                        <textarea id="txtAvisos" class="admin-input" style="height:200px">${dadosSistema.avisos.join('\n')}</textarea>
+                        <textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea>
                         <button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar Avisos</button>
                     </div>`;
             } else if(secao === 'video') {
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2>URLs dos Vídeos (YouTube)</h2>
-                        <p style="font-size:14px; margin-bottom:10px; color:#666">Cole um link por linha. Os vídeos tocarão em sequência e entrarão em loop automático.</p>
-                        <textarea id="vUrls" class="admin-input" style="height:200px">${dadosSistema.unidade.videoUrls.join('\n')}</textarea>
+                        <textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea>
                         <button class="admin-btn" onclick="atualizarVideos()">Atualizar Playlist</button>
                     </div>`;
             }
@@ -309,8 +343,7 @@
             const texto = document.getElementById('vUrls').value;
             dadosSistema.unidade.videoUrls = texto.split('\n').filter(url => url.trim() !== "");
             salvarDados();
-            carregarVideo();
-            alert('Playlist de vídeos atualizada!');
+            alert('Playlist atualizada!');
         }
 
         function renderListaAdmin(container, lista, chaveObjeto, chaveValor) {
@@ -320,9 +353,9 @@
                     <div id="listaItens">
                         ${lista.map((item, i) => `
                             <div style="display:flex; gap:10px; margin-bottom:10px;">
-                                <input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].nome=this.value">
-                                <input type="number" class="admin-input" style="width:100px" value="${item[chaveValor]}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].${chaveValor}=parseInt(this.value)">
-                                <button class="admin-btn admin-btn-danger" onclick="dadosSistema.unidade.${chaveObjeto}.splice(${i},1); mostrarSecao('${getSecaoByChave(chaveObjeto)}')">Remover</button>
+                                <input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].nome=this.value; salvarDados()">
+                                <input type="number" class="admin-input" style="width:100px" value="${item[chaveValor]}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].${chaveValor}=parseInt(this.value); salvarDados()">
+                                <button class="admin-btn admin-btn-danger" onclick="dadosSistema.unidade.${chaveObjeto}.splice(${i},1); salvarDados(); mostrarSecao('${getSecaoByChave(chaveObjeto)}')">Remover</button>
                             </div>
                         `).join('')}
                     </div>
@@ -337,13 +370,10 @@
         }
 
         window.onload = () => {
-            carregarDados();
+            carregarDadosFirebase();
             atualizarRelogio();
             setInterval(atualizarRelogio, 1000);
-            carregarVideo();
-            atualizarCarrosselDados();
             iniciarAnimacaoCarrossel();
-            iniciarAvisos();
         };
     </script>
 </body>
