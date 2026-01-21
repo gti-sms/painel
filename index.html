@@ -51,7 +51,7 @@
         .ticker-item.active { animation: slideInOut 15s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* ADMIN PANEL - INTEGRAL */
+        /* ADMIN PANEL */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; display: none; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
@@ -129,14 +129,14 @@
     </div>
 
     <script>
-        // DADOS DO SISTEMA (Funcionalidades completas)
+        // DADOS DO SISTEMA
         let dadosSistema = {
             unidade: {
                 nome: "UBS Adirbal Corralo",
                 videoUrls: ["https://youtu.be/FknHFVRTZuo"],
                 especialidades: [{ nome: "Clínico Geral", faltas: 10 }],
                 atendimentos: [{ nome: "Médicos", valor: 5 }],
-                smsMunicipal: [{ nome: "Consultas", valor: 1200 }] // Nova funcionalidade
+                smsMunicipal: [{ nome: "Consultas", valor: 1200 }]
             },
             avisos: ["Bem-vindos ao novo sistema informativo."]
         };
@@ -144,7 +144,6 @@
         let isMuted = true;
         let carouselIndex = 0;
 
-        // FUNÇÕES DE PERSISTÊNCIA
         function salvarDados() { 
             localStorage.setItem('sistemaSaudeDados', JSON.stringify(dadosSistema)); 
             atualizarCarrosselDados();
@@ -156,14 +155,12 @@
             document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
         }
 
-        // RELÓGIO
         function atualizarRelogio() {
             const agora = new Date();
             document.getElementById('currentDate').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
             document.getElementById('currentTime').textContent = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // VÍDEO (CORREÇÃO TÉCNICA: Não altera funcionalidade, apenas impede o reset)
         function extrairID(url) {
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
             const match = url.match(regExp);
@@ -172,13 +169,14 @@
 
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
-            const url = dadosSistema.unidade.videoUrls[0] || "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-            const id = extrairID(url);
+            const ids = dadosSistema.unidade.videoUrls.map(url => extrairID(url)).filter(id => id !== null);
             
-            if(id) {
-                const src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${id}&controls=0`;
-                // Só troca o HTML se o ID for diferente, para não dar "flash" preto ou reiniciar
-                if (!container.querySelector('iframe') || !container.querySelector('iframe').src.includes(id)) {
+            if(ids.length > 0) {
+                const primeiroId = ids[0];
+                const playlistIds = ids.join(',');
+                const src = `https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${playlistIds}&controls=0`;
+                
+                if (!container.querySelector('iframe') || !container.querySelector('iframe').src.includes(primeiroId)) {
                     container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
                 }
             }
@@ -186,15 +184,17 @@
 
         function ativarSom() {
             isMuted = false;
-            const id = extrairID(dadosSistema.unidade.videoUrls[0] || "");
-            const container = document.getElementById('videoContainer');
-            container.innerHTML = `<iframe class="video-iframe" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0&loop=1&playlist=${id}&controls=0" allow="autoplay"></iframe>`;
-            document.getElementById('btnSom').style.display = 'none';
+            const ids = dadosSistema.unidade.videoUrls.map(url => extrairID(url)).filter(id => id !== null);
+            if(ids.length > 0) {
+                const primeiroId = ids[0];
+                const playlistIds = ids.join(',');
+                const container = document.getElementById('videoContainer');
+                container.innerHTML = `<iframe class="video-iframe" src="https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=0&loop=1&playlist=${playlistIds}&controls=0" allow="autoplay"></iframe>`;
+                document.getElementById('btnSom').style.display = 'none';
+            }
         }
 
-        // CARROSSEL (CORREÇÃO TÉCNICA: Atualiza apenas o conteúdo de texto/números)
         function atualizarCarrosselDados() {
-            // Faltas
             const totalF = dadosSistema.unidade.especialidades.reduce((a, b) => a + b.faltas, 0);
             document.getElementById('itemFaltometro').innerHTML = `
                 <h2 class="section-title">FALTÔMETRO</h2>
@@ -207,7 +207,6 @@
                 `).join('')}</div>
             `;
 
-            // Atendimentos
             const totalA = dadosSistema.unidade.atendimentos.reduce((a, b) => a + b.valor, 0);
             document.getElementById('itemAtendimentos').innerHTML = `
                 <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
@@ -220,7 +219,6 @@
                 `).join('')}</div>
             `;
 
-            // SMS Municipal (Nova Modalidade)
             const totalS = dadosSistema.unidade.smsMunicipal.reduce((a, b) => a + b.valor, 0);
             document.getElementById('itemSMS').innerHTML = `
                 <h2 class="section-title sms-title">PRODUÇÃO MUNICIPAL</h2>
@@ -243,7 +241,6 @@
             }, 15000);
         }
 
-        // AVISOS
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
             container.innerHTML = dadosSistema.avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
@@ -258,7 +255,6 @@
             mostrar();
         }
 
-        // ADMINISTRAÇÃO (Funcionalidades de adicionar/remover integralmente mantidas)
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() { 
             if(document.getElementById('adminPass').value === 'admin') {
@@ -272,7 +268,8 @@
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            event.target.classList.add('active');
+            const activeItem = Array.from(document.querySelectorAll('.sidebar-item')).find(i => i.textContent.toLowerCase().includes(secao.replace('sms', 'municipal')));
+            if(activeItem) activeItem.classList.add('active');
 
             if(secao === 'unidade') {
                 content.innerHTML = `
@@ -297,11 +294,20 @@
             } else if(secao === 'video') {
                 content.innerHTML = `
                     <div class="admin-section">
-                        <h2>URL do Vídeo (YouTube)</h2>
-                        <input id="vUrl" class="admin-input" value="${dadosSistema.unidade.videoUrls[0]}">
-                        <button class="admin-btn" onclick="dadosSistema.unidade.videoUrls[0]=document.getElementById('vUrl').value; salvarDados(); carregarVideo(); alert('Vídeo Atualizado!')">Atualizar Vídeo</button>
+                        <h2>URLs dos Vídeos (YouTube)</h2>
+                        <p style="font-size:14px; margin-bottom:10px; color:#666">Cole um link por linha. Os vídeos tocarão em sequência e entrarão em loop automático.</p>
+                        <textarea id="vUrls" class="admin-input" style="height:200px">${dadosSistema.unidade.videoUrls.join('\n')}</textarea>
+                        <button class="admin-btn" onclick="atualizarVideos()">Atualizar Playlist</button>
                     </div>`;
             }
+        }
+
+        function atualizarVideos() {
+            const texto = document.getElementById('vUrls').value;
+            dadosSistema.unidade.videoUrls = texto.split('\n').filter(url => url.trim() !== "");
+            salvarDados();
+            carregarVideo();
+            alert('Playlist de vídeos atualizada!');
         }
 
         function renderListaAdmin(container, lista, chaveObjeto, chaveValor) {
@@ -327,7 +333,6 @@
             return 'sms';
         }
 
-        // INICIALIZAÇÃO
         window.onload = () => {
             carregarDados();
             atualizarRelogio();
