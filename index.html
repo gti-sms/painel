@@ -210,7 +210,7 @@
             // Atendimentos
             const totalA = dadosSistema.unidade.atendimentos.reduce((a, b) => a + b.valor, 0);
             document.getElementById('itemAtendimentos').innerHTML = `
-                <h2 class="section-title atendimentos-title">ATENDIMENTOS</h2>
+                <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
                 <div class="total-container total-atendimentos">
                     <div style="font-size: 20px;">EM ATENDIMENTO</div>
                     <div class="total-value">${totalA}</div>
