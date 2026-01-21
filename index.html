@@ -120,7 +120,7 @@
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">Unidade</div>
                 <div class="sidebar-item" onclick="mostrarSecao('faltometro')">Faltômetro</div>
                 <div class="sidebar-item" onclick="mostrarSecao('atendimentos')">Atendimentos</div>
-                <div class="sidebar-item" onclick="mostrarSecao('sms')">Total Mês Municipal SMS</div>
+                <div class="sidebar-item" onclick="mostrarSecao('sms')">Produção Municipal – Mês Anterior</div>
                 <div class="sidebar-item" onclick="mostrarSecao('avisos')">Avisos</div>
                 <div class="sidebar-item" onclick="mostrarSecao('video')">Vídeos</div>
             </div>
@@ -223,7 +223,7 @@
             // SMS Municipal (Nova Modalidade)
             const totalS = dadosSistema.unidade.smsMunicipal.reduce((a, b) => a + b.valor, 0);
             document.getElementById('itemSMS').innerHTML = `
-                <h2 class="section-title sms-title">TOTAL MÊS MUNICIPAL SMS</h2>
+                <h2 class="section-title sms-title">PRODUÇÃO MUNICIPAL – MÊS ANTERIOR</h2>
                 <div class="total-container total-sms">
                     <div style="font-size: 20px;">TOTAL GERAL</div>
                     <div class="total-value">${totalS}</div>
