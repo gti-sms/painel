@@ -51,7 +51,6 @@
         .ticker-item.active { animation: slideInOut 15s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* ADMIN PANEL */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; display: none; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
@@ -211,7 +210,7 @@
             document.getElementById('itemAtendimentos').innerHTML = `
                 <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
                 <div class="total-container total-atendimentos">
-                    <div style="font-size: 20px;">ATENDIMENTO</div>
+                    <div style="font-size: 20px;">EM ATENDIMENTO</div>
                     <div class="total-value">${totalA}</div>
                 </div>
                 <div class="lista-container">${dadosSistema.unidade.atendimentos.map(e => `
@@ -256,20 +255,23 @@
         }
 
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
+        
+        // SENHA ATUALIZADA PARA: smspmpf2026
         function login() { 
-            if(document.getElementById('adminPass').value === 'admin') {
+            if(document.getElementById('adminPass').value === 'smspmpf2026') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'flex';
                 mostrarSecao('unidade');
+            } else {
+                alert("Senha Incorreta");
             }
         }
+        
         function logout() { salvarDados(); location.reload(); }
 
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            const activeItem = Array.from(document.querySelectorAll('.sidebar-item')).find(i => i.textContent.toLowerCase().includes(secao.replace('sms', 'municipal')));
-            if(activeItem) activeItem.classList.add('active');
 
             if(secao === 'unidade') {
                 content.innerHTML = `
