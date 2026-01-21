@@ -43,8 +43,10 @@
 
         .lista-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
         .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .item-nome { font-size: 19px; font-weight: 600; }
-        .item-valor { font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace; }
+        
+        /* AJUSTE DE FONTES SOLICITADO */
+        .item-nome { font-size: 18px; font-weight: 600; max-width: 70%; line-height: 1.2; }
+        .item-valor { font-size: 22px; font-weight: 800; font-family: 'Courier New', monospace; }
 
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 120px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
@@ -202,7 +204,7 @@
                     <div class="total-value">${totalF}</div>
                 </div>
                 <div class="lista-container">${dadosSistema.unidade.especialidades.map(e => `
-                    <div class="item-lista"><span>${e.nome}</span><span class="item-valor" style="color:#ff5252">${e.faltas}</span></div>
+                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ff5252">${e.faltas}</span></div>
                 `).join('')}</div>
             `;
 
@@ -214,7 +216,7 @@
                     <div class="total-value">${totalA}</div>
                 </div>
                 <div class="lista-container">${dadosSistema.unidade.atendimentos.map(e => `
-                    <div class="item-lista"><span>${e.nome}</span><span class="item-valor" style="color:#2196f3">${e.valor}</span></div>
+                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#2196f3">${e.valor}</span></div>
                 `).join('')}</div>
             `;
 
@@ -226,7 +228,7 @@
                     <div class="total-value">${totalS}</div>
                 </div>
                 <div class="lista-container">${dadosSistema.unidade.smsMunicipal.map(e => `
-                    <div class="item-lista"><span>${e.nome}</span><span class="item-valor" style="color:#ba68c8">${e.valor}</span></div>
+                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ba68c8">${e.valor}</span></div>
                 `).join('')}</div>
             `;
         }
@@ -256,7 +258,6 @@
 
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         
-        // SENHA ATUALIZADA PARA: smspmpf2026
         function login() { 
             if(document.getElementById('adminPass').value === 'smspmpf2026') {
                 document.getElementById('loginScreen').style.display = 'none';
