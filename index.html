@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* ESTILOS ORIGINAIS INTEGRALMENTE MANTIDOS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -39,7 +38,7 @@
 
         .lista-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
         .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .item-nome { font-size: 18px; font-weight: 600; }
+        .item-nome { font-size: 20px; font-weight: 600; }
         .item-valor { font-size: 42px; font-weight: 800; font-family: 'Courier New', monospace; }
 
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 120px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
@@ -47,16 +46,19 @@
         .ticker-item.active { animation: slideInOut 15s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
+        /* ESTILOS ADMIN REVISADOS */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
         .admin-container { display: grid; grid-template-columns: 280px 1fr; width: 100%; height: calc(100% - 70px); }
         .admin-sidebar { background: white; border-right: 2px solid #e0e0e0; padding: 20px 0; }
-        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: 600; }
+        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: 600; border-bottom: 1px solid #eee; }
         .sidebar-item.active { background: #1565c0; color: white; }
         .admin-content { padding: 30px; overflow-y: auto; }
-        .admin-input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-        .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; }
+        .admin-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .admin-btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; transition: 0.3s; }
+        .admin-btn:hover { opacity: 0.8; }
+        .admin-btn-danger { background: #f44336; }
     </style>
 </head>
 <body>
@@ -88,16 +90,16 @@
 
     <div id="loginScreen">
         <div style="background:white; padding:40px; border-radius:15px; width:400px; text-align:center;">
-            <h2 style="color:#333">Acesso Restrito</h2>
-            <input type="password" id="adminPass" class="admin-input" placeholder="Senha">
-            <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
+            <h2 style="color:#333; margin-bottom:20px;">Painel Administrativo</h2>
+            <input type="password" id="adminPass" class="admin-input" placeholder="Digite a Senha">
+            <button class="admin-btn" style="width:100%; margin-top:10px;" onclick="login()">Entrar</button>
         </div>
     </div>
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h2 id="adminTitle">Painel Administrativo</h2>
-            <button class="admin-btn" style="background:#f44336" onclick="logout()">Sair e Salvar</button>
+            <h2 id="adminTitle">Configurações (ID: geral)</h2>
+            <button class="admin-btn admin-btn-danger" onclick="logout()">Sair e Salvar Tudo</button>
         </div>
         <div class="admin-container">
             <div class="admin-sidebar">
@@ -113,7 +115,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE COM AS SUAS CHAVES
+        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
             authDomain: "gti-painel.firebaseapp.com",
@@ -128,7 +130,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Identificação por ID na URL
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
         document.getElementById('adminTitle').innerText = `Configurações (ID: ${unidadeID})`;
@@ -139,6 +140,7 @@
         };
 
         let isMuted = true;
+        let secaoAtualAtiva = 'unidade';
 
         function salvarDados() {
             db.ref('paineis/' + unidadeID).set(dadosSistema);
@@ -150,12 +152,13 @@
                 if (data) {
                     dadosSistema = data;
                     document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
-                    renderizarTudo();
+                    renderizarInterfacePublica();
                 }
             });
         }
 
-        function renderizarTudo() {
+        // --- RENDERIZAÇÃO DA TV (PÚBLICO) ---
+        function renderizarInterfacePublica() {
             // Faltometro
             const totalF = (dadosSistema.unidade.especialidades || []).reduce((a, b) => a + (parseInt(b.faltas) || 0), 0);
             document.getElementById('itemFaltometro').innerHTML = `<h2 class="section-title">FALTÔMETRO</h2><div class="total-container"><div>TOTAL DE FALTAS</div><div class="total-value">${totalF}</div></div><div class="lista-container">${(dadosSistema.unidade.especialidades || []).map(e => `<div class="item-lista"><span>${e.nome}</span><span class="item-valor" style="color:#ff5252">${e.faltas}</span></div>`).join('')}</div>`;
@@ -168,10 +171,10 @@
             const totalS = (dadosSistema.unidade.smsMunicipal || []).reduce((a, b) => a + (parseInt(b.valor) || 0), 0);
             document.getElementById('itemSMS').innerHTML = `<h2 class="section-title" style="color:#ba68c8">PRODUÇÃO MUNICIPAL</h2><div class="total-container" style="background:#7b1fa2"><div>TOTAL GERAL</div><div class="total-value">${totalS}</div></div><div class="lista-container">${(dadosSistema.unidade.smsMunicipal || []).map(e => `<div class="item-lista"><span>${e.nome}</span><span class="item-valor" style="color:#ba68c8">${e.valor}</span></div>`).join('')}</div>`;
 
-            // Avisos e Vídeo
-            document.getElementById('tickerContainer').innerHTML = (dadosSistema.avisos || []).map(a => `<div class="ticker-item">${a}</div>`).join('');
-            const items = document.querySelectorAll('.ticker-item');
-            if(items.length > 0) items[0].classList.add('active');
+            // Avisos
+            const ticker = document.getElementById('tickerContainer');
+            ticker.innerHTML = (dadosSistema.avisos || []).map(a => `<div class="ticker-item">${a}</div>`).join('');
+            if(ticker.children.length > 0) ticker.children[0].classList.add('active');
             
             carregarVideo();
         }
@@ -184,7 +187,7 @@
 
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
-            const ids = (dadosSistema.unidade.videoUrls || []).map(url => extrairID(url)).filter(id => id);
+            const ids = (dadosSistema.unidade.videoUrls || []).map(url => extrairID(url.trim())).filter(id => id);
             if(ids.length > 0) {
                 const playlist = ids.join(',');
                 const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted?1:0}&loop=1&playlist=${playlist}&controls=0`;
@@ -196,49 +199,76 @@
 
         function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display='none'; }
 
+        // --- LÓGICA DO PAINEL ADMIN (OTIMIZADA) ---
+
+        function openLogin() { document.getElementById('loginScreen').style.display='flex'; }
+        
+        function login() { 
+            if(document.getElementById('adminPass').value === 'smspmpf2026') { 
+                document.getElementById('loginScreen').style.display='none'; 
+                document.getElementById('adminPanel').style.display='flex'; 
+                mostrarSecao('unidade'); 
+            } else { alert("Senha incorreta!"); }
+        }
+
+        function logout() { salvarDados(); location.reload(); }
+
+        function mostrarSecao(secao) {
+            secaoAtualAtiva = secao;
+            const content = document.getElementById('adminContent');
+            
+            // Highlight sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.toggle('active', item.innerText.toLowerCase().includes(secao.replace('faltometro', 'falto')));
+            });
+
+            if(secao === 'unidade') {
+                content.innerHTML = `<h3>Nome da Unidade (Como aparece no topo)</h3>
+                    <input id="uNome" class="admin-input" value="${dadosSistema.unidade.nome}">
+                    <button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Nome atualizado!')">Salvar Nome</button>`;
+            } else if(secao === 'faltometro') renderListaAdmin(content, 'especialidades', 'faltas');
+            else if(secao === 'atendimentos') renderListaAdmin(content, 'atendimentos', 'valor');
+            else if(secao === 'sms') renderListaAdmin(content, 'smsMunicipal', 'valor');
+            else if(secao === 'avisos') {
+                content.innerHTML = `<h3>Avisos de Rodapé (Um por linha)</h3>
+                    <textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea>
+                    <button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Avisos salvos!')">Salvar Avisos</button>`;
+            } else if(secao === 'video') {
+                content.innerHTML = `<h3>Links de Vídeos do YouTube (Um por linha)</h3>
+                    <textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea>
+                    <button class="admin-btn" onclick="dadosSistema.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n'); salvarDados(); alert('Playlist salva!')">Salvar Vídeos</button>`;
+            }
+        }
+
+        function renderListaAdmin(container, chave, valorNome) {
+            const lista = dadosSistema.unidade[chave] || [];
+            container.innerHTML = `<h3>Gerenciar Lista</h3>` + 
+                lista.map((item, i) => `
+                <div style="display:flex; gap:10px; margin-bottom:10px">
+                    <input class="admin-input" placeholder="Nome" value="${item.nome}" oninput="dadosSistema.unidade.${chave}[${i}].nome=this.value">
+                    <input class="admin-input" type="number" style="width:120px" value="${item[valorNome]}" oninput="dadosSistema.unidade.${chave}[${i}].${valorNome}=this.value">
+                    <button class="admin-btn" style="background:#f44336" onclick="dadosSistema.unidade.${chave}.splice(${i},1); mostrarSecao(secaoAtualAtiva)">X</button>
+                </div>`).join('') + 
+                `<div style="margin-top:20px">
+                    <button class="admin-btn" style="background:#2196f3" onclick="dadosSistema.unidade.${chave}.push({nome:'', ${valorNome}:0}); mostrarSecao(secaoAtualAtiva)">+ Adicionar Item</button>
+                    <button class="admin-btn" style="margin-left:10px" onclick="salvarDados(); alert('Alterações salvas com sucesso!')">SALVAR AGORA</button>
+                </div>`;
+        }
+
         // CARROSSEL E RELOGIO
         let cIdx = 0;
         setInterval(() => {
             const slides = document.querySelectorAll('.carousel-item');
-            slides.forEach(s => s.classList.remove('active'));
-            cIdx = (cIdx + 1) % slides.length;
-            slides[cIdx].classList.add('active');
+            if(slides.length > 0) {
+                slides.forEach(s => s.classList.remove('active'));
+                cIdx = (cIdx + 1) % slides.length;
+                slides[cIdx].classList.add('active');
+            }
         }, 15000);
 
         setInterval(() => {
             document.getElementById('currentTime').innerText = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
         }, 1000);
-
-        // LOGIN E ADMIN
-        function openLogin() { document.getElementById('loginScreen').style.display='flex'; }
-        function login() { if(document.getElementById('adminPass').value === 'smspmpf2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('adminPanel').style.display='flex'; mostrarSecao('unidade'); } }
-        function logout() { salvarDados(); location.reload(); }
-
-        function mostrarSecao(secao) {
-            const content = document.getElementById('adminContent');
-            if(secao === 'unidade') {
-                content.innerHTML = `<h3>Nome da Unidade</h3><input id="uNome" class="admin-input" value="${dadosSistema.unidade.nome}"><button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('uNome').value; salvarDados()">Salvar</button>`;
-            } else if(secao === 'faltometro') renderLista(content, 'especialidades', 'faltas');
-            else if(secao === 'atendimentos') renderLista(content, 'atendimentos', 'valor');
-            else if(secao === 'sms') renderLista(content, 'smsMunicipal', 'valor');
-            else if(secao === 'avisos') {
-                content.innerHTML = `<h3>Avisos (Um por linha)</h3><textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados()">Salvar</button>`;
-            } else if(secao === 'video') {
-                content.innerHTML = `<h3>Links YouTube (Um por linha)</h3><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n'); salvarDados()">Salvar</button>`;
-            }
-        }
-
-        function renderLista(container, chave, valorNome) {
-            const lista = dadosSistema.unidade[chave] || [];
-            container.innerHTML = `<h3>Editar Lista</h3>` + lista.map((item, i) => `
-                <div style="display:flex; gap:10px; margin-bottom:5px">
-                    <input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chave}[${i}].nome=this.value">
-                    <input class="admin-input" type="number" style="width:100px" value="${item[valorNome]}" onchange="dadosSistema.unidade.${chave}[${i}].${valorNome}=this.value">
-                    <button class="admin-btn" style="background:red" onclick="dadosSistema.unidade.${chave}.splice(${i},1); mostrarSecao(secaoAtual)">X</button>
-                </div>`).join('') + `<button class="admin-btn" onclick="dadosSistema.unidade.${chave}.push({nome:'Novo', ${valorNome}:0}); salvarDados(); renderizarTudo(); mostrarSecao('${secaoAtiva(chave)}')">+ Adicionar</button>`;
-        }
-        
-        function secaoAtiva(c) { return c === 'especialidades' ? 'faltometro' : (c === 'atendimentos' ? 'atendimentos' : 'sms'); }
 
         window.onload = carregarDados;
     </script>
