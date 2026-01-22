@@ -10,64 +10,80 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* MANTIDOS TODOS OS SEUS ESTILOS ORIGINAIS */
+        /* MANTIDOS SEUS ESTILOS ORIGINAIS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
-        body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(0, 230, 118, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%); pointer-events: none; }
-        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; box-shadow: 0 -3px 20px rgba(0, 230, 118, 0.5); animation: pulseGlow 6s ease-in-out infinite; }
-        @keyframes pulseGlow { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
-        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(0, 200, 100, 0.3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid rgba(0, 230, 118, 0.4); box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3); backdrop-filter: blur(10px); }
+        
+        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; }
+        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(0, 230, 118, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid rgba(0, 230, 118, 0.4); }
         
         .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
-        .header-logo { font-size: 38px; color: #00e676; }
-        .header-text h1 { font-size: 34px; font-weight: 700; }
         .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; }
 
-        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 75px - 4px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; }
+        .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 79px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; }
         .left-column { display: flex; flex-direction: column; gap: 8px; }
         .video-section { background: #000; border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; }
         .video-container { width: 100%; height: 100%; }
         .video-iframe { width: 100%; height: 100%; border: none; }
-        .btn-som { position: absolute; bottom: 20px; left: 20px; z-index: 101; background: rgba(0, 230, 118, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .btn-som { position: absolute; bottom: 20px; left: 20px; z-index: 101; background: rgba(0, 230, 118, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; }
 
-        .right-column { background: linear-gradient(135deg, #0d1b2a 0%, #1a2332 50%, #0f1b2d 100%); border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); overflow: hidden; }
+        /* BLOCO LATERAL DIREITO */
+        .right-column { background: rgba(13, 27, 42, 0.8); border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); overflow: hidden; }
         .carousel-container { height: 100%; position: relative; }
         .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; display: flex; flex-direction: column; transition: opacity 0.5s ease-in-out; }
         .carousel-item.active { opacity: 1; }
         
-        .section-title { font-size: 32px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 12px; text-transform: uppercase; border-bottom: 3px solid rgba(0, 230, 118, 0.3); }
+        .section-title { font-size: 28px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 10px; text-transform: uppercase; border-bottom: 3px solid rgba(0, 230, 118, 0.3); }
         .atendimentos-title { color: #2196f3; border-bottom-color: rgba(33, 150, 243, 0.3); }
         .sms-title { color: #ba68c8; border-bottom-color: rgba(186, 104, 200, 0.3); }
 
-        .total-container { background: linear-gradient(135deg, #d32f2f, #f44336); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px; border: 2px solid rgba(255, 255, 255, 0.25); }
+        .total-container { border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 10px; border: 2px solid rgba(255, 255, 255, 0.2); background: linear-gradient(135deg, #d32f2f, #f44336); }
         .total-atendimentos { background: linear-gradient(135deg, #1976d2, #2196f3); }
         .total-sms { background: linear-gradient(135deg, #7b1fa2, #9c27b0); }
-        .total-value { font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace; }
+        .total-value { font-size: 50px; font-weight: 900; font-family: 'Courier New', monospace; }
 
-        .lista-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
-        .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        /* AQUI ESTÁ O SEGREDO: LISTA AUTO-AJUSTÁVEL */
+        .lista-container { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            justify-content: flex-start; /* Alinha no topo */
+            overflow: hidden; 
+        }
+
+        .item-lista { 
+            background: rgba(255, 255, 255, 0.08); 
+            border-radius: 6px; 
+            padding: 4px 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            flex: 1 1 auto; /* Permite que o item diminua para caber */
+            min-height: 0;  /* Permite encolher além do conteúdo se necessário */
+            max-height: 70px; /* Limita o tamanho máximo para não ficar exagerado com poucos itens */
+        }
         
-        .item-nome { font-size: 18px; font-weight: 600; max-width: 70%; line-height: 1.2; }
-        .item-valor { font-size: 42px; font-weight: 800; font-family: 'Courier New', monospace; }
+        .item-nome { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-valor { font-size: 38px; font-weight: 800; font-family: 'Courier New', monospace; }
 
-        .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 120px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
+        .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 110px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
         .ticker-item.active { animation: slideInOut 15s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; }
-        #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; display: none; }
-        .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        /* ADMIN STYLE */
+        #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
+        #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
+        .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; }
         .admin-container { display: grid; grid-template-columns: 280px 1fr; width: 100%; height: calc(100% - 70px); }
-        .admin-sidebar { background: white; border-right: 2px solid #e0e0e0; padding: 20px 0; }
+        .admin-sidebar { background: white; border-right: 2px solid #e0e0e0; }
         .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: 600; }
         .sidebar-item.active { background: #1565c0; color: white; }
         .admin-content { padding: 30px; overflow-y: auto; }
-        .admin-section { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .admin-input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-        .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; margin-right: 10px; }
-        .admin-btn-danger { background: #f44336; }
+        .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; }
     </style>
 </head>
 <body>
@@ -75,11 +91,9 @@
     <div class="admin-gear" onclick="openLogin()"><i class="fas fa-cog"></i></div>
 
     <header class="main-header">
-        <div class="header-left">
-            <div class="header-text">
-                <h1 id="mainTitle">Secretaria Municipal de Saúde</h1>
-                <div style="font-size: 22px; opacity: 0.95;" id="headerSubtitle">PMPF - UBS Adirbal Corralo</div>
-            </div>
+        <div class="header-text">
+            <h1 id="mainTitle">Secretaria Municipal de Saúde</h1>
+            <div style="font-size: 22px; opacity: 0.95;" id="headerSubtitle">Carregando...</div>
         </div>
         <div class="datetime-container">
             <div id="currentDate" style="font-size: 14px; text-align: right;"></div>
@@ -90,9 +104,7 @@
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
-                <button id="btnSom" class="btn-som" onclick="ativarSom()">
-                    <i class="fas fa-volume-up"></i> ATIVAR SOM
-                </button>
+                <button id="btnSom" class="btn-som" onclick="ativarSom()"><i class="fas fa-volume-up"></i> ATIVAR SOM</button>
                 <div class="video-container" id="videoContainer"></div>
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
@@ -108,16 +120,16 @@
 
     <div id="loginScreen">
         <div style="background:white; padding:40px; border-radius:15px; width:400px; text-align:center;">
-            <h2 style="color: #333; margin-bottom: 20px;">Painel Administrativo</h2>
+            <h2>Acesso Administrativo</h2>
             <input type="password" id="adminPass" class="admin-input" placeholder="Senha">
-            <button class="admin-btn" style="width:100%; margin-top:10px;" onclick="login()">Entrar</button>
+            <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
         </div>
     </div>
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h1 id="adminIdTitle">Configurações (ID: Carregando...)</h1>
-            <button class="admin-btn admin-btn-danger" onclick="logout()">Sair e Salvar</button>
+            <h1 id="adminIdTitle">Configurações</h1>
+            <button class="admin-btn" style="background:#f44336" onclick="logout()">Sair e Salvar</button>
         </div>
         <div class="admin-container">
             <div class="admin-sidebar">
@@ -146,28 +158,14 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
-        document.getElementById('adminIdTitle').textContent = `Configurações (ID: ${unidadeID})`;
-
-        let dadosSistema = {
-            unidade: {
-                nome: "UBS Adirbal Corralo",
-                videoUrls: ["https://youtu.be/FknHFVRTZuo"],
-                especialidades: [{ nome: "Clínico Geral", faltas: 10 }],
-                atendimentos: [{ nome: "Médicos", valor: 5 }],
-                smsMunicipal: [{ nome: "Consultas", valor: 1200 }]
-            },
-            avisos: ["Bem-vindos ao novo sistema informativo."]
-        };
-
+        
+        let dadosSistema = { unidade: { nome: "", videoUrls: [], especialidades: [], atendimentos: [], smsMunicipal: [] }, avisos: [] };
         let isMuted = true;
         let carouselIndex = 0;
 
-        function salvarDados() { 
-            db.ref('paineis/' + unidadeID).set(dadosSistema);
-        }
+        function salvarDados() { db.ref('paineis/' + unidadeID).set(dadosSistema); }
         
         function carregarDadosFirebase() {
             db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
@@ -175,7 +173,7 @@
                 if(data) {
                     dadosSistema = data;
                     document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
-                    atualizarCarrosselDados();
+                    atualizarInterface();
                     carregarVideo();
                     iniciarAvisos();
                 }
@@ -184,89 +182,49 @@
 
         function atualizarRelogio() {
             const agora = new Date();
-            document.getElementById('currentDate').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+            document.getElementById('currentDate').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
             document.getElementById('currentTime').textContent = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function extrairID(url) {
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[7].length === 11) ? match[7] : null;
-        }
-
-        // --- CORREÇÃO APLICADA AQUI ---
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
             const videoUrls = dadosSistema.unidade.videoUrls || [];
-            const ids = videoUrls.map(url => extrairID(url)).filter(id => id !== null);
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const ids = videoUrls.map(url => { const m = url.match(regExp); return (m && m[7].length === 11) ? m[7] : null; }).filter(id => id !== null);
             
             if(ids.length > 0) {
-                const primeiroId = ids[0];
-                const playlistIds = ids.join(',');
-                const src = `https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${playlistIds}&controls=0&enablejsapi=1`;
-                
-                const iframeExistente = container.querySelector('iframe');
-                
-                // Só atualiza se o ID mudou OU se o som acabou de ser ativado (estava mute=1 e agora isMuted é false)
-                if (!iframeExistente || !iframeExistente.src.includes(primeiroId) || (isMuted === false && iframeExistente.src.includes('mute=1'))) {
+                const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
+                if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
                     container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
                 }
             }
         }
 
-        // --- CORREÇÃO APLICADA AQUI ---
-        function ativarSom() {
-            isMuted = false;
-            // Forçamos a limpeza do container para garantir que o carregarVideo() insira o novo iframe com mute=0
-            document.getElementById('videoContainer').innerHTML = '';
-            carregarVideo();
-            document.getElementById('btnSom').style.display = 'none';
+        function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display = 'none'; }
+
+        function atualizarInterface() {
+            renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS MÊS ANTERIOR', dadosSistema.unidade.especialidades, 'faltas', '#ff5252', '');
+            renderBloco('itemAtendimentos', 'ATENDIMENTOS DESTA UNIDADE', 'MÊS ANTERIOR', dadosSistema.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+            renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'MÊS ANTERIOR', dadosSistema.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
-        function atualizarCarrosselDados() {
-            const especialidades = dadosSistema.unidade.especialidades || [];
-            const totalF = especialidades.reduce((a, b) => a + (parseInt(b.faltas) || 0), 0);
-            document.getElementById('itemFaltometro').innerHTML = `
-                <h2 class="section-title">FALTÔMETRO</h2>
-                <div class="total-container">
-                    <div style="font-size: 20px;">TOTAL DE FALTAS MÊS ANTERIOR</div>
-                    <div class="total-value">${totalF}</div>
+        function renderBloco(id, titulo, label, lista, chave, cor, classe) {
+            const itens = lista || [];
+            const total = itens.reduce((a, b) => a + (parseInt(b[chave]) || 0), 0);
+            document.getElementById(id).innerHTML = `
+                <h2 class="section-title ${classe}">${titulo}</h2>
+                <div class="total-container ${classe}">
+                    <div style="font-size: 16px; opacity:0.9">${label}</div>
+                    <div class="total-value">${total}</div>
                 </div>
-                <div class="lista-container">${especialidades.map(e => `
-                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ff5252">${e.faltas}</span></div>
-                `).join('')}</div>
-            `;
-
-            const atendimentos = dadosSistema.unidade.atendimentos || [];
-            const totalA = atendimentos.reduce((a, b) => a + (parseInt(b.valor) || 0), 0);
-            document.getElementById('itemAtendimentos').innerHTML = `
-                <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
-                <div class="total-container total-atendimentos">
-                    <div style="font-size: 20px;">MÊS ANTERIOR</div>
-                    <div class="total-value">${totalA}</div>
+                <div class="lista-container">
+                    ${itens.map(e => `<div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:${cor}">${e[chave]}</span></div>`).join('')}
                 </div>
-                <div class="lista-container">${atendimentos.map(e => `
-                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#2196f3">${e.valor}</span></div>
-                `).join('')}</div>
-            `;
-
-            const smsMunicipal = dadosSistema.unidade.smsMunicipal || [];
-            const totalS = smsMunicipal.reduce((a, b) => a + (parseInt(b.valor) || 0), 0);
-            document.getElementById('itemSMS').innerHTML = `
-                <h2 class="section-title sms-title">PRODUÇÃO MUNICIPAL</h2>
-                <div class="total-container total-sms">
-                    <div style="font-size: 20px;">MÊS ANTERIOR</div>
-                    <div class="total-value">${totalS}</div>
-                </div>
-                <div class="lista-container">${smsMunicipal.map(e => `
-                    <div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:#ba68c8">${e.valor}</span></div>
-                `).join('')}</div>
             `;
         }
 
         function iniciarAnimacaoCarrossel() {
             const slides = document.querySelectorAll('.carousel-item');
-            if(slides.length === 0) return;
             setInterval(() => {
                 slides.forEach(s => s.classList.remove('active'));
                 carouselIndex = (carouselIndex + 1) % slides.length;
@@ -274,110 +232,46 @@
             }, 15000);
         }
 
-        let avisoInterval;
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
             const avisos = dadosSistema.avisos || [];
             container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
-            if(items.length === 0) return;
-            
             let idx = 0;
-            if(avisoInterval) clearInterval(avisoInterval);
-            
             const mostrar = () => {
                 items.forEach(i => i.classList.remove('active'));
                 if(items[idx]) items[idx].classList.add('active');
                 idx = (idx + 1) % items.length;
             };
-            mostrar();
-            avisoInterval = setInterval(mostrar, 15000);
+            mostrar(); setInterval(mostrar, 15000);
         }
 
+        // ADMIN FUNCTIONS
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
-        
-        function login() { 
-            if(document.getElementById('adminPass').value === 'smspmpf2026') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'flex';
-                mostrarSecao('unidade');
-            } else {
-                alert("Senha Incorreta");
-            }
-        }
-        
-        function logout() { salvarDados(); document.getElementById('adminPanel').style.display = 'none'; }
+        function login() { if(document.getElementById('adminPass').value === 'smspmpf2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('adminPanel').style.display='flex'; mostrarSecao('unidade'); } else { alert("Senha Incorreta"); } }
+        function logout() { salvarDados(); document.getElementById('adminPanel').style.display='none'; }
 
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-
             if(secao === 'unidade') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Nome da Unidade</h2>
-                        <input id="uNome" class="admin-input" value="${dadosSistema.unidade.nome}">
-                        <button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar Nome</button>
-                    </div>`;
-            } else if(secao === 'faltometro') {
-                renderListaAdmin(content, dadosSistema.unidade.especialidades, 'especialidades', 'faltas');
-            } else if(secao === 'atendimentos') {
-                renderListaAdmin(content, dadosSistema.unidade.atendimentos, 'atendimentos', 'valor');
-            } else if(secao === 'sms') {
-                renderListaAdmin(content, dadosSistema.unidade.smsMunicipal, 'smsMunicipal', 'valor');
+                content.innerHTML = `<h2>Unidade</h2><input id="uNome" class="admin-input" value="${dadosSistema.unidade.nome}"><button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar</button>`;
+            } else if(['faltometro', 'atendimentos', 'sms'].includes(secao)) {
+                let chave = secao === 'faltometro' ? 'especialidades' : (secao === 'atendimentos' ? 'atendimentos' : 'smsMunicipal');
+                let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
+                renderAdminLista(content, chave, subChave, secao);
             } else if(secao === 'avisos') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>Avisos (Um por linha)</h2>
-                        <textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea>
-                        <button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar Avisos</button>
-                    </div>`;
+                content.innerHTML = `<h2>Avisos</h2><textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar</button>`;
             } else if(secao === 'video') {
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2>URLs dos Vídeos (YouTube)</h2>
-                        <textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea>
-                        <button class="admin-btn" onclick="atualizarVideos()">Atualizar Playlist</button>
-                    </div>`;
+                content.innerHTML = `<h2>Vídeos</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar</button>`;
             }
         }
 
-        function atualizarVideos() {
-            const texto = document.getElementById('vUrls').value;
-            dadosSistema.unidade.videoUrls = texto.split('\n').filter(url => url.trim() !== "");
-            salvarDados();
-            alert('Playlist atualizada!');
+        function renderAdminLista(content, chave, subChave, secao) {
+            let lista = dadosSistema.unidade[chave] || [];
+            content.innerHTML = `<h2>Editar</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosSistema.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosSistema.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosSistema.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
         }
 
-        function renderListaAdmin(container, lista, chaveObjeto, chaveValor) {
-            container.innerHTML = `
-                <div class="admin-section">
-                    <h2>Gerenciar Dados</h2>
-                    <div id="listaItens">
-                        ${lista.map((item, i) => `
-                            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                                <input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].nome=this.value; salvarDados()">
-                                <input type="number" class="admin-input" style="width:100px" value="${item[chaveValor]}" onchange="dadosSistema.unidade.${chaveObjeto}[${i}].${chaveValor}=parseInt(this.value); salvarDados()">
-                                <button class="admin-btn admin-btn-danger" onclick="dadosSistema.unidade.${chaveObjeto}.splice(${i},1); salvarDados(); mostrarSecao('${getSecaoByChave(chaveObjeto)}')">Remover</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button class="admin-btn" onclick="dadosSistema.unidade.${chaveObjeto}.push({nome:'Novo', ${chaveValor}:0}); mostrarSecao('${getSecaoByChave(chaveObjeto)}')">+ Adicionar</button>
-                </div>`;
-        }
-
-        function getSecaoByChave(c) {
-            if(c === 'especialidades') return 'faltometro';
-            if(c === 'atendimentos') return 'atendimentos';
-            return 'sms';
-        }
-
-        window.onload = () => {
-            carregarDadosFirebase();
-            atualizarRelogio();
-            setInterval(atualizarRelogio, 1000);
-            iniciarAnimacaoCarrossel();
-        };
+        window.onload = () => { carregarDadosFirebase(); atualizarRelogio(); setInterval(atualizarRelogio, 1000); iniciarAnimacaoCarrossel(); };
     </script>
 </body>
 </html>
