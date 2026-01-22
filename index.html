@@ -43,13 +43,12 @@
         .total-sms { background: linear-gradient(135deg, #7b1fa2, #9c27b0); }
         .total-value { font-size: 50px; font-weight: 900; font-family: 'Courier New', monospace; }
 
-        /* AQUI ESTÁ O SEGREDO: LISTA AUTO-AJUSTÁVEL */
         .lista-container { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
             gap: 4px; 
-            justify-content: flex-start; /* Alinha no topo */
+            justify-content: flex-start; 
             overflow: hidden; 
         }
 
@@ -60,9 +59,9 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            flex: 1 1 auto; /* Permite que o item diminua para caber */
-            min-height: 0;  /* Permite encolher além do conteúdo se necessário */
-            max-height: 70px; /* Limita o tamanho máximo para não ficar exagerado com poucos itens */
+            flex: 1 1 auto; 
+            min-height: 0;  
+            max-height: 70px; 
         }
         
         .item-nome { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -204,8 +203,8 @@
 
         function atualizarInterface() {
             renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS MÊS ANTERIOR', dadosSistema.unidade.especialidades, 'faltas', '#ff5252', '');
-            renderBloco('itemAtendimentos', 'ATENDIMENTOS DESTA UNIDADE', 'MÊS ANTERIOR', dadosSistema.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'MÊS ANTERIOR', dadosSistema.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS DESTA UNIDADE</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosSistema.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+            renderBloco('itemSMS', '<span style="color:white">PRODUÇÃO MUNICIPAL</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosSistema.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
@@ -215,7 +214,7 @@
                 <h2 class="section-title ${classe}">${titulo}</h2>
                 <div class="total-container ${classe}">
                     <div style="font-size: 16px; opacity:0.9">${label}</div>
-                    <div class="total-value">${total}</div>
+                    <div class="total-value" style="color:white">${total}</div>
                 </div>
                 <div class="lista-container">
                     ${itens.map(e => `<div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:${cor}">${e[chave]}</span></div>`).join('')}
