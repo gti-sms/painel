@@ -69,8 +69,9 @@
 
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 110px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
-        .ticker-item.active { animation: slideInOut 15s ease-in-out forwards; }
-        @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 5% { transform: translateX(0); opacity: 1; } 95% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
+        /* AJUSTE: Animação de avisos agora dura 30s para acompanhar o tempo em tela */
+        .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
+        @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
         /* ADMIN STYLE */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
@@ -163,6 +164,7 @@
         let dadosSistema = { unidade: { nome: "", videoUrls: [], especialidades: [], atendimentos: [], smsMunicipal: [] }, avisos: [] };
         let isMuted = true;
         let carouselIndex = 0;
+        let tickerInterval = null;
 
         function salvarDados() { db.ref('paineis/' + unidadeID).set(dadosSistema); }
         
@@ -228,21 +230,46 @@
                 slides.forEach(s => s.classList.remove('active'));
                 carouselIndex = (carouselIndex + 1) % slides.length;
                 slides[carouselIndex].classList.add('active');
-            }, 15000);
+            }, 60000); // INVERTIDO: Carrossel lateral agora dura 60 segundos
         }
 
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
-            const avisos = dadosSistema.avisos || [];
+            const avisos = (dadosSistema.avisos || []).filter(a => a.trim() !== '');
+            
+            if (tickerInterval) clearInterval(tickerInterval);
+            
+            if (avisos.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
             container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
             let idx = 0;
-            const mostrar = () => {
-                items.forEach(i => i.classList.remove('active'));
-                if(items[idx]) items[idx].classList.add('active');
+
+            const mostrarProximo = () => {
+                items.forEach(i => {
+                    i.classList.remove('active');
+                    i.style.opacity = "0";
+                });
+
+                if (items.length === 1) {
+                    items[0].style.opacity = "1";
+                    items[0].style.transform = "translateX(0)";
+                    return;
+                }
+
+                if (items[idx]) {
+                    items[idx].classList.add('active');
+                }
                 idx = (idx + 1) % items.length;
             };
-            mostrar(); setInterval(mostrar, 15000);
+
+            mostrarProximo();
+            if (items.length > 1) {
+                tickerInterval = setInterval(mostrarProximo, 30000); // INVERTIDO: Avisos agora duram 30 segundos
+            }
         }
 
         // ADMIN FUNCTIONS
