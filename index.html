@@ -112,7 +112,7 @@
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">Unidade</div>
                 <div class="sidebar-item" id="menuFalto" onclick="mostrarSecao('faltometro')">Faltômetro</div>
                 <div class="sidebar-item" id="menuAtend" onclick="mostrarSecao('atendimentos')">Atendimentos</div>
-                <div class="sidebar-item" id="menuSMS" onclick="mostrarSecao('sms')">Produção Municipal</div>
+                <div class="sidebar-item" id="menuSMS" onclick="onclick="mostrarSecao('sms')">Produção Municipal</div>
                 <div class="sidebar-item" onclick="mostrarSecao('avisos')">Avisos</div>
                 <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">Vídeos</div>
                 <div class="sidebar-item" id="menuLogs" style="background: #e3f2fd; color: #1565c0; display:none" onclick="mostrarSecao('logs')"><i class="fas fa-history"></i> Status de Unidades</div>
@@ -150,7 +150,6 @@
         function salvarDados(isLocalUpdate = false) { 
             db.ref('paineis/' + unidadeID).set(dadosUnidade); 
             if(isMatriz) db.ref('paineis/geral').set(dadosGerais);
-            // Registra log se for alteração de Faltas/Atendimentos (localmente)
             if(isLocalUpdate && !isMatriz) {
                 db.ref('logs_atualizacao/' + unidadeID).set({
                     nome: dadosUnidade.unidade.nome || unidadeID,
@@ -173,8 +172,32 @@
                 if(data) { dadosGerais = data; processarInterface(); }
             });
             if(isMatriz) {
-                db.ref('logs_atualizacao').on('value', (snapshot) => { logsAtualizacao = snapshot.val() || {}; });
+                db.ref('logs_atualizacao').on('value', (snapshot) => { 
+                    logsAtualizacao = snapshot.val() || {}; 
+                    verificarLimpezaAutomaticaLogs(); // NOVA REGRA INSERIDA AQUI
+                });
             }
+        }
+
+        // --- FUNÇÃO DE LIMPEZA DE 6 MESES ---
+        function verificarLimpezaAutomaticaLogs() {
+            const SEIS_MESES_MS = 180 * 24 * 60 * 60 * 1000;
+            const agora = new Date().getTime();
+            
+            Object.keys(logsAtualizacao).forEach(id => {
+                const log = logsAtualizacao[id];
+                if (log.data) {
+                    // Tenta converter a string de data pt-BR para objeto Date
+                    const partes = log.data.split(', ');
+                    const dataPartes = partes[0].split('/');
+                    const horaPartes = partes[1].split(':');
+                    const dataObjeto = new Date(dataPartes[2], dataPartes[1]-1, dataPartes[0], horaPartes[0], horaPartes[1]);
+                    
+                    if (agora - dataObjeto.getTime() > SEIS_MESES_MS) {
+                        db.ref('logs_atualizacao/' + id).remove();
+                    }
+                }
+            });
         }
 
         function processarInterface() { atualizarInterface(); carregarVideo(); iniciarAvisos(); }
@@ -216,7 +239,7 @@
             setInterval(() => {
                 slides.forEach(s => s.classList.remove('active'));
                 carouselIndex = (carouselIndex + 1) % slides.length;
-                slides[carouselIndex].classList.add('active');
+                if(slides[carouselIndex]) slides[carouselIndex].classList.add('active');
             }, 60000); 
         }
 
@@ -243,7 +266,6 @@
             document.getElementById('menuSMS').style.display = isMatriz ? 'block' : 'none';
             document.getElementById('menuVideo').style.display = isMatriz ? 'block' : 'none';
             document.getElementById('menuLogs').style.display = isMatriz ? 'block' : 'none';
-            // AGORA AMBOS MOSTRAM FALTOMETRO E ATENDIMENTOS
             document.getElementById('menuFalto').style.display = 'block';
             document.getElementById('menuAtend').style.display = 'block';
             document.getElementById('loginScreen').style.display = 'flex'; 
