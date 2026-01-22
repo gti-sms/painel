@@ -133,7 +133,6 @@
     </div>
 
     <script>
-        // --- CONFIGURAÇÃO FIREBASE (Substitua pelos dados do seu Console) ---
         const firebaseConfig = {
           apiKey: "AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
           authDomain: "gti-painel.firebaseapp.com",
@@ -148,12 +147,10 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Identificação por ID na URL (?id=unidade1)
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
         document.getElementById('adminIdTitle').textContent = `Configurações (ID: ${unidadeID})`;
 
-        // DADOS DO SISTEMA
         let dadosSistema = {
             unidade: {
                 nome: "UBS Adirbal Corralo",
@@ -168,12 +165,10 @@
         let isMuted = true;
         let carouselIndex = 0;
 
-        // SALVAR NO FIREBASE
         function salvarDados() { 
             db.ref('paineis/' + unidadeID).set(dadosSistema);
         }
         
-        // CARREGAR E OUVIR MUDANÇAS EM TEMPO REAL
         function carregarDadosFirebase() {
             db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -199,6 +194,7 @@
             return (match && match[7].length === 11) ? match[7] : null;
         }
 
+        // --- CORREÇÃO APLICADA AQUI ---
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
             const videoUrls = dadosSistema.unidade.videoUrls || [];
@@ -207,16 +203,22 @@
             if(ids.length > 0) {
                 const primeiroId = ids[0];
                 const playlistIds = ids.join(',');
-                const src = `https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${playlistIds}&controls=0`;
+                const src = `https://www.youtube.com/embed/${primeiroId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${playlistIds}&controls=0&enablejsapi=1`;
                 
-                if (!container.querySelector('iframe') || !container.querySelector('iframe').src.includes(primeiroId)) {
+                const iframeExistente = container.querySelector('iframe');
+                
+                // Só atualiza se o ID mudou OU se o som acabou de ser ativado (estava mute=1 e agora isMuted é false)
+                if (!iframeExistente || !iframeExistente.src.includes(primeiroId) || (isMuted === false && iframeExistente.src.includes('mute=1'))) {
                     container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
                 }
             }
         }
 
+        // --- CORREÇÃO APLICADA AQUI ---
         function ativarSom() {
             isMuted = false;
+            // Forçamos a limpeza do container para garantir que o carregarVideo() insira o novo iframe com mute=0
+            document.getElementById('videoContainer').innerHTML = '';
             carregarVideo();
             document.getElementById('btnSom').style.display = 'none';
         }
