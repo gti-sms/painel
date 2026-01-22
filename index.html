@@ -10,65 +10,56 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* MANTIDOS TODOS OS SEUS ESTILOS ORIGINAIS */
+        /* ESTILOS ORIGINAIS INTEGRALMENTE MANTIDOS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
-        
         .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; }
-        
-        .admin-gear { 
-            position: fixed; top: 10px; right: 10px; width: 35px; height: 35px; 
-            background: transparent; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; z-index: 2000; opacity: 0.15; transition: opacity 0.3s;
-        }
+        .admin-gear { position: fixed; top: 10px; right: 10px; width: 35px; height: 35px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2000; opacity: 0.15; transition: opacity 0.3s; }
         .admin-gear:hover { opacity: 0.8; }
         .admin-gear i { color: rgba(255, 255, 255, 0.5); font-size: 20px; }
-        
         .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
         .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; }
-
         .main-container { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100% - 79px); display: grid; grid-template-columns: 75% 25%; gap: 12px; padding: 12px; }
         .left-column { display: flex; flex-direction: column; gap: 8px; }
         .video-section { background: #000; border-radius: 16px; overflow: hidden; flex: 4; border: 2px solid rgba(0, 230, 118, 0.3); position: relative; }
         .video-container { width: 100%; height: 100%; }
         .video-iframe { width: 100%; height: 100%; border: none; }
         .btn-som { position: absolute; bottom: 20px; left: 20px; z-index: 101; background: rgba(0, 230, 118, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; }
-
         .right-column { background: rgba(13, 27, 42, 0.8); border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); overflow: hidden; }
         .carousel-container { height: 100%; position: relative; }
         .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; display: flex; flex-direction: column; transition: opacity 0.5s ease-in-out; }
         .carousel-item.active { opacity: 1; }
-        
         .section-title { font-size: 28px; font-weight: 800; color: #00e676; text-align: center; margin-bottom: 10px; text-transform: uppercase; border-bottom: 3px solid rgba(0, 230, 118, 0.3); }
         .atendimentos-title { color: #2196f3; border-bottom-color: rgba(33, 150, 243, 0.3); }
         .sms-title { color: #ba68c8; border-bottom-color: rgba(186, 104, 200, 0.3); }
-
         .total-container { border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 10px; border: 2px solid rgba(255, 255, 255, 0.2); background: linear-gradient(135deg, #d32f2f, #f44336); }
         .total-atendimentos { background: linear-gradient(135deg, #1976d2, #2196f3); }
         .total-sms { background: linear-gradient(135deg, #7b1fa2, #9c27b0); }
         .total-value { font-size: 50px; font-weight: 900; font-family: 'Courier New', monospace; }
-
         .lista-container { flex: 1; display: flex; flex-direction: column; gap: 4px; justify-content: flex-start; overflow: hidden; }
         .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 4px 12px; display: flex; justify-content: space-between; align-items: center; flex: 1 1 auto; min-height: 0; max-height: 70px; }
         .item-nome { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-valor { font-size: 38px; font-weight: 800; font-family: 'Courier New', monospace; }
-
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 110px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
         .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
+        /* ESTILOS DO ADMIN */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; }
         .admin-container { display: grid; grid-template-columns: 280px 1fr; width: 100%; height: calc(100% - 70px); }
         .admin-sidebar { background: white; border-right: 2px solid #e0e0e0; }
-        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: 600; }
+        .sidebar-item { padding: 15px 30px; cursor: pointer; font-weight: 600; border-bottom: 1px solid #eee; }
         .sidebar-item.active { background: #1565c0; color: white; }
         .admin-content { padding: 30px; overflow-y: auto; }
         .admin-input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
         .admin-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #00e676; color: white; }
+        .log-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        .log-table th, .log-table td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        .log-table th { background: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -105,7 +96,7 @@
 
     <div id="loginScreen">
         <div style="background:white; padding:40px; border-radius:15px; width:400px; text-align:center;">
-            <h2>Acesso Administrativo</h2>
+            <h2 id="loginLabel">Acesso Unidade</h2>
             <input type="password" id="adminPass" class="admin-input" placeholder="Senha">
             <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
         </div>
@@ -113,17 +104,18 @@
 
     <div id="adminPanel">
         <div class="admin-header">
-            <h1 id="adminIdTitle">Configurações</h1>
+            <h1 id="adminIdTitle">Painel Administrativo</h1>
             <button class="admin-btn" style="background:#f44336" onclick="logout()">Sair e Salvar</button>
         </div>
         <div class="admin-container">
             <div class="admin-sidebar" id="sidebar">
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">Unidade</div>
-                <div class="sidebar-item" onclick="mostrarSecao('faltometro')">Faltômetro</div>
-                <div class="sidebar-item" onclick="mostrarSecao('atendimentos')">Atendimentos</div>
+                <div class="sidebar-item" id="menuFalto" onclick="mostrarSecao('faltometro')">Faltômetro</div>
+                <div class="sidebar-item" id="menuAtend" onclick="mostrarSecao('atendimentos')">Atendimentos</div>
                 <div class="sidebar-item" id="menuSMS" onclick="mostrarSecao('sms')">Produção Municipal</div>
                 <div class="sidebar-item" onclick="mostrarSecao('avisos')">Avisos</div>
                 <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">Vídeos</div>
+                <div class="sidebar-item" id="menuLogs" style="background: #e3f2fd; color: #1565c0; display:none" onclick="mostrarSecao('logs')"><i class="fas fa-history"></i> Status de Unidades</div>
             </div>
             <div class="admin-content" id="adminContent"></div>
         </div>
@@ -145,46 +137,46 @@
         const db = firebase.database();
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
+        const isMatriz = (unidadeID === 'geral');
         
-        // Estrutura de dados separada
         let dadosUnidade = { unidade: { nome: "", especialidades: [], atendimentos: [] }, avisos: [] };
         let dadosGerais = { unidade: { videoUrls: [], smsMunicipal: [] }, avisos: [] };
+        let logsAtualizacao = {};
         
         let isMuted = true;
         let carouselIndex = 0;
         let tickerInterval = null;
 
-        function salvarDados() { 
+        function salvarDados(isLocalUpdate = false) { 
             db.ref('paineis/' + unidadeID).set(dadosUnidade); 
-            if(unidadeID === 'geral') db.ref('paineis/geral').set(dadosGerais);
+            if(isMatriz) db.ref('paineis/geral').set(dadosGerais);
+            if(isLocalUpdate && !isMatriz) {
+                db.ref('logs_atualizacao/' + unidadeID).set({
+                    nome: dadosUnidade.unidade.nome || unidadeID,
+                    data: new Date().toLocaleString('pt-BR')
+                });
+            }
         }
         
         function carregarDadosFirebase() {
-            // Monitora dados da UNIDADE
             db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
                     dadosUnidade = data;
-                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome || 'Geral'}`;
+                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome || 'Matriz'}`;
                     processarInterface();
                 }
             });
-
-            // Monitora dados GERAIS (Sede)
             db.ref('paineis/geral').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if(data) {
-                    dadosGerais = data;
-                    processarInterface();
-                }
+                if(data) { dadosGerais = data; processarInterface(); }
             });
+            if(isMatriz) {
+                db.ref('logs_atualizacao').on('value', (snapshot) => { logsAtualizacao = snapshot.val() || {}; });
+            }
         }
 
-        function processarInterface() {
-            atualizarInterface();
-            carregarVideo();
-            iniciarAvisos();
-        }
+        function processarInterface() { atualizarInterface(); carregarVideo(); iniciarAvisos(); }
 
         function atualizarRelogio() {
             const agora = new Date();
@@ -194,10 +186,9 @@
 
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
-            const videoUrls = dadosGerais.unidade.videoUrls || []; // Busca do Geral
+            const videoUrls = dadosGerais.unidade.videoUrls || [];
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
             const ids = videoUrls.map(url => { const m = url.match(regExp); return (m && m[7].length === 11) ? m[7] : null; }).filter(id => id !== null);
-            
             if(ids.length > 0) {
                 const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
                 if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
@@ -209,27 +200,15 @@
         function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display = 'none'; }
 
         function atualizarInterface() {
-            // Faltômetro e Atendimentos (Unidade)
             renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
             renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS DESTA UNIDADE</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            
-            // Produção Municipal (Sempre do Geral)
             renderBloco('itemSMS', '<span style="color:white">PRODUÇÃO MUNICIPAL</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
             const itens = lista || [];
             const total = itens.reduce((a, b) => a + (parseInt(b[chave]) || 0), 0);
-            document.getElementById(id).innerHTML = `
-                <h2 class="section-title ${classe}">${titulo}</h2>
-                <div class="total-container ${classe}">
-                    <div style="font-size: 16px; opacity:0.9">${label}</div>
-                    <div class="total-value" style="color:white">${total}</div>
-                </div>
-                <div class="lista-container">
-                    ${itens.map(e => `<div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:${cor}">${e[chave]}</span></div>`).join('')}
-                </div>
-            `;
+            document.getElementById(id).innerHTML = `<h2 class="section-title ${classe}">${titulo}</h2><div class="total-container ${classe}"><div style="font-size: 16px; opacity:0.9">${label}</div><div class="total-value" style="color:white">${total}</div></div><div class="lista-container">${itens.map(e => `<div class="item-lista"><span class="item-nome">${e.nome}</span><span class="item-valor" style="color:${cor}">${e[chave]}</span></div>`).join('')}</div>`;
         }
 
         function iniciarAnimacaoCarrossel() {
@@ -243,52 +222,51 @@
 
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
-            
-            // MESCLA: Avisos Gerais + Avisos da Unidade
-            const avisosG = (dadosGerais.avisos || []).filter(a => a.trim() !== '');
-            const avisosU = (dadosUnidade.avisos || []).filter(a => a.trim() !== '');
-            const avisos = [...avisosG, ...avisosU];
-            
+            const avisos = [...(dadosGerais.avisos || []), ...(dadosUnidade.avisos || [])].filter(a => a && a.trim() !== '');
             if (tickerInterval) clearInterval(tickerInterval);
             if (avisos.length === 0) { container.innerHTML = ''; return; }
-
             container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
             let idx = 0;
-
             const mostrarProximo = () => {
                 items.forEach(i => { i.classList.remove('active'); i.style.opacity = "0"; });
                 if (items.length === 1) { items[0].style.opacity = "1"; items[0].style.transform = "translateX(0)"; return; }
-                if (items[idx]) { items[idx].classList.add('active'); }
+                if (items[idx]) items[idx].classList.add('active');
                 idx = (idx + 1) % items.length;
             };
-
             mostrarProximo();
-            if (items.length > 1) { tickerInterval = setInterval(mostrarProximo, 30000); }
+            if (items.length > 1) tickerInterval = setInterval(mostrarProximo, 30000);
         }
 
-        // ADMIN FUNCTIONS
         function openLogin() { 
-            // Esconde opções globais se não for o painel 'geral'
-            document.getElementById('menuSMS').style.display = (unidadeID === 'geral') ? 'block' : 'none';
-            document.getElementById('menuVideo').style.display = (unidadeID === 'geral') ? 'block' : 'none';
+            document.getElementById('loginLabel').innerText = isMatriz ? "Acesso Matriz" : "Acesso Unidade";
+            document.getElementById('menuSMS').style.display = isMatriz ? 'block' : 'none';
+            document.getElementById('menuVideo').style.display = isMatriz ? 'block' : 'none';
+            document.getElementById('menuLogs').style.display = isMatriz ? 'block' : 'none';
+            document.getElementById('menuFalto').style.display = isMatriz ? 'none' : 'block';
+            document.getElementById('menuAtend').style.display = isMatriz ? 'none' : 'block';
             document.getElementById('loginScreen').style.display = 'flex'; 
         }
         
         function login() { 
-            if(document.getElementById('adminPass').value === 'smspmpf2026') { 
+            const pass = document.getElementById('adminPass').value;
+            // LÓGICA DE SENHA DUPLA
+            const senhaCorreta = isMatriz ? (pass === 'Itatilac2009') : (pass === 'smspmpf2026');
+            
+            if(senhaCorreta) { 
                 document.getElementById('loginScreen').style.display='none'; 
                 document.getElementById('adminPanel').style.display='flex'; 
                 mostrarSecao('unidade'); 
-            } else { alert("Senha Incorreta"); } 
+            } else { alert("Senha Incorreta para este nível de acesso."); } 
         }
         
         function logout() { salvarDados(); document.getElementById('adminPanel').style.display='none'; }
 
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             if(secao === 'unidade') {
-                content.innerHTML = `<h2>Nome da Unidade</h2><input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}"><button class="admin-btn" onclick="dadosUnidade.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar Nome</button>`;
+                content.innerHTML = `<h2>Identificação</h2><input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}"><button class="admin-btn" onclick="dadosUnidade.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar</button>`;
             } else if(['faltometro', 'atendimentos'].includes(secao)) {
                 let chave = secao === 'faltometro' ? 'especialidades' : 'atendimentos';
                 let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
@@ -296,20 +274,26 @@
             } else if(secao === 'sms') {
                 renderAdminListaGeral(content, 'smsMunicipal', 'valor', 'sms');
             } else if(secao === 'avisos') {
-                content.innerHTML = `<h2>Seus Avisos Locais</h2><p style="font-size:12px; color:blue">Nota: Os avisos da sede serão somados a estes automaticamente.</p><textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosUnidade.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosUnidade.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar Avisos</button>`;
+                let target = isMatriz ? dadosGerais : dadosUnidade;
+                content.innerHTML = `<h2>Avisos</h2><p style="font-size:12px;color:#666">${isMatriz ? 'Estes avisos aparecerão em TODAS as unidades.' : 'Estes avisos aparecerão apenas NESTA unidade.'}</p><textarea id="txtAvisos" class="admin-input" style="height:200px">${(target.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="if(isMatriz){dadosGerais.avisos=document.getElementById('txtAvisos').value.split('\\n')}else{dadosUnidade.avisos=document.getElementById('txtAvisos').value.split('\\n')}; salvarDados(); alert('Salvo!')">Salvar</button>`;
             } else if(secao === 'video') {
-                content.innerHTML = `<h2>Vídeos Globais (Sede)</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosGerais.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar Vídeos</button>`;
+                content.innerHTML = `<h2>Vídeos Globais</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosGerais.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar</button>`;
+            } else if(secao === 'logs') {
+                let logsHtml = '<table class="log-table"><tr><th>Unidade</th><th>Última Atualização (Dados Locais)</th></tr>';
+                Object.values(logsAtualizacao).forEach(log => { logsHtml += `<tr><td>${log.nome}</td><td>${log.data}</td></tr>`; });
+                logsHtml += '</table>';
+                content.innerHTML = `<h2>Status das Unidades</h2>${logsHtml}`;
             }
         }
 
         function renderAdminListaLocal(content, chave, subChave, secao) {
             let lista = dadosUnidade.unidade[chave] || [];
-            content.innerHTML = `<h2>Editar ${secao}</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosUnidade.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosUnidade.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosUnidade.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosUnidade.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
+            content.innerHTML = `<h2>Editar ${secao}</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosUnidade.unidade.${chave}[${i}].nome=this.value;salvarDados(true)"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosUnidade.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados(true)"><button onclick="dadosUnidade.unidade.${chave}.splice(${i},1);salvarDados(true);mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosUnidade.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
         }
 
         function renderAdminListaGeral(content, chave, subChave, secao) {
             let lista = dadosGerais.unidade[chave] || [];
-            content.innerHTML = `<h2>Editar Produção Municipal (Global)</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosGerais.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosGerais.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosGerais.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosGerais.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
+            content.innerHTML = `<h2>Produção Municipal (Global)</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosGerais.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosGerais.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosGerais.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosGerais.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
         }
 
         window.onload = () => { carregarDadosFirebase(); atualizarRelogio(); setInterval(atualizarRelogio, 1000); iniciarAnimacaoCarrossel(); };
