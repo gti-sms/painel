@@ -229,7 +229,7 @@
             document.getElementById('itemFaltometro').innerHTML = `
                 <h2 class="section-title">FALTÔMETRO</h2>
                 <div class="total-container">
-                    <div style="font-size: 20px;">TOTAL DE FALTAS</div>
+                    <div style="font-size: 20px;">TOTAL DE FALTAS MÊS ANTERIOR</div>
                     <div class="total-value">${totalF}</div>
                 </div>
                 <div class="lista-container">${especialidades.map(e => `
@@ -242,7 +242,7 @@
             document.getElementById('itemAtendimentos').innerHTML = `
                 <h2 class="section-title atendimentos-title">ATENDIMENTOS DESTA UNIDADE</h2>
                 <div class="total-container total-atendimentos">
-                    <div style="font-size: 20px;">EM ATENDIMENTO</div>
+                    <div style="font-size: 20px;">MÊS ANTERIOR</div>
                     <div class="total-value">${totalA}</div>
                 </div>
                 <div class="lista-container">${atendimentos.map(e => `
@@ -255,7 +255,7 @@
             document.getElementById('itemSMS').innerHTML = `
                 <h2 class="section-title sms-title">PRODUÇÃO MUNICIPAL</h2>
                 <div class="total-container total-sms">
-                    <div style="font-size: 20px;">TOTAL GERAL</div>
+                    <div style="font-size: 20px;">MÊS ANTERIOR</div>
                     <div class="total-value">${totalS}</div>
                 </div>
                 <div class="lista-container">${smsMunicipal.map(e => `
