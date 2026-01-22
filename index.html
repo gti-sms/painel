@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* ESTILOS ORIGINAIS INTEGRALMENTE MANTIDOS */
+        /* ESTILOS ORIGINAIS MANTIDOS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
@@ -46,7 +46,7 @@
         .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* ESTILOS DO ADMIN */
+        /* ADMIN */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; }
@@ -96,7 +96,7 @@
 
     <div id="loginScreen">
         <div style="background:white; padding:40px; border-radius:15px; width:400px; text-align:center;">
-            <h2 id="loginLabel">Acesso Unidade</h2>
+            <h2 id="loginLabel">Acesso Administrativo</h2>
             <input type="password" id="adminPass" class="admin-input" placeholder="Senha">
             <button class="admin-btn" style="width:100%" onclick="login()">Entrar</button>
         </div>
@@ -150,6 +150,7 @@
         function salvarDados(isLocalUpdate = false) { 
             db.ref('paineis/' + unidadeID).set(dadosUnidade); 
             if(isMatriz) db.ref('paineis/geral').set(dadosGerais);
+            // Registra log se for alteração de Faltas/Atendimentos (localmente)
             if(isLocalUpdate && !isMatriz) {
                 db.ref('logs_atualizacao/' + unidadeID).set({
                     nome: dadosUnidade.unidade.nome || unidadeID,
@@ -177,7 +178,6 @@
         }
 
         function processarInterface() { atualizarInterface(); carregarVideo(); iniciarAvisos(); }
-
         function atualizarRelogio() {
             const agora = new Date();
             document.getElementById('currentDate').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
@@ -243,21 +243,20 @@
             document.getElementById('menuSMS').style.display = isMatriz ? 'block' : 'none';
             document.getElementById('menuVideo').style.display = isMatriz ? 'block' : 'none';
             document.getElementById('menuLogs').style.display = isMatriz ? 'block' : 'none';
-            document.getElementById('menuFalto').style.display = isMatriz ? 'none' : 'block';
-            document.getElementById('menuAtend').style.display = isMatriz ? 'none' : 'block';
+            // AGORA AMBOS MOSTRAM FALTOMETRO E ATENDIMENTOS
+            document.getElementById('menuFalto').style.display = 'block';
+            document.getElementById('menuAtend').style.display = 'block';
             document.getElementById('loginScreen').style.display = 'flex'; 
         }
         
         function login() { 
             const pass = document.getElementById('adminPass').value;
-            // LÓGICA DE SENHA DUPLA
             const senhaCorreta = isMatriz ? (pass === 'Itatilac2009') : (pass === 'smspmpf2026');
-            
             if(senhaCorreta) { 
                 document.getElementById('loginScreen').style.display='none'; 
                 document.getElementById('adminPanel').style.display='flex'; 
                 mostrarSecao('unidade'); 
-            } else { alert("Senha Incorreta para este nível de acesso."); } 
+            } else { alert("Senha Incorreta."); } 
         }
         
         function logout() { salvarDados(); document.getElementById('adminPanel').style.display='none'; }
@@ -275,11 +274,11 @@
                 renderAdminListaGeral(content, 'smsMunicipal', 'valor', 'sms');
             } else if(secao === 'avisos') {
                 let target = isMatriz ? dadosGerais : dadosUnidade;
-                content.innerHTML = `<h2>Avisos</h2><p style="font-size:12px;color:#666">${isMatriz ? 'Estes avisos aparecerão em TODAS as unidades.' : 'Estes avisos aparecerão apenas NESTA unidade.'}</p><textarea id="txtAvisos" class="admin-input" style="height:200px">${(target.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="if(isMatriz){dadosGerais.avisos=document.getElementById('txtAvisos').value.split('\\n')}else{dadosUnidade.avisos=document.getElementById('txtAvisos').value.split('\\n')}; salvarDados(); alert('Salvo!')">Salvar</button>`;
+                content.innerHTML = `<h2>Avisos</h2><p style="font-size:12px;color:#666">${isMatriz ? 'Globais (Matriz)' : 'Locais (Unidade)'}</p><textarea id="txtAvisos" class="admin-input" style="height:200px">${(target.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="if(isMatriz){dadosGerais.avisos=document.getElementById('txtAvisos').value.split('\\n')}else{dadosUnidade.avisos=document.getElementById('txtAvisos').value.split('\\n')}; salvarDados(); alert('Salvo!')">Salvar</button>`;
             } else if(secao === 'video') {
                 content.innerHTML = `<h2>Vídeos Globais</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosGerais.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar</button>`;
             } else if(secao === 'logs') {
-                let logsHtml = '<table class="log-table"><tr><th>Unidade</th><th>Última Atualização (Dados Locais)</th></tr>';
+                let logsHtml = '<table class="log-table"><tr><th>Unidade</th><th>Última Atualização (Local)</th></tr>';
                 Object.values(logsAtualizacao).forEach(log => { logsHtml += `<tr><td>${log.nome}</td><td>${log.data}</td></tr>`; });
                 logsHtml += '</table>';
                 content.innerHTML = `<h2>Status das Unidades</h2>${logsHtml}`;
@@ -293,7 +292,7 @@
 
         function renderAdminListaGeral(content, chave, subChave, secao) {
             let lista = dadosGerais.unidade[chave] || [];
-            content.innerHTML = `<h2>Produção Municipal (Global)</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosGerais.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosGerais.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosGerais.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosGerais.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
+            content.innerHTML = `<h2>Produção Municipal</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosGerais.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosGerais.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosGerais.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosGerais.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
         }
 
         window.onload = () => { carregarDadosFirebase(); atualizarRelogio(); setInterval(atualizarRelogio, 1000); iniciarAnimacaoCarrossel(); };
