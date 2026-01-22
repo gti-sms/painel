@@ -16,7 +16,25 @@
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
         
         .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; }
-        .admin-gear { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(0, 230, 118, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid rgba(0, 230, 118, 0.4); }
+        
+        /* AJUSTE: Engrenagem movida para o topo direito e quase transparente */
+        .admin-gear { 
+            position: fixed; 
+            top: 10px; 
+            right: 10px; 
+            width: 35px; 
+            height: 35px; 
+            background: transparent; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            z-index: 2000; 
+            opacity: 0.15; /* Quase transparente */
+            transition: opacity 0.3s;
+        }
+        .admin-gear:hover { opacity: 0.8; } /* Aparece ao passar o mouse */
+        .admin-gear i { color: rgba(255, 255, 255, 0.5); font-size: 20px; }
         
         .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
         .header-time { font-size: 42px; font-weight: bold; color: #00e676; font-family: 'Courier New', monospace; }
@@ -28,7 +46,6 @@
         .video-iframe { width: 100%; height: 100%; border: none; }
         .btn-som { position: absolute; bottom: 20px; left: 20px; z-index: 101; background: rgba(0, 230, 118, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; }
 
-        /* BLOCO LATERAL DIREITO */
         .right-column { background: rgba(13, 27, 42, 0.8); border-radius: 16px; padding: 15px; border: 2px solid rgba(255, 82, 82, 0.3); overflow: hidden; }
         .carousel-container { height: 100%; position: relative; }
         .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; display: flex; flex-direction: column; transition: opacity 0.5s ease-in-out; }
@@ -69,12 +86,11 @@
 
         .announcements-section { background: rgba(33, 150, 243, 0.15); border-radius: 16px; padding: 12px; height: 110px; border: 2px solid rgba(33, 150, 243, 0.3); position: relative; overflow: hidden; }
         .ticker-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; font-size: 29px; font-weight: 600; opacity: 0; padding: 0 20px; border-left: 5px solid #2196f3; }
-        /* AJUSTE: Animação de avisos agora dura 30s para acompanhar o tempo em tela */
         .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
         /* ADMIN STYLE */
-        #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
+        #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; }
         .admin-container { display: grid; grid-template-columns: 280px 1fr; width: 100%; height: calc(100% - 70px); }
@@ -230,7 +246,7 @@
                 slides.forEach(s => s.classList.remove('active'));
                 carouselIndex = (carouselIndex + 1) % slides.length;
                 slides[carouselIndex].classList.add('active');
-            }, 60000); // INVERTIDO: Carrossel lateral agora dura 60 segundos
+            }, 60000); 
         }
 
         function iniciarAvisos() {
@@ -268,11 +284,10 @@
 
             mostrarProximo();
             if (items.length > 1) {
-                tickerInterval = setInterval(mostrarProximo, 30000); // INVERTIDO: Avisos agora duram 30 segundos
+                tickerInterval = setInterval(mostrarProximo, 30000); 
             }
         }
 
-        // ADMIN FUNCTIONS
         function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
         function login() { if(document.getElementById('adminPass').value === 'smspmpf2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('adminPanel').style.display='flex'; mostrarSecao('unidade'); } else { alert("Senha Incorreta"); } }
         function logout() { salvarDados(); document.getElementById('adminPanel').style.display='none'; }
