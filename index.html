@@ -10,30 +10,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* MANTIDOS SEUS ESTILOS ORIGINAIS */
+        /* MANTIDOS TODOS OS SEUS ESTILOS ORIGINAIS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
         body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
         
         .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; }
         
-        /* AJUSTE: Engrenagem movida para o topo direito e quase transparente */
         .admin-gear { 
-            position: fixed; 
-            top: 10px; 
-            right: 10px; 
-            width: 35px; 
-            height: 35px; 
-            background: transparent; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            z-index: 2000; 
-            opacity: 0.15; /* Quase transparente */
-            transition: opacity 0.3s;
+            position: fixed; top: 10px; right: 10px; width: 35px; height: 35px; 
+            background: transparent; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; z-index: 2000; opacity: 0.15; transition: opacity 0.3s;
         }
-        .admin-gear:hover { opacity: 0.8; } /* Aparece ao passar o mouse */
+        .admin-gear:hover { opacity: 0.8; }
         .admin-gear i { color: rgba(255, 255, 255, 0.5); font-size: 20px; }
         
         .main-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #00e676; height: 75px; width: 100%; position: fixed; top: 0; left: 0; z-index: 100; }
@@ -60,27 +49,8 @@
         .total-sms { background: linear-gradient(135deg, #7b1fa2, #9c27b0); }
         .total-value { font-size: 50px; font-weight: 900; font-family: 'Courier New', monospace; }
 
-        .lista-container { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 4px; 
-            justify-content: flex-start; 
-            overflow: hidden; 
-        }
-
-        .item-lista { 
-            background: rgba(255, 255, 255, 0.08); 
-            border-radius: 6px; 
-            padding: 4px 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            flex: 1 1 auto; 
-            min-height: 0;  
-            max-height: 70px; 
-        }
-        
+        .lista-container { flex: 1; display: flex; flex-direction: column; gap: 4px; justify-content: flex-start; overflow: hidden; }
+        .item-lista { background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 4px 12px; display: flex; justify-content: space-between; align-items: center; flex: 1 1 auto; min-height: 0; max-height: 70px; }
         .item-nome { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-valor { font-size: 38px; font-weight: 800; font-family: 'Courier New', monospace; }
 
@@ -89,7 +59,6 @@
         .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* ADMIN STYLE */
         #loginScreen, #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
         #adminPanel { background: #f8f9fa; color: #333; flex-direction: column; }
         .admin-header { background: #1565c0; color: white; padding: 15px 30px; width: 100%; display: flex; justify-content: space-between; }
@@ -148,13 +117,13 @@
             <button class="admin-btn" style="background:#f44336" onclick="logout()">Sair e Salvar</button>
         </div>
         <div class="admin-container">
-            <div class="admin-sidebar">
+            <div class="admin-sidebar" id="sidebar">
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">Unidade</div>
                 <div class="sidebar-item" onclick="mostrarSecao('faltometro')">Faltômetro</div>
                 <div class="sidebar-item" onclick="mostrarSecao('atendimentos')">Atendimentos</div>
-                <div class="sidebar-item" onclick="mostrarSecao('sms')">Produção Municipal</div>
+                <div class="sidebar-item" id="menuSMS" onclick="mostrarSecao('sms')">Produção Municipal</div>
                 <div class="sidebar-item" onclick="mostrarSecao('avisos')">Avisos</div>
-                <div class="sidebar-item" onclick="mostrarSecao('video')">Vídeos</div>
+                <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">Vídeos</div>
             </div>
             <div class="admin-content" id="adminContent"></div>
         </div>
@@ -177,24 +146,44 @@
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
         
-        let dadosSistema = { unidade: { nome: "", videoUrls: [], especialidades: [], atendimentos: [], smsMunicipal: [] }, avisos: [] };
+        // Estrutura de dados separada
+        let dadosUnidade = { unidade: { nome: "", especialidades: [], atendimentos: [] }, avisos: [] };
+        let dadosGerais = { unidade: { videoUrls: [], smsMunicipal: [] }, avisos: [] };
+        
         let isMuted = true;
         let carouselIndex = 0;
         let tickerInterval = null;
 
-        function salvarDados() { db.ref('paineis/' + unidadeID).set(dadosSistema); }
+        function salvarDados() { 
+            db.ref('paineis/' + unidadeID).set(dadosUnidade); 
+            if(unidadeID === 'geral') db.ref('paineis/geral').set(dadosGerais);
+        }
         
         function carregarDadosFirebase() {
+            // Monitora dados da UNIDADE
             db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
-                    dadosSistema = data;
-                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosSistema.unidade.nome}`;
-                    atualizarInterface();
-                    carregarVideo();
-                    iniciarAvisos();
+                    dadosUnidade = data;
+                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome || 'Geral'}`;
+                    processarInterface();
                 }
             });
+
+            // Monitora dados GERAIS (Sede)
+            db.ref('paineis/geral').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    dadosGerais = data;
+                    processarInterface();
+                }
+            });
+        }
+
+        function processarInterface() {
+            atualizarInterface();
+            carregarVideo();
+            iniciarAvisos();
         }
 
         function atualizarRelogio() {
@@ -205,7 +194,7 @@
 
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
-            const videoUrls = dadosSistema.unidade.videoUrls || [];
+            const videoUrls = dadosGerais.unidade.videoUrls || []; // Busca do Geral
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
             const ids = videoUrls.map(url => { const m = url.match(regExp); return (m && m[7].length === 11) ? m[7] : null; }).filter(id => id !== null);
             
@@ -220,9 +209,12 @@
         function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display = 'none'; }
 
         function atualizarInterface() {
-            renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS MÊS ANTERIOR', dadosSistema.unidade.especialidades, 'faltas', '#ff5252', '');
-            renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS DESTA UNIDADE</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosSistema.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            renderBloco('itemSMS', '<span style="color:white">PRODUÇÃO MUNICIPAL</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosSistema.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            // Faltômetro e Atendimentos (Unidade)
+            renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
+            renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS DESTA UNIDADE</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+            
+            // Produção Municipal (Sempre do Geral)
+            renderBloco('itemSMS', '<span style="color:white">PRODUÇÃO MUNICIPAL</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
@@ -251,65 +243,73 @@
 
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
-            const avisos = (dadosSistema.avisos || []).filter(a => a.trim() !== '');
+            
+            // MESCLA: Avisos Gerais + Avisos da Unidade
+            const avisosG = (dadosGerais.avisos || []).filter(a => a.trim() !== '');
+            const avisosU = (dadosUnidade.avisos || []).filter(a => a.trim() !== '');
+            const avisos = [...avisosG, ...avisosU];
             
             if (tickerInterval) clearInterval(tickerInterval);
-            
-            if (avisos.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
+            if (avisos.length === 0) { container.innerHTML = ''; return; }
 
             container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
             let idx = 0;
 
             const mostrarProximo = () => {
-                items.forEach(i => {
-                    i.classList.remove('active');
-                    i.style.opacity = "0";
-                });
-
-                if (items.length === 1) {
-                    items[0].style.opacity = "1";
-                    items[0].style.transform = "translateX(0)";
-                    return;
-                }
-
-                if (items[idx]) {
-                    items[idx].classList.add('active');
-                }
+                items.forEach(i => { i.classList.remove('active'); i.style.opacity = "0"; });
+                if (items.length === 1) { items[0].style.opacity = "1"; items[0].style.transform = "translateX(0)"; return; }
+                if (items[idx]) { items[idx].classList.add('active'); }
                 idx = (idx + 1) % items.length;
             };
 
             mostrarProximo();
-            if (items.length > 1) {
-                tickerInterval = setInterval(mostrarProximo, 30000); 
-            }
+            if (items.length > 1) { tickerInterval = setInterval(mostrarProximo, 30000); }
         }
 
-        function openLogin() { document.getElementById('loginScreen').style.display = 'flex'; }
-        function login() { if(document.getElementById('adminPass').value === 'smspmpf2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('adminPanel').style.display='flex'; mostrarSecao('unidade'); } else { alert("Senha Incorreta"); } }
+        // ADMIN FUNCTIONS
+        function openLogin() { 
+            // Esconde opções globais se não for o painel 'geral'
+            document.getElementById('menuSMS').style.display = (unidadeID === 'geral') ? 'block' : 'none';
+            document.getElementById('menuVideo').style.display = (unidadeID === 'geral') ? 'block' : 'none';
+            document.getElementById('loginScreen').style.display = 'flex'; 
+        }
+        
+        function login() { 
+            if(document.getElementById('adminPass').value === 'smspmpf2026') { 
+                document.getElementById('loginScreen').style.display='none'; 
+                document.getElementById('adminPanel').style.display='flex'; 
+                mostrarSecao('unidade'); 
+            } else { alert("Senha Incorreta"); } 
+        }
+        
         function logout() { salvarDados(); document.getElementById('adminPanel').style.display='none'; }
 
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
             if(secao === 'unidade') {
-                content.innerHTML = `<h2>Unidade</h2><input id="uNome" class="admin-input" value="${dadosSistema.unidade.nome}"><button class="admin-btn" onclick="dadosSistema.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar</button>`;
-            } else if(['faltometro', 'atendimentos', 'sms'].includes(secao)) {
-                let chave = secao === 'faltometro' ? 'especialidades' : (secao === 'atendimentos' ? 'atendimentos' : 'smsMunicipal');
+                content.innerHTML = `<h2>Nome da Unidade</h2><input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}"><button class="admin-btn" onclick="dadosUnidade.unidade.nome=document.getElementById('uNome').value; salvarDados(); alert('Salvo!')">Salvar Nome</button>`;
+            } else if(['faltometro', 'atendimentos'].includes(secao)) {
+                let chave = secao === 'faltometro' ? 'especialidades' : 'atendimentos';
                 let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
-                renderAdminLista(content, chave, subChave, secao);
+                renderAdminListaLocal(content, chave, subChave, secao);
+            } else if(secao === 'sms') {
+                renderAdminListaGeral(content, 'smsMunicipal', 'valor', 'sms');
             } else if(secao === 'avisos') {
-                content.innerHTML = `<h2>Avisos</h2><textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosSistema.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar</button>`;
+                content.innerHTML = `<h2>Seus Avisos Locais</h2><p style="font-size:12px; color:blue">Nota: Os avisos da sede serão somados a estes automaticamente.</p><textarea id="txtAvisos" class="admin-input" style="height:200px">${(dadosUnidade.avisos || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosUnidade.avisos=document.getElementById('txtAvisos').value.split('\\n'); salvarDados(); alert('Salvo!')">Salvar Avisos</button>`;
             } else if(secao === 'video') {
-                content.innerHTML = `<h2>Vídeos</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosSistema.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosSistema.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar</button>`;
+                content.innerHTML = `<h2>Vídeos Globais (Sede)</h2><textarea id="vUrls" class="admin-input" style="height:200px">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea><button class="admin-btn" onclick="dadosGerais.unidade.videoUrls=document.getElementById('vUrls').value.split('\\n').filter(u=>u.trim()!=''); salvarDados(); alert('Salvo!')">Salvar Vídeos</button>`;
             }
         }
 
-        function renderAdminLista(content, chave, subChave, secao) {
-            let lista = dadosSistema.unidade[chave] || [];
-            content.innerHTML = `<h2>Editar</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosSistema.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosSistema.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosSistema.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosSistema.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
+        function renderAdminListaLocal(content, chave, subChave, secao) {
+            let lista = dadosUnidade.unidade[chave] || [];
+            content.innerHTML = `<h2>Editar ${secao}</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosUnidade.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosUnidade.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosUnidade.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosUnidade.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
+        }
+
+        function renderAdminListaGeral(content, chave, subChave, secao) {
+            let lista = dadosGerais.unidade[chave] || [];
+            content.innerHTML = `<h2>Editar Produção Municipal (Global)</h2>${lista.map((item, i) => `<div style="display:flex;gap:10px;margin-bottom:5px"><input class="admin-input" value="${item.nome}" onchange="dadosGerais.unidade.${chave}[${i}].nome=this.value;salvarDados()"><input type="number" class="admin-input" style="width:100px" value="${item[subChave]}" onchange="dadosGerais.unidade.${chave}[${i}].${subChave}=parseInt(this.value);salvarDados()"><button onclick="dadosGerais.unidade.${chave}.splice(${i},1);salvarDados();mostrarSecao('${secao}')">X</button></div>`).join('')}<button class="admin-btn" onclick="dadosGerais.unidade.${chave}.push({nome:'Novo',${subChave}:0});mostrarSecao('${secao}')">+ Adicionar</button>`;
         }
 
         window.onload = () => { carregarDadosFirebase(); atualizarRelogio(); setInterval(atualizarRelogio, 1000); iniciarAnimacaoCarrossel(); };
