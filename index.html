@@ -221,7 +221,7 @@
         function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display = 'none'; }
 
         function atualizarInterface() {
-            renderBloco('itemFaltometro', 'FALTÔMETRO - FALTAS DOS PACIENTES', 'TOTAL MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
+            renderBloco('itemFaltometro', 'FALTÔMETRO - FALTAS DOS PACIENTES NESTA UNIDADE', 'TOTAL MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
             renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS REALIZADOS NESTA UNIDADE DE SAÚDE </span>', '<span style="color:white">TOTAL MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
             renderBloco('itemSMS', '<span style="color:white">ATENDIMENTOS REALIZADOS EM TODAS UNIDADES DE SAÚDE </span>', '<span style="color:white">TOTAL MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
