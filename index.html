@@ -221,9 +221,9 @@
         function ativarSom() { isMuted = false; carregarVideo(); document.getElementById('btnSom').style.display = 'none'; }
 
         function atualizarInterface() {
-            renderBloco('itemFaltometro', 'FALTÔMETRO - SMS', 'TOTAL DE FALTAS DOS PACIENTES MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
-            renderBloco('itemAtendimentos', '<span style="color:white">TOTAL DE ATENDIMENTOS REALIZADOS NESTA UNIDADE - SMS</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            renderBloco('itemSMS', '<span style="color:white">TOTAL DE ATENDIMENTOS REALIZADOS EM TODAS UNIDADES DE SAÚDE - SMS</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS DOS PACIENTES MÊS ANTERIOR NESTA UNIDADE', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
+            renderBloco('itemAtendimentos', '<span style="color:white">TOTAL DE ATENDIMENTOS REALIZADOS NESTA UNIDADE </span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+            renderBloco('itemSMS', '<span style="color:white">TOTAL DE ATENDIMENTOS NA REDE MUNICIPAL </span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
