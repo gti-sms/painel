@@ -223,7 +223,7 @@
         function atualizarInterface() {
             renderBloco('itemFaltometro', 'FALTÔMETRO', 'TOTAL DE FALTAS DOS PACIENTES MÊS ANTERIOR', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
             renderBloco('itemAtendimentos', '<span style="color:white">TOTAL DE ATENDIMENTOS REALIZADOS NESTA UNIDADE</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            renderBloco('itemSMS', '<span style="color:white">TOTAL DE ATENDIMENTOS DO MUNÍCIPIO</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            renderBloco('itemSMS', '<span style="color:white">TOTAL DE ATENDIMENTOS REALIZADOS NO MUNÍCIPIO</span>', '<span style="color:white">MÊS ANTERIOR</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
