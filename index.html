@@ -46,7 +46,7 @@
         .ticker-item.active { animation: slideInOut 30s ease-in-out forwards; }
         @keyframes slideInOut { 0% { transform: translateX(100%); opacity: 0; } 4% { transform: translateX(0); opacity: 1; } 96% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
 
-        /* ADMIN - REDESIGN PROFISSIONAL (não alterado) */
+        /* ADMIN - REDESIGN PROFISSIONAL */
         #loginScreen, #adminPanel { 
             display: none; 
             position: fixed; 
@@ -412,7 +412,6 @@
             font-size: 12px;
         }
         
-        /* NOVO: Cards de Unidades (não alterado) */
         .unidades-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -543,7 +542,7 @@
             color: #ddd;
         }
         
-        /* Modal de Criação (não alterado) */
+        /* Modal de Criação */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -722,7 +721,7 @@
             border: 1px solid #e0e0e0;
         }
         
-        /* NOVO: Estilos para monitoramento de unidades inativas */
+        /* Estilos para monitoramento de unidades inativas */
         .status-monitor {
             display: flex;
             gap: 15px;
@@ -887,7 +886,7 @@
             background: #e0e0e0;
         }
         
-        /* NOVOS ESTILOS PARA CONTROLE DE ACESSO */
+        /* ESTILOS PARA CONTROLE DE ACESSO */
         .access-message {
             text-align: center;
             padding: 40px;
@@ -933,6 +932,30 @@
             font-size: 18px;
             font-weight: 700;
             color: #1565c0;
+        }
+        
+        /* ESTILOS PARA MATRIZ (EXEMPLO) */
+        .exemplo-section {
+            border: 2px solid #ff9800 !important;
+        }
+        
+        .exemplo-header {
+            color: #ff9800 !important;
+        }
+        
+        .exemplo-info {
+            background: #fff3e0 !important;
+            border-left-color: #ff9800 !important;
+        }
+        
+        .btn-exemplo {
+            background: #ff9800 !important;
+            color: white !important;
+            border-color: #ff9800 !important;
+        }
+        
+        .btn-exemplo:hover {
+            background: #f57c00 !important;
         }
     </style>
 </head>
@@ -1100,28 +1123,23 @@
         let carouselIndex = 0;
         let tickerInterval = null;
 
-        // MODIFICAÇÃO: Nova função para verificar inatividade
         function verificarUnidadesInativas() {
             const agora = new Date();
-            const mesAtual = agora.getMonth(); // 0-11
+            const mesAtual = agora.getMonth();
             const anoAtual = agora.getFullYear();
             
             let unidadesInativasFalto = [];
             let unidadesInativasAtend = [];
             
-            // Analisar todas as unidades
             Object.entries(todasUnidades).forEach(([id, dados]) => {
-                if (id === 'geral') return; // Ignorar matriz
+                if (id === 'geral') return;
                 
                 const nome = dados.unidade?.nome || id;
-                
-                // Verificar logs detalhados desta unidade
                 const logsUnidade = Object.values(logsDetalhados).filter(log => 
                     log.unidadeID === id && 
                     (log.categoria === 'falto' || log.categoria === 'atend')
                 );
                 
-                // Verificar se há logs no mês atual para FALTÔMETRO
                 const temLogFaltoMesAtual = logsUnidade.some(log => {
                     if (log.categoria === 'falto' && log.data) {
                         const dataLog = parseDataLog(log.data);
@@ -1130,7 +1148,6 @@
                     return false;
                 });
                 
-                // Verificar se há logs no mês atual para ATENDIMENTOS
                 const temLogAtendMesAtual = logsUnidade.some(log => {
                     if (log.categoria === 'atend' && log.data) {
                         const dataLog = parseDataLog(log.data);
@@ -1139,7 +1156,6 @@
                     return false;
                 });
                 
-                // Se não tem log de faltômetro no mês atual
                 if (!temLogFaltoMesAtual) {
                     unidadesInativasFalto.push({
                         id: id,
@@ -1151,7 +1167,6 @@
                     });
                 }
                 
-                // Se não tem log de atendimentos no mês atual
                 if (!temLogAtendMesAtual) {
                     unidadesInativasAtend.push({
                         id: id,
@@ -1167,7 +1182,7 @@
             return {
                 faltometro: unidadesInativasFalto,
                 atendimentos: unidadesInativasAtend,
-                totalUnidades: Object.keys(todasUnidades).length - 1, // Exclui matriz
+                totalUnidades: Object.keys(todasUnidades).length - 1,
                 mesReferencia: `${agora.toLocaleDateString('pt-BR', { month: 'long' })}/${anoAtual}`
             };
         }
@@ -1176,7 +1191,6 @@
             const timestamp = new Date().toLocaleString('pt-BR');
             const nomeUnidade = dadosUnidade.unidade.nome || unidadeID;
             
-            // Determinar descrição baseada no tipo
             let descricao = '';
             let categoria = '';
             
@@ -1200,7 +1214,6 @@
                 categoria = 'unidade';
             }
             
-            // Criar objeto do log
             const logData = {
                 nome: nomeUnidade,
                 tipo: tipo,
@@ -1208,17 +1221,12 @@
                 descricao: descricao,
                 data: timestamp,
                 unidadeID: unidadeID,
-                mes: new Date().getMonth() + 1, // 1-12
+                mes: new Date().getMonth() + 1,
                 ano: new Date().getFullYear()
             };
             
-            // Gerar uma chave única baseada no timestamp
             const logKey = `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            
-            // Salvar no Firebase em um novo caminho para logs detalhados
             db.ref(`logs_detalhados/${logKey}`).set(logData);
-            
-            // Também manter o log simplificado para compatibilidade
             db.ref(`logs_atualizacao/${unidadeID}`).set({
                 nome: nomeUnidade,
                 data: timestamp,
@@ -1230,14 +1238,12 @@
             db.ref('paineis/' + unidadeID).set(dadosUnidade); 
             if(isMatriz) db.ref('paineis/geral').set(dadosGerais);
             
-            // Salvar log detalhado se especificado o tipo
             if(isLocalUpdate && tipoAlteracao) {
                 salvarLogDetalhado(tipoAlteracao);
             }
         }
         
         function carregarDadosFirebase() {
-            // Carrega dados da unidade atual
             db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
@@ -1248,7 +1254,6 @@
                 }
             });
             
-            // Carrega dados gerais (matriz)
             db.ref('paineis/geral').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if(data) { 
@@ -1257,19 +1262,16 @@
                 }
             });
             
-            // Carrega logs de atualização (simplificado) - APENAS PARA BACKEND
             db.ref('logs_atualizacao').on('value', (snapshot) => { 
                 logsAtualizacao = snapshot.val() || {}; 
                 verificarLimpezaAutomaticaLogs();
             });
             
-            // Carrega TODAS as unidades (apenas para matriz)
             if(isMatriz) {
                 db.ref('paineis').on('value', (snapshot) => {
                     todasUnidades = snapshot.val() || {};
                 });
                 
-                // Carrega logs detalhados
                 db.ref('logs_detalhados').on('value', (snapshot) => {
                     logsDetalhados = snapshot.val() || {};
                 });
@@ -1280,7 +1282,6 @@
             const SEIS_MESES_MS = 180 * 24 * 60 * 60 * 1000;
             const agora = new Date().getTime();
             
-            // Limpar logs simplificados antigos
             Object.keys(logsAtualizacao).forEach(id => {
                 const log = logsAtualizacao[id];
                 if (log.data) {
@@ -1295,7 +1296,6 @@
                 }
             });
             
-            // Também limpar logs detalhados antigos
             db.ref('logs_detalhados').once('value').then(snapshot => {
                 const logsDetalhados = snapshot.val() || {};
                 Object.keys(logsDetalhados).forEach(logKey => {
@@ -1384,23 +1384,42 @@
             if (items.length > 1) tickerInterval = setInterval(mostrarProximo, 30000);
         }
 
-        // MODIFICAÇÃO: Função renderAdminListaLocal - APENAS PARA UNIDADES
+        // FUNÇÃO MODIFICADA: Permite matriz editar como exemplo
         function renderAdminListaLocal(content, chave, subChave, titulo, descricao, secao) {
-            // Verificar se é matriz tentando acessar seção que só unidades podem editar
-            if (isMatriz && (secao === 'faltometro' || secao === 'atendimentos')) {
+            const itens = dadosUnidade.unidade[chave] || [];
+            
+            // Se for matriz, mostrar como exemplo
+            if (isMatriz) {
                 content.innerHTML = `
-                    <div class="admin-section">
-                        <h2><i class="fas fa-lock" style="color: #00c853;"></i> ${titulo} - Acesso Restrito</h2>
-                        <div class="section-info" style="background: #e8f5e9; border-left-color: #00c853;">
-                            <i class="fas fa-info-circle"></i> Esta seção é editada <strong>APENAS pelas unidades</strong>. 
-                            A matriz apenas visualiza os dados consolidados no painel principal.
-                            <br><br>
-                            <i class="fas fa-building"></i> Para editar, acesse o painel administrativo da unidade específica.
+                    <div class="admin-section exemplo-section">
+                        <h2 class="exemplo-header"><i class="fas fa-edit" style="color: #ff9800;"></i> ${titulo} - EXEMPLO</h2>
+                        <div class="section-info exemplo-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>ATENÇÃO: ESTA SEÇÃO É APENAS PARA EXEMPLO NA MATRIZ</strong><br><br>
+                            Os dados aqui configurados são apenas para demonstração. 
+                            As unidades reais configuram seus próprios dados em seus painéis individuais.
+                            ${descricao.replace('<strong>(Apenas esta unidade)</strong>', '<strong>(Exemplo na matriz)</strong>')}
                         </div>
-                        
-                        <h3 style="margin-top: 25px; color: #555;">Dados Atuais da Unidade:</h3>
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 10px;">
-                            ${renderListaSomenteLeitura(dadosUnidade.unidade[chave] || [], subChave)}
+                        <div id="listaEdicao">
+                            ${itens.map((e, i) => `
+                                <div class="item-row">
+                                    <input type="text" value="${e.nome}" placeholder="Nome" class="admin-input" onchange="atualizarItem(${i}, '${chave}', 'nome', this.value, '${secao}')">
+                                    <input type="number" value="${e[subChave]}" placeholder="Valor" class="admin-input" onchange="atualizarItem(${i}, '${chave}', '${subChave}', this.value, '${secao}')">
+                                    <button class="btn-remove" onclick="removerItem(${i}, '${chave}', '${secao}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn-add btn-exemplo" onclick="adicionarItem('${chave}', '${subChave}', '${secao}')">
+                            <i class="fas fa-plus"></i> Adicionar Item de Exemplo
+                        </button>
+                        <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #1565c0;">
+                            <h4 style="color: #555; margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Como Funciona:</h4>
+                            <ol style="margin-left: 20px; color: #666; font-size: 14px;">
+                                <li>Estes dados são apenas para demonstração na matriz</li>
+                                <li>Cada unidade tem seu próprio painel com dados reais</li>
+                                <li>Para ver dados reais, acesse uma unidade específica</li>
+                                <li>Os dados da matriz não afetam as unidades</li>
+                            </ol>
                         </div>
                     </div>
                 `;
@@ -1408,7 +1427,6 @@
             }
             
             // Código original para unidades...
-            const itens = dadosUnidade.unidade[chave] || [];
             content.innerHTML = `
                 <div class="admin-section">
                     <h2><i class="fas fa-edit"></i> ${titulo}</h2>
@@ -1431,7 +1449,6 @@
             `;
         }
 
-        // MODIFICAÇÃO: Função renderAdminListaGeral - APENAS PARA MATRIZ
         function renderAdminListaGeral(content, chave, subChave, titulo) {
             // Verificar se é unidade tentando acessar seção que só matriz pode editar
             if (!isMatriz) {
@@ -1477,7 +1494,6 @@
             `;
         }
 
-        // NOVA FUNÇÃO: Renderizar lista somente leitura
         function renderListaSomenteLeitura(itens, subChave) {
             if (itens.length === 0) {
                 return '<p style="color: #666; font-style: italic;">Nenhum dado disponível</p>';
@@ -1496,7 +1512,7 @@
             return html;
         }
 
-        // MODIFICAÇÃO: Função mostrarSecao - ATUALIZAR PARA LÓGICA DE ACESSO
+        // FUNÇÃO MODIFICADA: Permite matriz acessar faltômetro e atendimentos como exemplo
         function mostrarSecao(secao) {
             const content = document.getElementById('adminContent');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -1504,20 +1520,13 @@
             let activeElement = document.querySelector(`.sidebar-item[onclick*="${secao}"]`);
             if (activeElement) activeElement.classList.add('active');
             
-            // LÓGICA DE CONTROLE DE ACESSO
-            const secaoUnidade = ['faltometro', 'atendimentos'];
+            // LÓGICA ATUALIZADA: Permitir matriz acessar faltômetro e atendimentos como exemplo
+            const secaoUnidade = ['faltometro', 'atendimentos']; // AGORA permitido para matriz como exemplo
             const secaoMatriz = ['sms', 'video', 'unidades', 'monitor'];
             const secaoHibrida = ['avisos'];
             
-            // Verificar acesso para seções exclusivas
-            if (secaoUnidade.includes(secao) && isMatriz) {
-                // Matriz tenta acessar seção de unidade - mostrar mensagem
-                mostrarMensagemAcessoRestrito(content, secao, 'unidade');
-                return;
-            }
-            
+            // Verificar acesso para seções exclusivas da matriz
             if (secaoMatriz.includes(secao) && !isMatriz) {
-                // Unidade tenta acessar seção de matriz - mostrar mensagem
                 mostrarMensagemAcessoRestrito(content, secao, 'matriz');
                 return;
             }
@@ -1526,35 +1535,44 @@
             if(secao === 'unidade') {
                 content.innerHTML = `
                     <div class="admin-section">
-                        <h2><i class="fas fa-hospital"></i> Identificação da Unidade</h2>
+                        <h2><i class="fas fa-hospital"></i> Identificação da ${isMatriz ? 'Matriz' : 'Unidade'}</h2>
                         <div class="section-info">
-                            <i class="fas fa-info-circle"></i> Configure o nome da unidade que aparecerá no painel
-                            ${isMatriz ? ' <strong>(Matriz - Controle Central)</strong>' : ''}
+                            <i class="fas fa-info-circle"></i> Configure o nome da ${isMatriz ? 'matriz' : 'unidade'} que aparecerá no painel
+                            ${isMatriz ? ' <strong>(Controle Central)</strong>' : ''}
                         </div>
                         <div style="max-width: 500px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
-                            <input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}" placeholder="Digite o nome da unidade">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da ${isMatriz ? 'Matriz' : 'Unidade'}:</label>
+                            <input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}" placeholder="Digite o nome">
                             <button class="admin-btn" onclick="dadosUnidade.unidade.nome=document.getElementById('uNome').value; document.getElementById('adminUnidadeNome').textContent = document.getElementById('uNome').value; salvarDados(true, 'unidade'); mostrarNotificacao('Nome salvo com sucesso!', 'success')" style="margin-top: 20px;">
                                 <i class="fas fa-save"></i> Salvar Alterações
                             </button>
+                            ${isMatriz ? `
+                            <div style="margin-top: 15px; padding: 12px; background: #e3f2fd; border-radius: 6px; border-left: 4px solid #1565c0;">
+                                <i class="fas fa-info-circle"></i> A matriz é o painel de controle central que gerencia todas as unidades.
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
             } else if(['faltometro', 'atendimentos'].includes(secao)) {
-                // Acesso já validado acima
+                // AGORA permitido para matriz como exemplo
                 let chave = secao === 'faltometro' ? 'especialidades' : 'atendimentos';
                 let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
                 let titulo = secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos da Unidade';
                 let descricao = secao === 'faltometro' ? 
-                    'Configure as especialidades e número de faltas dos pacientes <strong>(Apenas esta unidade)</strong>' : 
-                    'Configure os tipos de atendimentos realizados nesta unidade <strong>(Apenas esta unidade)</strong>';
+                    (isMatriz ? 'Exemplo de especialidades e faltas (APENAS PARA DEMONSTRAÇÃO)' : 
+                     'Configure as especialidades e número de faltas dos pacientes <strong>(Apenas esta unidade)</strong>') : 
+                    (isMatriz ? 'Exemplo de atendimentos (APENAS PARA DEMONSTRAÇÃO)' : 
+                     'Configure os tipos de atendimentos realizados nesta unidade <strong>(Apenas esta unidade)</strong>');
                 
                 renderAdminListaLocal(content, chave, subChave, titulo, descricao, secao);
             } else if(secao === 'sms') {
-                // Acesso já validado acima
+                if (!isMatriz) {
+                    mostrarMensagemAcessoRestrito(content, secao, 'matriz');
+                    return;
+                }
                 renderAdminListaGeral(content, 'smsMunicipal', 'valor', 'Produção Municipal');
             } else if(secao === 'avisos') {
-                // Seção HÍBRIDA - ambos podem editar
                 let target = isMatriz ? dadosGerais : dadosUnidade;
                 let tipo = isMatriz ? 'Globais (Matriz)' : 'Locais (Unidade)';
                 let descricao = isMatriz ? 
@@ -1579,7 +1597,6 @@
                     </div>
                 `;
             } else if(secao === 'video') {
-                // Acesso já validado acima
                 if (!isMatriz) {
                     mostrarMensagemAcessoRestrito(content, 'video', 'matriz');
                     return;
@@ -1612,7 +1629,6 @@
             }
         }
 
-        // NOVA FUNÇÃO: Mostrar mensagem de acesso restrito
         function mostrarMensagemAcessoRestrito(content, secao, tipoPermissao) {
             const secoesNomes = {
                 'faltometro': 'Faltômetro',
@@ -1743,14 +1759,12 @@
             mostrarSecao('sms');
         }
 
-        // MODIFICAÇÃO: Função atualizada para mostrar unidades SEM REDUNDÂNCIA
         function mostrarTodasUnidades() {
             db.ref('paineis').once('value').then(snapshot => {
                 const unidades = snapshot.val() || {};
                 const logs = logsAtualizacao;
                 const dadosInatividade = verificarUnidadesInativas();
                 
-                // Criar conjunto de IDs inativos para fácil verificação
                 const idsInativosFalto = new Set(dadosInatividade.faltometro.map(u => u.id));
                 const idsInativosAtend = new Set(dadosInatividade.atendimentos.map(u => u.id));
                 
@@ -1758,15 +1772,11 @@
                     const isMatrizUnidade = (id === 'geral');
                     const nome = dados.unidade?.nome || (isMatrizUnidade ? 'MATRIZ' : id);
                     
-                    // Contar estatísticas
                     const totalEspecialidades = (dados.unidade?.especialidades || []).length;
                     const totalAtendimentos = (dados.unidade?.atendimentos || []).length;
                     const totalAvisos = (dados.avisos || []).length;
                     
-                    // Última atualização
                     const ultimaAtualizacao = logs[id]?.data || 'Nunca atualizou';
-                    
-                    // Verificar se está inativo no mês
                     const isInativoFalto = idsInativosFalto.has(id);
                     const isInativoAtend = idsInativosAtend.has(id);
                     const isInativo = isInativoFalto || isInativoAtend;
@@ -1786,7 +1796,6 @@
                     };
                 });
                 
-                // Ordenar: Matriz primeiro, depois por inatividade, depois por nome
                 unidadesArray.sort((a, b) => {
                     if (a.isMatrizUnidade) return -1;
                     if (b.isMatrizUnidade) return 1;
@@ -1839,7 +1848,6 @@
                         const link = `${window.location.origin}${window.location.pathname}?id=${unidade.id}`;
                         const cardClass = unidade.isInativo ? 'unidade-card unidade-inativa' : 'unidade-card';
                         
-                        // MODIFICAÇÃO: Texto alterado para evitar redundância
                         const inativaText = unidade.isInativo ? 
                             (unidade.isInativoFalto && unidade.isInativoAtend ? 
                                 '<span class="inativa-label"><i class="fas fa-exclamation-triangle"></i> INATIVA NO MÊS</span>' : 
@@ -1848,7 +1856,6 @@
                                 '<span class="inativa-label"><i class="fas fa-exclamation-triangle"></i> SEM ATENDIMENTOS</span>'
                             ) : '';
                         
-                        // MODIFICAÇÃO: Status alterado para ficar mais claro
                         const statusText = unidade.ultimaAtualizacao !== 'Nunca atualizou' ? 'Ativa' : 'Sem Histórico';
                         const statusClass = unidade.ultimaAtualizacao !== 'Nunca atualizou' ? 'status-active' : 'status-inactive';
                         
@@ -1905,10 +1912,10 @@
                         `;
                     });
                     
-                    html += '</div>'; // fecha unidades-grid
+                    html += '</div>';
                 }
                 
-                html += '</div>'; // fecha admin-section
+                html += '</div>';
                 
                 document.getElementById('adminContent').innerHTML = html;
             });
@@ -1946,7 +1953,6 @@
                     </div>
             `;
             
-            // Combinar e ordenar todas as unidades inativas
             const todasInativas = [
                 ...dadosInatividade.faltometro.map(u => ({ ...u, tipo: 'falto' })),
                 ...dadosInatividade.atendimentos.map(u => ({ ...u, tipo: 'atend' }))
@@ -2001,7 +2007,7 @@
                 `;
             }
             
-            html += '</div>'; // Fecha admin-section
+            html += '</div>';
             
             document.getElementById('adminContent').innerHTML = html;
         }
@@ -2028,7 +2034,6 @@
             }
         }
 
-        // Funções auxiliares mantidas
         function parseDataLog(dataString) {
             if (!dataString || dataString === 'Nunca atualizou') return new Date(0);
             try {
@@ -2058,13 +2063,10 @@
             return 'Agora mesmo';
         }
 
-        // Funções de notificação
         function mostrarNotificacao(mensagem, tipo = "success") {
-            // Implementação básica de notificação
             alert(mensagem);
         }
 
-        // Funções auxiliares de modal
         function abrirModalCriarUnidade() {
             document.getElementById('modalCriarUnidade').style.display = 'flex';
         }
@@ -2083,14 +2085,12 @@
                 return;
             }
             
-            // Verificar se ID já existe
             db.ref('paineis/' + id).once('value').then(snapshot => {
                 if (snapshot.exists()) {
                     mostrarNotificacao('ID já existe! Escolha outro ID.', 'error');
                     return;
                 }
                 
-                // Criar nova unidade
                 const novaUnidade = {
                     unidade: {
                         nome: nome,
