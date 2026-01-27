@@ -1192,7 +1192,6 @@
                     </div>
                     <div class="user-details">
                         <div class="user-name" id="userName">Carregando...</div>
-                        <div class="user-email" id="userEmail"></div>
                         <div class="user-role" id="userRole"></div>
                     </div>
                 </div>
@@ -1426,7 +1425,6 @@
                 usuarioAtual = {
                     login: usuario,
                     nome: usuarioEncontrado.nome,
-                    email: usuarioEncontrado.email || `${usuario}@pmpf.rs.gov.br`,
                     usuarioKey: usuarioKey
                 };
                 
@@ -1465,7 +1463,6 @@
             if (!usuarioAtual) return;
             
             document.getElementById('userName').textContent = usuarioAtual.nome || usuarioAtual.login;
-            document.getElementById('userEmail').textContent = usuarioAtual.email || '';
             
             // Configurar role
             let roleText = '';
@@ -1803,13 +1800,12 @@
                                     ${dados.status === 'inativo' ? '<span class="user-status status-inactive" style="margin-left: 5px;">INATIVO</span>' : ''}
                                 </div>
                                 <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Login: ${dados.login}</div>
-                                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Email: ${dados.email || 'Não informado'}</div>
                                 <div style="color: #888; font-size: 12px; margin-bottom: 15px;">
                                     <i class="fas fa-hospital"></i> ${unidadesText || 'Nenhuma unidade'}
                                 </div>
                                 
                                 <div class="user-actions">
-                                    <button class="btn-remove" style="background: #ff9800;" onclick="editarUsuario('${key}', ${JSON.stringify(dados).replace(/'/g, "\\'")})">
+                                    <button class="btn-remove" style="background: #ff9800;" onclick="editarUsuario('${key}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     ${dados.login !== 'gti' ? `
@@ -1857,11 +1853,6 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="novoUsuarioEmail">E-mail</label>
-                    <input type="email" id="novoUsuarioEmail" class="admin-input" placeholder="exemplo@pmpf.rs.gov.br">
-                </div>
-                
-                <div class="form-group">
                     <label for="novoUsuarioSenha">Senha</label>
                     <input type="password" id="novoUsuarioSenha" class="admin-input" placeholder="Digite uma senha segura">
                 </div>
@@ -1903,13 +1894,25 @@
                 const container = document.getElementById('unidadesSelecionaveis');
                 let html = '';
                 
-                Object.entries(unidades).forEach(([id, dados]) => {
+                // Converter para array e ordenar por nome
+                const unidadesArray = Object.entries(unidades).map(([id, dados]) => {
                     const nome = dados.unidade?.nome || (id === 'geral' ? 'MATRIZ' : id);
+                    return { id, nome };
+                });
+                
+                // Ordenar: primeiro a matriz, depois as unidades em ordem alfabética
+                unidadesArray.sort((a, b) => {
+                    if (a.id === 'geral') return -1;
+                    if (b.id === 'geral') return 1;
+                    return a.nome.localeCompare(b.nome);
+                });
+                
+                unidadesArray.forEach(unidade => {
                     html += `
                         <div style="margin-bottom: 5px;">
                             <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" value="${id}" class="permission-checkbox" style="margin-right: 10px;">
-                                ${nome} (${id})
+                                <input type="checkbox" value="${unidade.id}" class="permission-checkbox" style="margin-right: 10px;">
+                                ${unidade.nome} (${unidade.id})
                             </label>
                         </div>
                     `;
@@ -1922,7 +1925,6 @@
         function adicionarNovoUsuario() {
             const nome = document.getElementById('novoUsuarioNome').value.trim();
             const login = document.getElementById('novoUsuarioLogin').value.trim().toLowerCase();
-            const email = document.getElementById('novoUsuarioEmail').value.trim().toLowerCase();
             const senha = document.getElementById('novoUsuarioSenha').value;
             const nivel = document.getElementById('novoUsuarioNivel').value;
             
@@ -1960,7 +1962,6 @@
                 const novoUsuario = {
                     nome: nome,
                     login: login,
-                    email: email,
                     senha: senha,
                     nivel: nivel,
                     unidades_permitidas: unidadesPermitidas,
@@ -1984,67 +1985,71 @@
             });
         }
 
-        function editarUsuario(key, dados) {
-            document.getElementById('modalUsuarioTitulo').textContent = 'Editar Usuário';
-            
-            let html = `
-                <div class="form-group">
-                    <label for="editarUsuarioNome">Nome Completo</label>
-                    <input type="text" id="editarUsuarioNome" class="admin-input" value="${dados.nome}">
-                </div>
+        function editarUsuario(key) {
+            // Carregar dados do usuário do Firebase
+            db.ref('usuarios/' + key).once('value').then((snapshot) => {
+                const dados = snapshot.val();
+                if (!dados) {
+                    mostrarNotificacao('Usuário não encontrado!', 'error');
+                    return;
+                }
                 
-                <div class="form-group">
-                    <label>Login</label>
-                    <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">${dados.login}</div>
-                    <small style="color: #666; font-size: 12px;">O login não pode ser alterado</small>
-                </div>
+                document.getElementById('modalUsuarioTitulo').textContent = 'Editar Usuário';
                 
-                <div class="form-group">
-                    <label for="editarUsuarioEmail">E-mail</label>
-                    <input type="email" id="editarUsuarioEmail" class="admin-input" value="${dados.email || ''}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="editarUsuarioSenha">Nova Senha (deixe em branco para manter a atual)</label>
-                    <input type="password" id="editarUsuarioSenha" class="admin-input" placeholder="Digite nova senha">
-                </div>
-                
-                <div class="form-group">
-                    <label for="editarUsuarioNivel">Nível de Permissão</label>
-                    <select id="editarUsuarioNivel" class="admin-input">
-                        <option value="admin_unidade" ${dados.nivel === 'admin_unidade' ? 'selected' : ''}>Administrador da Unidade</option>
-                        <option value="super_admin" ${dados.nivel === 'super_admin' ? 'selected' : ''}>Super Administrador</option>
-                        <option value="visualizador" ${dados.nivel === 'visualizador' ? 'selected' : ''}>Visualizador (Somente Leitura)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editarUsuarioStatus">Status</label>
-                    <select id="editarUsuarioStatus" class="admin-input">
-                        <option value="ativo" ${dados.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                        <option value="inativo" ${dados.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Unidades Permitidas</label>
-                    <div id="unidadesSelecionaveisEditar" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px;">
-                        <!-- Unidades serão carregadas aqui -->
+                let html = `
+                    <div class="form-group">
+                        <label for="editarUsuarioNome">Nome Completo</label>
+                        <input type="text" id="editarUsuarioNome" class="admin-input" value="${dados.nome}">
                     </div>
-                </div>
+                    
+                    <div class="form-group">
+                        <label>Login</label>
+                        <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">${dados.login}</div>
+                        <small style="color: #666; font-size: 12px;">O login não pode ser alterado</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editarUsuarioSenha">Nova Senha (deixe em branco para manter a atual)</label>
+                        <input type="password" id="editarUsuarioSenha" class="admin-input" placeholder="Digite nova senha">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editarUsuarioNivel">Nível de Permissão</label>
+                        <select id="editarUsuarioNivel" class="admin-input">
+                            <option value="admin_unidade" ${dados.nivel === 'admin_unidade' ? 'selected' : ''}>Administrador da Unidade</option>
+                            <option value="super_admin" ${dados.nivel === 'super_admin' ? 'selected' : ''}>Super Administrador</option>
+                            <option value="visualizador" ${dados.nivel === 'visualizador' ? 'selected' : ''}>Visualizador (Somente Leitura)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editarUsuarioStatus">Status</label>
+                        <select id="editarUsuarioStatus" class="admin-input">
+                            <option value="ativo" ${dados.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                            <option value="inativo" ${dados.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Unidades Permitidas</label>
+                        <div id="unidadesSelecionaveisEditar" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px;">
+                            <!-- Unidades serão carregadas aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="admin-btn admin-btn-secondary" onclick="fecharModal()">Cancelar</button>
+                        <button class="admin-btn admin-btn-primary" onclick="salvarEdicaoUsuario('${key}')">Salvar Alterações</button>
+                    </div>
+                `;
                 
-                <div class="form-actions">
-                    <button class="admin-btn admin-btn-secondary" onclick="fecharModal()">Cancelar</button>
-                    <button class="admin-btn admin-btn-primary" onclick="salvarEdicaoUsuario('${key}')">Salvar Alterações</button>
-                </div>
-            `;
-            
-            document.getElementById('modalUsuarioContent').innerHTML = html;
-            
-            // Carregar unidades com as selecionadas
-            carregarUnidadesParaEdicao(dados.unidades_permitidas || []);
-            
-            document.getElementById('modalGerenciarUsuario').style.display = 'flex';
+                document.getElementById('modalUsuarioContent').innerHTML = html;
+                
+                // Carregar unidades com as selecionadas
+                carregarUnidadesParaEdicao(dados.unidades_permitidas || []);
+                
+                document.getElementById('modalGerenciarUsuario').style.display = 'flex';
+            });
         }
 
         function carregarUnidadesParaEdicao(unidadesPermitidas) {
@@ -2053,16 +2058,27 @@
                 const container = document.getElementById('unidadesSelecionaveisEditar');
                 let html = '';
                 
-                Object.entries(unidades).forEach(([id, dados]) => {
+                // Converter para array e ordenar por nome
+                const unidadesArray = Object.entries(unidades).map(([id, dados]) => {
                     const nome = dados.unidade?.nome || (id === 'geral' ? 'MATRIZ' : id);
                     const isSelecionada = unidadesPermitidas.includes('todas') || unidadesPermitidas.includes(id);
-                    
+                    return { id, nome, isSelecionada };
+                });
+                
+                // Ordenar: primeiro a matriz, depois as unidades em ordem alfabética
+                unidadesArray.sort((a, b) => {
+                    if (a.id === 'geral') return -1;
+                    if (b.id === 'geral') return 1;
+                    return a.nome.localeCompare(b.nome);
+                });
+                
+                unidadesArray.forEach(unidade => {
                     html += `
                         <div style="margin-bottom: 5px;">
                             <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" value="${id}" class="permission-checkbox" 
-                                    ${isSelecionada ? 'checked' : ''} style="margin-right: 10px;">
-                                ${nome} (${id})
+                                <input type="checkbox" value="${unidade.id}" class="permission-checkbox" 
+                                    ${unidade.isSelecionada ? 'checked' : ''} style="margin-right: 10px;">
+                                ${unidade.nome} (${unidade.id})
                             </label>
                         </div>
                     `;
@@ -2074,7 +2090,6 @@
 
         function salvarEdicaoUsuario(key) {
             const nome = document.getElementById('editarUsuarioNome').value.trim();
-            const email = document.getElementById('editarUsuarioEmail').value.trim().toLowerCase();
             const novaSenha = document.getElementById('editarUsuarioSenha').value;
             const nivel = document.getElementById('editarUsuarioNivel').value;
             const status = document.getElementById('editarUsuarioStatus').value;
@@ -2090,7 +2105,6 @@
             
             const usuarioAtualizado = {
                 nome: nome,
-                email: email,
                 nivel: nivel,
                 status: status,
                 unidades_permitidas: unidadesPermitidas,
@@ -3059,7 +3073,6 @@
                     const adminUsuario = {
                         nome: 'Administrador Principal GTI',
                         login: adminLogin,
-                        email: 'gti@pmpf.rs.gov.br',
                         senha: 'Itatilac2009',
                         nivel: 'super_admin',
                         unidades_permitidas: ['todas'],
