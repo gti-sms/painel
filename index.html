@@ -960,7 +960,7 @@
             background: #f57c00 !important;
         }
         
-        /* NOVOS ESTILOS PARA AUTENTICAÇÃO */
+        /* ESTILOS PARA AUTENTICAÇÃO SEM GOOGLE */
         .login-method {
             background: white;
             border: 2px solid #e0e0e0;
@@ -1046,7 +1046,7 @@
             color: white;
         }
         
-        .role-unidade {
+        .role-visualizador {
             background: #ff9800;
             color: white;
         }
@@ -1175,15 +1175,21 @@
                 <i class="fas fa-lock" id="loginIcon"></i>
             </div>
             <h2 id="loginLabel">Acesso Administrativo</h2>
-            <p id="loginDescription">Escolha o método de login</p>
+            <p id="loginDescription">Digite suas credenciais de acesso</p>
             
             <div id="loginMethods">
-                <!-- Métodos de login serão carregados aqui -->
+                <input type="text" id="loginUsuario" class="admin-input" placeholder="Usuário (ex: gti)" style="margin-bottom: 15px;">
+                <input type="password" id="loginSenha" class="admin-input" placeholder="Senha">
+                <button class="admin-btn" style="width:100%; margin-top: 20px;" onclick="verificarLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
             </div>
             
             <div id="userInfo" style="display: none;">
                 <div class="user-info">
-                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-avatar" id="userAvatar">
+                        <i class="fas fa-user-circle" style="font-size: 50px; color: #666;"></i>
+                    </div>
                     <div class="user-details">
                         <div class="user-name" id="userName">Carregando...</div>
                         <div class="user-email" id="userEmail"></div>
@@ -1255,7 +1261,7 @@
             </div>
         </div>
         <div class="version-info">
-            Sistema de Saúde PMPF v3.0 | Autenticação com Google
+            Sistema de Saúde PMPF v3.0 | Sistema de Autenticação Local
         </div>
     </div>
 
@@ -1324,10 +1330,6 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
-        
-        // Configuração de domínio autorizado (opcional)
-        auth.useDeviceLanguage();
         
         // Variáveis globais
         const urlParams = new URLSearchParams(window.location.search);
@@ -1362,121 +1364,86 @@
             }
             
             document.getElementById('loginLabel').innerText = isMatriz ? "Acesso Matriz" : "Acesso Unidade";
-            document.getElementById('loginDescription').innerText = "Escolha o método de login";
+            document.getElementById('loginDescription').innerText = "Digite suas credenciais de acesso";
             document.getElementById('loginIcon').className = "fas fa-lock";
             
-            // Mostrar métodos de login
-            let html = `
-                <div class="login-method" onclick="loginComGoogle()">
-                    <h3><i class="fab fa-google" style="color: #DB4437;"></i> Entrar com Google</h3>
-                    <p style="color: #666; font-size: 14px;">Use sua conta do Google (@pmpf.rs.gov.br)</p>
-                </div>
-                
-                <div class="login-method" onclick="loginComSenha()" style="display: ${isMatriz ? 'block' : 'none'}">
-                    <h3><i class="fas fa-key" style="color: #FF9800;"></i> Login com Senha (Legado)</h3>
-                    <p style="color: #666; font-size: 14px;">Para compatibilidade com versões antigas</p>
-                </div>
+            // Mostrar formulário de login
+            document.getElementById('loginMethods').innerHTML = `
+                <input type="text" id="loginUsuario" class="admin-input" placeholder="Usuário (ex: gti)" style="margin-bottom: 15px;">
+                <input type="password" id="loginSenha" class="admin-input" placeholder="Senha">
+                <button class="admin-btn" style="width:100%; margin-top: 20px;" onclick="verificarLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
             `;
             
-            document.getElementById('loginMethods').innerHTML = html;
             document.getElementById('userInfo').style.display = 'none';
             document.getElementById('loginMethods').style.display = 'block';
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        function loginComGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
+        function verificarLogin() {
+            const usuario = document.getElementById('loginUsuario').value.trim();
+            const senha = document.getElementById('loginSenha').value;
             
-            // Opcional: restringir ao domínio pmpf.rs.gov.br
-            // provider.setCustomParameters({
-            //     hd: 'pmpf.rs.gov.br'
-            // });
-            
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    usuarioAtual = result.user;
-                    console.log('Usuário logado:', usuarioAtual.email);
-                    
-                    // Verificar se o usuário está autorizado
-                    verificarPermissoesUsuario();
-                })
-                .catch((error) => {
-                    console.error('Erro no login:', error);
-                    mostrarNotificacao('Erro ao fazer login com Google: ' + error.message, 'error');
-                });
-        }
-
-        function loginComSenha() {
-            // Método legado para compatibilidade
-            document.getElementById('loginMethods').innerHTML = `
-                <input type="password" id="adminPass" class="admin-input" placeholder="Digite a senha da matriz">
-                <button class="admin-btn" style="width:100%; margin-top: 20px;" onclick="verificarSenhaLegada()">
-                    <i class="fas fa-sign-in-alt"></i> Entrar
-                </button>
-            `;
-        }
-
-        function verificarSenhaLegada() {
-            const pass = document.getElementById('adminPass').value;
-            const senhaCorreta = isMatriz ? (pass === 'Itatilac2009') : (pass === 'smspmpf2026');
-            
-            if(senhaCorreta) {
-                // Criar usuário temporário para senha legada
-                usuarioAtual = {
-                    email: 'legado@senha.local',
-                    displayName: 'Usuário Legado',
-                    photoURL: null
-                };
-                
-                permissoesUsuario = {
-                    nivel: isMatriz ? 'super_admin' : 'admin_unidade',
-                    unidades_permitidas: isMatriz ? ['todas'] : [unidadeID],
-                    nome: 'Usuário Legado'
-                };
-                
-                mostrarInfoUsuario();
-            } else {
-                mostrarNotificacao("Senha Incorreta.", "error");
-                document.getElementById('adminPass').value = '';
-                document.getElementById('adminPass').focus();
-            }
-        }
-
-        function verificarPermissoesUsuario() {
-            if (!usuarioAtual || !usuarioAtual.email) {
-                mostrarNotificacao('Erro: usuário não identificado', 'error');
+            if (!usuario || !senha) {
+                mostrarNotificacao('Preencha todos os campos!', 'error');
                 return;
             }
             
-            // Normalizar email para usar como chave (substituir pontos por vírgulas)
-            const emailKey = usuarioAtual.email.replace(/\./g, ',');
-            
-            db.ref('usuarios/' + emailKey).once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        permissoesUsuario = snapshot.val();
-                        
-                        // Verificar se o usuário tem acesso à unidade atual
-                        if (temAcessoUnidade()) {
-                            mostrarInfoUsuario();
-                        } else {
-                            mostrarNotificacao('Você não tem permissão para acessar esta unidade.', 'error');
-                            auth.signOut();
-                            usuarioAtual = null;
-                            permissoesUsuario = null;
-                        }
-                    } else {
-                        // Usuário não encontrado na lista de autorizados
-                        mostrarNotificacao('Seu e-mail não está autorizado para acessar este sistema.', 'error');
-                        auth.signOut();
-                        usuarioAtual = null;
-                        permissoesUsuario = null;
+            // Verificar credenciais no Firebase
+            db.ref('usuarios').once('value').then((snapshot) => {
+                const usuarios = snapshot.val() || {};
+                
+                // Procurar usuário pelo login
+                let usuarioEncontrado = null;
+                let usuarioKey = null;
+                
+                Object.entries(usuarios).forEach(([key, dados]) => {
+                    if (dados.login === usuario) {
+                        usuarioEncontrado = dados;
+                        usuarioKey = key;
                     }
-                })
-                .catch((error) => {
-                    console.error('Erro ao verificar permissões:', error);
-                    mostrarNotificacao('Erro ao verificar permissões.', 'error');
                 });
+                
+                if (!usuarioEncontrado) {
+                    mostrarNotificacao('Usuário não encontrado!', 'error');
+                    return;
+                }
+                
+                // Verificar senha
+                if (usuarioEncontrado.senha !== senha) {
+                    mostrarNotificacao('Senha incorreta!', 'error');
+                    return;
+                }
+                
+                // Verificar se está ativo
+                if (usuarioEncontrado.status === 'inativo') {
+                    mostrarNotificacao('Usuário desativado!', 'error');
+                    return;
+                }
+                
+                // Login bem sucedido
+                usuarioAtual = {
+                    login: usuario,
+                    nome: usuarioEncontrado.nome,
+                    email: usuarioEncontrado.email || `${usuario}@pmpf.rs.gov.br`,
+                    usuarioKey: usuarioKey
+                };
+                
+                permissoesUsuario = usuarioEncontrado;
+                
+                // Verificar se o usuário tem acesso à unidade atual
+                if (temAcessoUnidade()) {
+                    mostrarInfoUsuario();
+                } else {
+                    mostrarNotificacao('Você não tem permissão para acessar esta unidade.', 'error');
+                    usuarioAtual = null;
+                    permissoesUsuario = null;
+                }
+            }).catch((error) => {
+                console.error('Erro ao verificar login:', error);
+                mostrarNotificacao('Erro ao verificar credenciais.', 'error');
+            });
         }
 
         function temAcessoUnidade() {
@@ -1497,15 +1464,8 @@
         function mostrarInfoUsuario() {
             if (!usuarioAtual) return;
             
-            // Configurar avatar
-            let avatarHTML = '<i class="fas fa-user-circle" style="font-size: 50px; color: #666;"></i>';
-            if (usuarioAtual.photoURL) {
-                avatarHTML = `<img src="${usuarioAtual.photoURL}" alt="Avatar">`;
-            }
-            
-            document.getElementById('userAvatar').innerHTML = avatarHTML;
-            document.getElementById('userName').textContent = usuarioAtual.displayName || 'Usuário';
-            document.getElementById('userEmail').textContent = usuarioAtual.email;
+            document.getElementById('userName').textContent = usuarioAtual.nome || usuarioAtual.login;
+            document.getElementById('userEmail').textContent = usuarioAtual.email || '';
             
             // Configurar role
             let roleText = '';
@@ -1523,11 +1483,11 @@
                         break;
                     case 'visualizador':
                         roleText = 'Visualizador';
-                        roleClass = 'role-unidade';
+                        roleClass = 'role-visualizador';
                         break;
                     default:
                         roleText = 'Usuário';
-                        roleClass = 'role-unidade';
+                        roleClass = 'role-visualizador';
                 }
             }
             
@@ -1553,7 +1513,7 @@
             document.getElementById('adminPanel').style.display = 'flex';
             
             // Atualizar informações no cabeçalho
-            document.getElementById('adminUserName').textContent = usuarioAtual.displayName || usuarioAtual.email;
+            document.getElementById('adminUserName').textContent = usuarioAtual.nome || usuarioAtual.login;
             
             // Mostrar seção inicial
             mostrarSecao('unidade');
@@ -1575,25 +1535,21 @@
             document.getElementById('menuVideo').style.display = isMatriz ? 'block' : (nivel === 'super_admin' ? 'block' : 'none');
             
             // Menus que todos os administradores veem
-            document.getElementById('menuFalto').style.display = 'block';
-            document.getElementById('menuAtend').style.display = 'block';
+            document.getElementById('menuFalto').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+            document.getElementById('menuAtend').style.display = nivel !== 'visualizador' ? 'block' : 'none';
         }
 
         function trocarUsuario() {
-            auth.signOut().then(() => {
-                usuarioAtual = null;
-                permissoesUsuario = null;
-                openLogin();
-            });
+            usuarioAtual = null;
+            permissoesUsuario = null;
+            openLogin();
         }
 
         function logout() {
-            auth.signOut().then(() => {
-                usuarioAtual = null;
-                permissoesUsuario = null;
-                document.getElementById('adminPanel').style.display = 'none';
-                mostrarNotificacao('Você saiu do sistema.', 'info');
-            });
+            usuarioAtual = null;
+            permissoesUsuario = null;
+            document.getElementById('adminPanel').style.display = 'none';
+            mostrarNotificacao('Você saiu do sistema.', 'info');
         }
 
         // ============================================
@@ -1606,6 +1562,12 @@
             
             // Super admin tem acesso a tudo
             if (permissoesUsuario.nivel === 'super_admin') return true;
+            
+            // Visualizador só pode ver algumas seções
+            if (permissoesUsuario.nivel === 'visualizador') {
+                const secoesVisualizacao = ['unidade', 'avisos'];
+                return secoesVisualizacao.includes(secao);
+            }
             
             // Seções que qualquer admin pode acessar
             const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos'];
@@ -1638,15 +1600,11 @@
                 mostrarGerenciamentoUsuarios();
             } else {
                 // Chamar as funções originais para outras seções
-                // (As funções originais permanecem inalteradas)
                 mostrarSecaoOriginal(secao, content);
             }
         }
 
         function mostrarSecaoOriginal(secao, content) {
-            // Esta função contém o código original de mostrarSecao
-            // Foi separada para manter a compatibilidade
-            
             const secaoUnidade = ['faltometro', 'atendimentos'];
             const secaoMatriz = ['sms', 'video', 'unidades', 'monitor'];
             const secaoHibrida = ['avisos'];
@@ -1674,6 +1632,24 @@
                     </div>
                 `;
             } else if(['faltometro', 'atendimentos'].includes(secao)) {
+                // Verificar se é visualizador
+                if (permissoesUsuario.nivel === 'visualizador') {
+                    content.innerHTML = `
+                        <div class="admin-section">
+                            <h2><i class="fas fa-eye"></i> ${secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos da Unidade'}</h2>
+                            <div class="section-info">
+                                <i class="fas fa-info-circle"></i> Você tem permissão de <strong>apenas visualização</strong> nesta seção.
+                            </div>
+                            
+                            <h3 style="margin-top: 25px; color: #555;">Dados Atuais (Somente Leitura):</h3>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 10px;">
+                                ${renderListaSomenteLeitura(dadosUnidade.unidade[secao === 'faltometro' ? 'especialidades' : 'atendimentos'] || [], secao === 'faltometro' ? 'faltas' : 'valor')}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
                 let chave = secao === 'faltometro' ? 'especialidades' : 'atendimentos';
                 let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
                 let titulo = secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos da Unidade';
@@ -1755,17 +1731,14 @@
             
             db.ref('usuarios').once('value').then((snapshot) => {
                 const usuarios = snapshot.val() || {};
-                const usuariosArray = Object.entries(usuarioAtual ? 
-                    usuarios : 
-                    { 'gti@pmpf,rs,gov,br': { nome: 'Administrador Principal', nivel: 'super_admin', unidades_permitidas: ['todas'] } }
-                );
+                const usuariosArray = Object.entries(usuarios);
                 
                 let html = `
                     <div class="admin-section">
                         <h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2>
                         <div class="section-info">
                             <i class="fas fa-info-circle"></i> Gerencie os usuários autorizados a acessar o sistema.
-                            A conta <strong>gti@pmpf.rs.gov.br</strong> é o super administrador principal.
+                            O usuário <strong>gti</strong> é o super administrador principal.
                         </div>
                         
                         <button class="admin-btn admin-btn-primary" onclick="abrirModalAdicionarUsuario()">
@@ -1784,9 +1757,8 @@
                         </div>
                     `;
                 } else {
-                    usuariosArray.forEach(([emailKey, dados]) => {
-                        const email = emailKey.replace(/,/g, '.');
-                        const isCurrentUser = usuarioAtual && usuarioAtual.email === email;
+                    usuariosArray.forEach(([key, dados]) => {
+                        const isCurrentUser = usuarioAtual && usuarioAtual.usuarioKey === key;
                         const cardClass = isCurrentUser ? 'user-card current-user' : 'user-card';
                         
                         // Determinar cor do nível
@@ -1803,11 +1775,11 @@
                                 break;
                             case 'visualizador':
                                 nivelText = 'Visualizador';
-                                nivelClass = 'role-unidade';
+                                nivelClass = 'role-visualizador';
                                 break;
                             default:
                                 nivelText = dados.nivel;
-                                nivelClass = 'role-unidade';
+                                nivelClass = 'role-visualizador';
                         }
                         
                         // Formatar unidades permitidas
@@ -1828,18 +1800,20 @@
                                 <div style="margin-bottom: 10px;">
                                     <strong>${dados.nome}</strong>
                                     <span class="user-status ${nivelClass}" style="margin-left: 10px;">${nivelText}</span>
+                                    ${dados.status === 'inativo' ? '<span class="user-status status-inactive" style="margin-left: 5px;">INATIVO</span>' : ''}
                                 </div>
-                                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">${email}</div>
+                                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Login: ${dados.login}</div>
+                                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Email: ${dados.email || 'Não informado'}</div>
                                 <div style="color: #888; font-size: 12px; margin-bottom: 15px;">
                                     <i class="fas fa-hospital"></i> ${unidadesText || 'Nenhuma unidade'}
                                 </div>
                                 
                                 <div class="user-actions">
-                                    <button class="btn-remove" style="background: #ff9800;" onclick="editarUsuario('${emailKey}', '${email}', ${JSON.stringify(dados).replace(/'/g, "\\'")})">
+                                    <button class="btn-remove" style="background: #ff9800;" onclick="editarUsuario('${key}', ${JSON.stringify(dados).replace(/'/g, "\\'")})">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    ${email !== 'gti@pmpf.rs.gov.br' ? `
-                                    <button class="btn-remove" onclick="excluirUsuario('${emailKey}', '${email}')">
+                                    ${dados.login !== 'gti' ? `
+                                    <button class="btn-remove" onclick="excluirUsuario('${key}', '${dados.login}', '${dados.nome}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     ` : ''}
@@ -1877,9 +1851,19 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="novoUsuarioEmail">E-mail (Google)</label>
+                    <label for="novoUsuarioLogin">Login (usuário)</label>
+                    <input type="text" id="novoUsuarioLogin" class="admin-input" placeholder="ex: jose.silva">
+                    <small style="color: #666; font-size: 12px;">Será usado para fazer login no sistema</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="novoUsuarioEmail">E-mail</label>
                     <input type="email" id="novoUsuarioEmail" class="admin-input" placeholder="exemplo@pmpf.rs.gov.br">
-                    <small style="color: #666; font-size: 12px;">O usuário deve fazer login com esta conta do Google</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="novoUsuarioSenha">Senha</label>
+                    <input type="password" id="novoUsuarioSenha" class="admin-input" placeholder="Digite uma senha segura">
                 </div>
                 
                 <div class="form-group">
@@ -1937,51 +1921,70 @@
 
         function adicionarNovoUsuario() {
             const nome = document.getElementById('novoUsuarioNome').value.trim();
+            const login = document.getElementById('novoUsuarioLogin').value.trim().toLowerCase();
             const email = document.getElementById('novoUsuarioEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('novoUsuarioSenha').value;
             const nivel = document.getElementById('novoUsuarioNivel').value;
             
-            if (!nome || !email) {
+            if (!nome || !login || !senha) {
                 mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
                 return;
             }
             
-            // Validar formato de email (opcional para domínio específico)
-            if (!email.endsWith('@pmpf.rs.gov.br')) {
-                mostrarNotificacao('Apenas emails do domínio @pmpf.rs.gov.br são permitidos.', 'warning');
-            }
-            
-            // Coletar unidades selecionadas
-            const unidadesSelecionadas = [];
-            document.querySelectorAll('#unidadesSelecionaveis input[type="checkbox"]:checked').forEach((checkbox) => {
-                unidadesSelecionadas.push(checkbox.value);
-            });
-            
-            // Se for super admin, dar acesso a todas as unidades
-            const unidadesPermitidas = nivel === 'super_admin' ? ['todas'] : 
-                                      (unidadesSelecionadas.length > 0 ? unidadesSelecionadas : [unidadeID]);
-            
-            const emailKey = email.replace(/\./g, ',');
-            
-            const novoUsuario = {
-                nome: nome,
-                nivel: nivel,
-                unidades_permitidas: unidadesPermitidas,
-                data_criacao: new Date().toISOString(),
-                criado_por: usuarioAtual.email
-            };
-            
-            db.ref('usuarios/' + emailKey).set(novoUsuario)
-                .then(() => {
-                    mostrarNotificacao('Usuário adicionado com sucesso!', 'success');
-                    fecharModal();
-                    mostrarGerenciamentoUsuarios();
-                })
-                .catch((error) => {
-                    mostrarNotificacao('Erro ao adicionar usuário: ' + error.message, 'error');
+            // Verificar se login já existe
+            db.ref('usuarios').once('value').then((snapshot) => {
+                const usuarios = snapshot.val() || {};
+                let loginExiste = false;
+                
+                Object.values(usuarios).forEach(usuario => {
+                    if (usuario.login === login) {
+                        loginExiste = true;
+                    }
                 });
+                
+                if (loginExiste) {
+                    mostrarNotificacao('Este login já está em uso! Escolha outro.', 'error');
+                    return;
+                }
+                
+                // Coletar unidades selecionadas
+                const unidadesSelecionadas = [];
+                document.querySelectorAll('#unidadesSelecionaveis input[type="checkbox"]:checked').forEach((checkbox) => {
+                    unidadesSelecionadas.push(checkbox.value);
+                });
+                
+                // Se for super admin, dar acesso a todas as unidades
+                const unidadesPermitidas = nivel === 'super_admin' ? ['todas'] : 
+                                          (unidadesSelecionadas.length > 0 ? unidadesSelecionadas : [unidadeID]);
+                
+                const novoUsuario = {
+                    nome: nome,
+                    login: login,
+                    email: email,
+                    senha: senha,
+                    nivel: nivel,
+                    unidades_permitidas: unidadesPermitidas,
+                    status: 'ativo',
+                    data_criacao: new Date().toISOString(),
+                    criado_por: usuarioAtual.login
+                };
+                
+                // Gerar uma chave única para o usuário
+                const usuarioKey = `user_${Date.now()}`;
+                
+                db.ref('usuarios/' + usuarioKey).set(novoUsuario)
+                    .then(() => {
+                        mostrarNotificacao('Usuário adicionado com sucesso!', 'success');
+                        fecharModal();
+                        mostrarGerenciamentoUsuarios();
+                    })
+                    .catch((error) => {
+                        mostrarNotificacao('Erro ao adicionar usuário: ' + error.message, 'error');
+                    });
+            });
         }
 
-        function editarUsuario(emailKey, email, dados) {
+        function editarUsuario(key, dados) {
             document.getElementById('modalUsuarioTitulo').textContent = 'Editar Usuário';
             
             let html = `
@@ -1991,9 +1994,19 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>E-mail</label>
-                    <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">${email}</div>
-                    <small style="color: #666; font-size: 12px;">O email não pode ser alterado</small>
+                    <label>Login</label>
+                    <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">${dados.login}</div>
+                    <small style="color: #666; font-size: 12px;">O login não pode ser alterado</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editarUsuarioEmail">E-mail</label>
+                    <input type="email" id="editarUsuarioEmail" class="admin-input" value="${dados.email || ''}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editarUsuarioSenha">Nova Senha (deixe em branco para manter a atual)</label>
+                    <input type="password" id="editarUsuarioSenha" class="admin-input" placeholder="Digite nova senha">
                 </div>
                 
                 <div class="form-group">
@@ -2006,6 +2019,14 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="editarUsuarioStatus">Status</label>
+                    <select id="editarUsuarioStatus" class="admin-input">
+                        <option value="ativo" ${dados.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                        <option value="inativo" ${dados.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
                     <label>Unidades Permitidas</label>
                     <div id="unidadesSelecionaveisEditar" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px;">
                         <!-- Unidades serão carregadas aqui -->
@@ -2014,7 +2035,7 @@
                 
                 <div class="form-actions">
                     <button class="admin-btn admin-btn-secondary" onclick="fecharModal()">Cancelar</button>
-                    <button class="admin-btn admin-btn-primary" onclick="salvarEdicaoUsuario('${emailKey}', '${email}')">Salvar Alterações</button>
+                    <button class="admin-btn admin-btn-primary" onclick="salvarEdicaoUsuario('${key}')">Salvar Alterações</button>
                 </div>
             `;
             
@@ -2051,9 +2072,12 @@
             });
         }
 
-        function salvarEdicaoUsuario(emailKey, email) {
+        function salvarEdicaoUsuario(key) {
             const nome = document.getElementById('editarUsuarioNome').value.trim();
+            const email = document.getElementById('editarUsuarioEmail').value.trim().toLowerCase();
+            const novaSenha = document.getElementById('editarUsuarioSenha').value;
             const nivel = document.getElementById('editarUsuarioNivel').value;
+            const status = document.getElementById('editarUsuarioStatus').value;
             
             // Coletar unidades selecionadas
             const unidadesSelecionadas = [];
@@ -2066,13 +2090,20 @@
             
             const usuarioAtualizado = {
                 nome: nome,
+                email: email,
                 nivel: nivel,
+                status: status,
                 unidades_permitidas: unidadesPermitidas,
                 data_atualizacao: new Date().toISOString(),
-                atualizado_por: usuarioAtual.email
+                atualizado_por: usuarioAtual.login
             };
             
-            db.ref('usuarios/' + emailKey).update(usuarioAtualizado)
+            // Se foi informada nova senha, atualizar
+            if (novaSenha) {
+                usuarioAtualizado.senha = novaSenha;
+            }
+            
+            db.ref('usuarios/' + key).update(usuarioAtualizado)
                 .then(() => {
                     mostrarNotificacao('Usuário atualizado com sucesso!', 'success');
                     fecharModal();
@@ -2083,17 +2114,17 @@
                 });
         }
 
-        function excluirUsuario(emailKey, email) {
-            if (email === 'gti@pmpf.rs.gov.br') {
+        function excluirUsuario(key, login, nome) {
+            if (login === 'gti') {
                 mostrarNotificacao('Não é possível excluir o administrador principal.', 'error');
                 return;
             }
             
-            if (!confirm(`Tem certeza que deseja excluir o usuário "${email}"?\n\nEsta ação não pode ser desfeita.`)) {
+            if (!confirm(`Tem certeza que deseja excluir o usuário "${nome}" (${login})?\n\nEsta ação não pode ser desfeita.`)) {
                 return;
             }
             
-            db.ref('usuarios/' + emailKey).remove()
+            db.ref('usuarios/' + key).remove()
                 .then(() => {
                     mostrarNotificacao('Usuário excluído com sucesso!', 'success');
                     mostrarGerenciamentoUsuarios();
@@ -2106,9 +2137,6 @@
         // ============================================
         // FUNÇÕES ORIGINAIS DO SISTEMA (MANTIDAS)
         // ============================================
-
-        // [TODAS AS FUNÇÕES ORIGINAIS FORAM MANTIDAS AQUI]
-        // Apenas algumas foram ajustadas para usar o novo sistema de autenticação
 
         function verificarUnidadesInativas() {
             const agora = new Date();
@@ -2208,7 +2236,7 @@
                 descricao: descricao,
                 data: timestamp,
                 unidadeID: unidadeID,
-                usuario: usuarioAtual ? usuarioAtual.email : 'sistema',
+                usuario: usuarioAtual ? usuarioAtual.login : 'sistema',
                 mes: new Date().getMonth() + 1,
                 ano: new Date().getFullYear()
             };
@@ -2219,7 +2247,7 @@
                 nome: nomeUnidade,
                 data: timestamp,
                 ultimaAcao: descricao,
-                usuario: usuarioAtual ? usuarioAtual.email : 'sistema'
+                usuario: usuarioAtual ? usuarioAtual.login : 'sistema'
             });
         }
 
@@ -2269,11 +2297,6 @@
                 
                 db.ref('logs_detalhados').on('value', (snapshot) => {
                     logsDetalhados = snapshot.val() || {};
-                });
-                
-                // Carregar usuários autorizados
-                db.ref('usuarios').on('value', (snapshot) => {
-                    usuariosAutorizados = snapshot.val() || {};
                 });
             }
         }
@@ -3013,14 +3036,6 @@
             setInterval(atualizarRelogio, 1000); 
             iniciarAnimacaoCarrossel(); 
             
-            // Verificar se já está logado
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    usuarioAtual = user;
-                    verificarPermissoesUsuario();
-                }
-            });
-            
             // Criar usuário admin principal se não existir
             if (isMatriz) {
                 criarUsuarioAdminPrincipal();
@@ -3028,22 +3043,36 @@
         };
 
         function criarUsuarioAdminPrincipal() {
-            const adminEmail = 'gti@pmpf.rs.gov.br';
-            const adminEmailKey = adminEmail.replace(/\./g, ',');
+            const adminLogin = 'gti';
             
-            db.ref('usuarios/' + adminEmailKey).once('value').then((snapshot) => {
-                if (!snapshot.exists()) {
+            db.ref('usuarios').once('value').then((snapshot) => {
+                const usuarios = snapshot.val() || {};
+                let adminExiste = false;
+                
+                Object.values(usuarios).forEach(usuario => {
+                    if (usuario.login === adminLogin) {
+                        adminExiste = true;
+                    }
+                });
+                
+                if (!adminExiste) {
                     const adminUsuario = {
-                        nome: 'Administrador Principal',
+                        nome: 'Administrador Principal GTI',
+                        login: adminLogin,
+                        email: 'gti@pmpf.rs.gov.br',
+                        senha: 'Itatilac2009',
                         nivel: 'super_admin',
                         unidades_permitidas: ['todas'],
+                        status: 'ativo',
                         data_criacao: new Date().toISOString(),
                         criado_por: 'sistema'
                     };
                     
-                    db.ref('usuarios/' + adminEmailKey).set(adminUsuario)
+                    const adminKey = 'admin_gti';
+                    
+                    db.ref('usuarios/' + adminKey).set(adminUsuario)
                         .then(() => {
-                            console.log('Usuário admin principal criado:', adminEmail);
+                            console.log('Usuário admin principal criado:', adminLogin);
                         })
                         .catch((error) => {
                             console.error('Erro ao criar usuário admin:', error);
