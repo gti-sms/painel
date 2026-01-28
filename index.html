@@ -911,6 +911,11 @@
             color: #f57c00;
         }
         
+        .cost-very-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
         /* ================================
            TELA DE LOGIN
            ================================ */
@@ -1272,22 +1277,23 @@
         let tickerInterval = null;
 
         // =================================================================
-        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
+        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA COM 30 MINUTOS
         // =================================================================
 
-        // Configurações de sincronização
+        // Configurações de sincronização com intervalo de 30 minutos
         const syncConfig = {
-            currentInterval: 10, // minutos (padrão: 10)
+            currentInterval: 30, // minutos (padrão: 30)
             intervals: {
-                4: { label: "4 minutos", cost: "Baixo", color: "#ff9800" },
-                6: { label: "6 minutos", cost: "Mínimo", color: "#4caf50" },
-                10: { label: "10 minutos", cost: "Zero", color: "#00c853" }
+                10: { label: "10 minutos", cost: "Mínimo", color: "#4caf50" },
+                20: { label: "20 minutos", cost: "Baixíssimo", color: "#00c853" },
+                30: { label: "30 minutos", cost: "Zero", color: "#2e7d32" }
             },
             
             save() {
                 localStorage.setItem('syncConfig', JSON.stringify({
                     interval: this.currentInterval,
-                    lastUpdated: new Date().toISOString()
+                    lastUpdated: new Date().toISOString(),
+                    unidadeId: unidadeID // Salva por unidade
                 }));
             },
             
@@ -1296,9 +1302,14 @@
                 if (saved) {
                     try {
                         const config = JSON.parse(saved);
-                        this.currentInterval = config.interval || 10;
+                        // Verificar se a configuração é para esta unidade
+                        if (config.unidadeId === unidadeID) {
+                            this.currentInterval = config.interval || 30;
+                        } else {
+                            this.currentInterval = 30; // Padrão para nova unidade
+                        }
                     } catch (e) {
-                        this.currentInterval = 10;
+                        this.currentInterval = 30;
                     }
                 }
                 return this.currentInterval;
@@ -1343,6 +1354,9 @@
                         }
                         if (!this.db.objectStoreNames.contains('timestamps')) {
                             this.db.createObjectStore('timestamps', { keyPath: 'id' });
+                        }
+                        if (!this.db.objectStoreNames.contains('unitSync')) {
+                            this.db.createObjectStore('unitSync', { keyPath: 'unitId' });
                         }
                     };
                     
@@ -1409,30 +1423,76 @@
                         });
                     };
                 });
+            },
+            
+            async saveUnitSyncSchedule(unitId, schedule) {
+                if (!this.db) await this.init();
+                
+                const transaction = this.db.transaction(['unitSync'], 'readwrite');
+                transaction.objectStore('unitSync').put({
+                    unitId: unitId,
+                    schedule: schedule,
+                    lastUpdated: Date.now()
+                });
+                
+                return new Promise(resolve => {
+                    transaction.oncomplete = () => resolve(true);
+                });
+            },
+            
+            async getUnitSyncSchedule(unitId) {
+                if (!this.db) await this.init();
+                
+                return new Promise((resolve) => {
+                    const transaction = this.db.transaction(['unitSync']);
+                    const store = transaction.objectStore('unitSync');
+                    const request = store.get(unitId);
+                    
+                    request.onsuccess = (e) => {
+                        resolve(e.target.result ? e.target.result.schedule : null);
+                    };
+                    
+                    request.onerror = () => resolve(null);
+                });
             }
         };
 
-        // Gerenciador de sincronização automática
+        // Gerenciador de sincronização automática com atualização individual
         const syncManager = {
             syncTimer: null,
             isSyncing: false,
             lastSyncTime: 0,
             hasInitialSync: false,
             realtimeListener: null,
+            unitSyncOffset: 0, // Offset em minutos para distribuir sincronizações
             
             init() {
-                console.log('🚀 Inicializando sistema automático');
+                console.log('🚀 Inicializando sistema automático com atualização individual');
+                
+                // Calcular offset baseado no ID da unidade para distribuir as sincronizações
+                this.calculateUnitOffset();
                 
                 // Carregar cache primeiro para mostrar dados rapidamente
                 this.loadFromCache();
                 
-                // Configurar sincronização automática
+                // Configurar sincronização automática com offset
                 this.startAutomaticSync();
                 
                 // Configurar listener para atualizações em tempo real
                 if (!isMatriz) {
                     this.setupRealtimeListener();
                 }
+            },
+            
+            calculateUnitOffset() {
+                // Usar hash do ID da unidade para calcular offset entre 0-29 minutos
+                let hash = 0;
+                for (let i = 0; i < unidadeID.length; i++) {
+                    hash = ((hash << 5) - hash) + unidadeID.charCodeAt(i);
+                    hash = hash & hash; // Converter para 32-bit
+                }
+                this.unitSyncOffset = Math.abs(hash % 30); // Offset entre 0-29 minutos
+                console.log(`⏱️  Offset de sincronização para ${unidadeID}: ${this.unitSyncOffset} minutos`);
             },
             
             async loadFromCache() {
@@ -1461,27 +1521,31 @@
                 }
                 
                 const intervalMs = syncConfig.currentInterval * 60 * 1000;
+                const initialDelay = this.unitSyncOffset * 60 * 1000;
                 
-                // Primeira sincronização
+                console.log(`⏰ Configurando sync individual: ${syncConfig.currentInterval} min com offset de ${this.unitSyncOffset} min`);
+                
+                // Primeira sincronização com offset
                 setTimeout(() => {
-                    this.syncData('scheduled');
-                }, 10000); // 10 segundos após carregamento
+                    this.syncData('first_with_offset');
+                }, initialDelay);
                 
-                // Sincronizações periódicas
+                // Sincronizações periódicas com intervalo completo
                 this.syncTimer = setInterval(() => {
                     this.syncData('scheduled');
                 }, intervalMs);
-                
-                console.log(`⏰ Sync automática configurada: ${syncConfig.currentInterval} minutos`);
             },
             
             async syncData(reason = 'scheduled') {
-                if (this.isSyncing) return;
+                if (this.isSyncing) {
+                    console.log('⏭️  Sincronização já em andamento, pulando...');
+                    return;
+                }
                 
                 this.isSyncing = true;
                 
                 try {
-                    console.log(`🔄 Sincronizando (${reason})...`);
+                    console.log(`🔄 Sincronizando ${unidadeID} (${reason})...`);
                     
                     // Buscar dados do Firebase
                     let firebaseData = await this.fetchFromFirebase();
@@ -1496,9 +1560,13 @@
                                 atendimentos: [] 
                             },
                             avisos: [],
-                            ultima_atualizacao: Date.now()
+                            ultima_atualizacao: Date.now(),
+                            ultima_sincronizacao: Date.now()
                         };
                     }
+                    
+                    // Adicionar timestamp da sincronização
+                    firebaseData.ultima_sincronizacao = Date.now();
                     
                     // Comparar com dados atuais
                     const cacheInfo = await cacheManager.getFromCacheWithTTL(unidadeID);
@@ -1521,7 +1589,7 @@
                     this.hasInitialSync = true;
                     
                     // Esconder loading se for primeira sincronização
-                    if (reason === 'first_time' || reason === 'cache_expired') {
+                    if (reason === 'first_time' || reason === 'cache_expired' || reason === 'first_with_offset') {
                         setTimeout(() => {
                             const loadingOverlay = document.getElementById('loadingOverlay');
                             if (loadingOverlay) {
@@ -1533,15 +1601,15 @@
                         }, 500);
                     }
                     
-                    console.log(`✅ Sincronização concluída (${reason})`);
+                    console.log(`✅ Sincronização ${unidadeID} concluída (${reason})`);
                     
                 } catch (error) {
                     console.error('❌ Erro na sincronização:', error);
                     
                     // Se for primeira sincronização e falhou, tentar novamente
                     if (!this.hasInitialSync) {
-                        console.log('🔄 Tentando novamente em 10 segundos...');
-                        setTimeout(() => this.syncData('retry'), 10000);
+                        console.log('🔄 Tentando novamente em 60 segundos...');
+                        setTimeout(() => this.syncData('retry'), 60000);
                     }
                     
                 } finally {
@@ -1581,7 +1649,15 @@
             
             isEqualData(data1, data2) {
                 if (!data1 || !data2) return false;
-                return JSON.stringify(data1) === JSON.stringify(data2);
+                // Remover timestamps de comparação
+                const cleanData1 = { ...data1 };
+                const cleanData2 = { ...data2 };
+                delete cleanData1.ultima_sincronizacao;
+                delete cleanData2.ultima_sincronizacao;
+                delete cleanData1.ultima_atualizacao;
+                delete cleanData2.ultima_atualizacao;
+                
+                return JSON.stringify(cleanData1) === JSON.stringify(cleanData2);
             },
             
             changeInterval(newInterval) {
@@ -1706,7 +1782,7 @@
                             loadingOverlay.style.display = 'none';
                         }, 300);
                     }
-                }, 15000); // Máximo 15 segundos
+                }, 30000); // Máximo 30 segundos
             }, 1000);
             
             // Criar usuário admin principal se for matriz
@@ -2166,7 +2242,8 @@
                     <h2><i class="fas fa-sync-alt"></i> Configuração de Sincronização</h2>
                     <div class="section-info">
                         <i class="fas fa-info-circle"></i> Configure o intervalo de sincronização automática.
-                        <strong>Sistema 100% automático</strong> | 40 TVs ativas
+                        <strong>Sistema 100% automático com atualização individual</strong> | 40 TVs ativas
+                        <br><strong>Atualização distribuída:</strong> Cada unidade sincroniza em horário diferente para evitar picos de rede.
                     </div>
                     
                     <div style="margin-bottom: 30px;">
@@ -2178,6 +2255,9 @@
                                 </div>
                                 <div style="color: #666; font-size: 14px;">
                                     ${syncConfig.intervals[currentInterval].label}
+                                </div>
+                                <div style="margin-top: 10px; font-size: 13px; color: #666;">
+                                    <i class="fas fa-clock"></i> Esta unidade sincroniza com offset de ${syncManager.unitSyncOffset} minutos
                                 </div>
                             </div>
                             <div style="flex: 2;">
@@ -2213,7 +2293,7 @@
                 const intervalStats = syncConfig.getStats.call({currentInterval: parseInt(interval)});
                 const isSelected = (parseInt(interval) === currentInterval);
                 const cardClass = isSelected ? 'sync-option-card selected' : 'sync-option-card';
-                const costClass = intervalStats.isFree ? 'cost-free' : 'cost-low';
+                const costClass = intervalStats.isFree ? 'cost-free' : 'cost-very-low';
                 
                 html += `
                     <div class="${cardClass}" onclick="syncManager.changeInterval(${interval})">
@@ -2223,7 +2303,7 @@
                         <div class="sync-option-time">${interval} min</div>
                         <div class="sync-option-desc">${config.label}</div>
                         <div class="sync-option-cost ${costClass}">
-                            ${intervalStats.isFree ? 'CUSTO ZERO' : 'CUSTO BAIXO'}
+                            ${intervalStats.isFree ? 'CUSTO ZERO' : 'CUSTO MÍNIMO'}
                         </div>
                         ${isSelected ? '<div style="margin-top: 10px; color: #00c853;"><i class="fas fa-check-circle"></i> Selecionado</div>' : ''}
                     </div>
@@ -2234,18 +2314,23 @@
                     </div>
                     
                     <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                        <h4><i class="fas fa-lightbulb"></i> Como funciona:</h4>
+                        <h4><i class="fas fa-lightbulb"></i> Como funciona (Sistema Distribuído):</h4>
                         <ul style="color: #666; margin-left: 20px;">
-                            <li><strong>Sistema 100% automático</strong> - TVs atualizam sozinhas</li>
+                            <li><strong>Atualização individual</strong> - Cada TV atualiza em horário diferente</li>
+                            <li><strong>Distribuição inteligente</strong> - Offsets calculados para evitar picos</li>
                             <li><strong>Cache inteligente</strong> - Dados aparecem instantaneamente</li>
                             <li><strong>Atualização em tempo real</strong> - Quando admin altera dados</li>
                             <li><strong>Sincronização periódica</strong> - Mantém dados atualizados</li>
+                            <li><strong>30 minutos padrão</strong> - Otimizado para 40 TVs simultâneas</li>
                         </ul>
                     </div>
                     
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button class="admin-btn" onclick="syncManager.forceSync()">
-                            <i class="fas fa-sync-alt"></i> Sincronizar Agora
+                            <i class="fas fa-sync-alt"></i> Sincronizar Esta Unidade Agora
+                        </button>
+                        <button class="admin-btn admin-btn-primary" onclick="forcarSincronizacaoTodas()">
+                            <i class="fas fa-sync"></i> Sincronizar Todas as Unidades
                         </button>
                         <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidade')">
                             <i class="fas fa-arrow-left"></i> Voltar
@@ -2551,6 +2636,7 @@
             
             // Adicionar timestamp de atualização
             dadosUnidade.ultima_atualizacao = agora;
+            dadosUnidade.ultima_sincronizacao = agora;
             
             // Sincronizar com Firebase
             const syncPromise = db.ref('paineis/' + unidadeID).set(dadosUnidade);
@@ -2558,6 +2644,7 @@
             if(isMatriz) {
                 cacheManager.saveToCache('geral', dadosGerais);
                 dadosGerais.ultima_atualizacao = agora;
+                dadosGerais.ultima_sincronizacao = agora;
                 syncPromise.then(() => {
                     db.ref('paineis/geral').set(dadosGerais);
                 });
@@ -2717,7 +2804,8 @@
                             especialidades: dados.unidade?.especialidades?.length || 0,
                             atendimentos: dados.unidade?.atendimentos?.length || 0,
                             avisos: dados.avisos?.length || 0,
-                            ultima_atualizacao: dados.ultima_atualizacao || 0
+                            ultima_atualizacao: dados.ultima_atualizacao || 0,
+                            ultima_sincronizacao: dados.ultima_sincronizacao || 0
                         });
                     }
                 });
@@ -2850,6 +2938,360 @@
         }
 
         /**
+         * Adiciona um novo usuário (interface)
+         */
+        function adicionarNovoUsuario() {
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-plus"></i> Adicionar Novo Usuário</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Preencha os dados do novo usuário. A senha será visível apenas durante a criação.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="novoUsuarioNome" class="admin-input" placeholder="Digite o nome completo">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login:</label>
+                            <input id="novoUsuarioLogin" class="admin-input" placeholder="Digite o login (ex: enfermeira.joana)">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Senha:</label>
+                            <input id="novoUsuarioSenha" type="password" class="admin-input" placeholder="Digite a senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="novoUsuarioNivel" class="admin-input">
+                                <option value="super_admin">Super Administrador (acesso total)</option>
+                                <option value="admin_unidade">Administrador de Unidade (pode editar)</option>
+                                <option value="visualizador">Visualizador (apenas leitura)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;" id="unidadesPermitidasContainer">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <label style="display: block; margin-bottom: 10px;">
+                                    <input type="checkbox" id="todasUnidades" onchange="toggleTodasUnidades()"> 
+                                    <strong>Todas as unidades</strong>
+                                </label>
+                                <div id="listaUnidadesCheckboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    ${listaTodasUnidades.map(unidade => `
+                                        <label>
+                                            <input type="checkbox" class="checkUnidade" value="${unidade.id}"> 
+                                            ${unidade.nome}
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="novoUsuarioStatus" class="admin-input">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarNovoUsuario()">
+                                <i class="fas fa-save"></i> Salvar Usuário
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('usuarios')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Toggle para selecionar todas as unidades
+         */
+        function toggleTodasUnidades() {
+            const todasCheckbox = document.getElementById('todasUnidades');
+            const checkboxes = document.querySelectorAll('.checkUnidade');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+            });
+        }
+
+        /**
+         * Salva o novo usuário no Firebase
+         */
+        function salvarNovoUsuario() {
+            const nome = document.getElementById('novoUsuarioNome').value.trim();
+            const login = document.getElementById('novoUsuarioLogin').value.trim();
+            const senha = document.getElementById('novoUsuarioSenha').value;
+            const nivel = document.getElementById('novoUsuarioNivel').value;
+            const status = document.getElementById('novoUsuarioStatus').value;
+            
+            if (!nome || !login || !senha) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            // Verificar se login já existe
+            const loginExistente = listaUsuarios.find(u => u.login === login);
+            if (loginExistente) {
+                mostrarNotificacao('Este login já está em uso! Escolha outro.', 'error');
+                return;
+            }
+            
+            let unidades_permitidas = [];
+            
+            if (document.getElementById('todasUnidades').checked) {
+                unidades_permitidas = ['todas'];
+            } else {
+                const checkboxes = document.querySelectorAll('.checkUnidade:checked');
+                checkboxes.forEach(checkbox => {
+                    unidades_permitidas.push(checkbox.value);
+                });
+            }
+            
+            const novoUsuario = {
+                nome: nome,
+                login: login,
+                senha: senha,
+                nivel: nivel,
+                unidades_permitidas: unidades_permitidas,
+                status: status,
+                data_criacao: new Date().toISOString(),
+                criado_por: usuarioAtual.nome || 'admin'
+            };
+            
+            // Gerar uma chave única para o usuário
+            const usuarioKey = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            db.ref('usuarios/' + usuarioKey).set(novoUsuario)
+                .then(() => {
+                    mostrarNotificacao('Usuário criado com sucesso!', 'success');
+                    // Atualizar lista local
+                    carregarTodosUsuarios();
+                    // Voltar para lista de usuários
+                    setTimeout(() => mostrarSecao('usuarios'), 1000);
+                })
+                .catch(error => {
+                    console.error('Erro ao criar usuário:', error);
+                    mostrarNotificacao('Erro ao criar usuário!', 'error');
+                });
+        }
+
+        /**
+         * Edita um usuário existente
+         */
+        function editarUsuario(usuarioId) {
+            const usuario = listaUsuarios.find(u => u.id === usuarioId);
+            
+            if (!usuario) {
+                mostrarNotificacao('Usuário não encontrado!', 'error');
+                return;
+            }
+            
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-edit"></i> Editar Usuário: ${usuario.nome}</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Edite os dados do usuário. Deixe a senha em branco para mantê-la.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="editarUsuarioNome" class="admin-input" value="${usuario.nome}">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login:</label>
+                            <input id="editarUsuarioLogin" class="admin-input" value="${usuario.login}">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nova Senha (deixe em branco para não alterar):</label>
+                            <input id="editarUsuarioSenha" type="password" class="admin-input" placeholder="Digite nova senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="editarUsuarioNivel" class="admin-input">
+                                <option value="super_admin" ${usuario.nivel === 'super_admin' ? 'selected' : ''}>Super Administrador (acesso total)</option>
+                                <option value="admin_unidade" ${usuario.nivel === 'admin_unidade' ? 'selected' : ''}>Administrador de Unidade (pode editar)</option>
+                                <option value="visualizador" ${usuario.nivel === 'visualizador' ? 'selected' : ''}>Visualizador (apenas leitura)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;" id="editarUnidadesPermitidasContainer">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <label style="display: block; margin-bottom: 10px;">
+                                    <input type="checkbox" id="editarTodasUnidades" onchange="toggleTodasUnidadesEditar()" 
+                                           ${usuario.unidades_permitidas && usuario.unidades_permitidas.includes('todas') ? 'checked' : ''}> 
+                                    <strong>Todas as unidades</strong>
+                                </label>
+                                <div id="editarListaUnidadesCheckboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    ${listaTodasUnidades.map(unidade => {
+                                        const isChecked = usuario.unidades_permitidas && 
+                                            (usuario.unidades_permitidas.includes('todas') || 
+                                             usuario.unidades_permitidas.includes(unidade.id));
+                                        return `
+                                            <label>
+                                                <input type="checkbox" class="checkUnidadeEditar" value="${unidade.id}" 
+                                                       ${isChecked ? 'checked' : ''}> 
+                                                ${unidade.nome}
+                                            </label>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="editarUsuarioStatus" class="admin-input">
+                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarEdicaoUsuario('${usuarioId}')">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('usuarios')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Toggle para selecionar todas as unidades (edição)
+         */
+        function toggleTodasUnidadesEditar() {
+            const todasCheckbox = document.getElementById('editarTodasUnidades');
+            const checkboxes = document.querySelectorAll('.checkUnidadeEditar');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+                checkbox.disabled = todasCheckbox.checked;
+            });
+        }
+
+        /**
+         * Salva a edição do usuário
+         */
+        function salvarEdicaoUsuario(usuarioId) {
+            const nome = document.getElementById('editarUsuarioNome').value.trim();
+            const login = document.getElementById('editarUsuarioLogin').value.trim();
+            const novaSenha = document.getElementById('editarUsuarioSenha').value;
+            const nivel = document.getElementById('editarUsuarioNivel').value;
+            const status = document.getElementById('editarUsuarioStatus').value;
+            
+            if (!nome || !login) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            // Verificar se login já existe (exceto para o próprio usuário)
+            const usuarioExistente = listaUsuarios.find(u => u.login === login && u.id !== usuarioId);
+            if (usuarioExistente) {
+                mostrarNotificacao('Este login já está em uso! Escolha outro.', 'error');
+                return;
+            }
+            
+            let unidades_permitidas = [];
+            
+            if (document.getElementById('editarTodasUnidades').checked) {
+                unidades_permitidas = ['todas'];
+            } else {
+                const checkboxes = document.querySelectorAll('.checkUnidadeEditar:checked');
+                checkboxes.forEach(checkbox => {
+                    unidades_permitidas.push(checkbox.value);
+                });
+            }
+            
+            // Buscar dados atuais do usuário
+            db.ref('usuarios/' + usuarioId).once('value').then((snapshot) => {
+                const usuarioAtualData = snapshot.val();
+                
+                const dadosAtualizados = {
+                    nome: nome,
+                    login: login,
+                    nivel: nivel,
+                    unidades_permitidas: unidades_permitidas,
+                    status: status,
+                    data_atualizacao: new Date().toISOString(),
+                    atualizado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                // Manter senha atual se não for alterada
+                if (novaSenha) {
+                    dadosAtualizados.senha = novaSenha;
+                } else {
+                    dadosAtualizados.senha = usuarioAtualData.senha;
+                }
+                
+                // Manter dados de criação
+                if (usuarioAtualData.data_criacao) {
+                    dadosAtualizados.data_criacao = usuarioAtualData.data_criacao;
+                    dadosAtualizados.criado_por = usuarioAtualData.criado_por;
+                }
+                
+                db.ref('usuarios/' + usuarioId).set(dadosAtualizados)
+                    .then(() => {
+                        mostrarNotificacao('Usuário atualizado com sucesso!', 'success');
+                        // Atualizar lista local
+                        carregarTodosUsuarios();
+                        // Voltar para lista de usuários
+                        setTimeout(() => mostrarSecao('usuarios'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar usuário:', error);
+                        mostrarNotificacao('Erro ao atualizar usuário!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Exclui um usuário
+         */
+        function excluirUsuario(usuarioId, usuarioNome) {
+            if (usuarioId === 'admin_gti') {
+                mostrarNotificacao('Não é possível excluir o administrador principal!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir o usuário "${usuarioNome}"?\n\nEsta ação não pode ser desfeita!`)) {
+                db.ref('usuarios/' + usuarioId).remove()
+                    .then(() => {
+                        mostrarNotificacao(`Usuário "${usuarioNome}" excluído com sucesso!`, 'success');
+                        // Atualizar lista local
+                        carregarTodosUsuarios();
+                        // Recarregar a seção de usuários
+                        setTimeout(() => mostrarSecao('usuarios'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir usuário:', error);
+                        mostrarNotificacao('Erro ao excluir usuário!', 'error');
+                    });
+            }
+        }
+
+        /**
          * Mostra o gerenciamento de todas as unidades
          */
         function mostrarTodasUnidades() {
@@ -2911,6 +3353,10 @@
                         ? new Date(unidade.ultima_atualizacao).toLocaleString('pt-BR')
                         : 'Nunca';
                     
+                    const ultimaSincronizacao = unidade.ultima_sincronizacao 
+                        ? new Date(unidade.ultima_sincronizacao).toLocaleString('pt-BR')
+                        : 'Nunca';
+                    
                     html += `
                         <div class="unidade-card">
                             <div class="unidade-header">
@@ -2945,6 +3391,7 @@
                             
                             <div style="font-size: 11px; color: #666; margin-top: 10px;">
                                 <i class="fas fa-clock"></i> Última atualização: ${ultimaAtualizacao}
+                                <br><i class="fas fa-sync-alt"></i> Última sincronização: ${ultimaSincronizacao}
                             </div>
                             
                             <div class="unidade-actions">
@@ -2970,6 +3417,7 @@
                             <li>Use <strong>"Editar Unidade"</strong> para modificar o nome ou dados da unidade</li>
                             <li>Para excluir uma unidade, edite-a e use a opção de exclusão</li>
                             <li>Cada unidade pode ser acessada via URL: <code>?id=ID_DA_UNIDADE</code></li>
+                            <li>Cada unidade sincroniza individualmente para evitar picos de rede</li>
                         </ul>
                     </div>
                 </div>
@@ -2979,14 +3427,328 @@
         }
 
         /**
+         * Atualiza a lista de unidades
+         */
+        function atualizarListaUnidades() {
+            carregarTodasUnidades();
+            setTimeout(() => mostrarTodasUnidades(), 500);
+            mostrarNotificacao('Lista de unidades atualizada!', 'success');
+        }
+
+        /**
+         * Acessa uma unidade específica
+         */
+        function acessarUnidade(unidadeId) {
+            const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
+            window.open(url, '_blank');
+        }
+
+        /**
+         * Adiciona uma nova unidade
+         */
+        function adicionarNovaUnidade() {
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-plus-circle"></i> Adicionar Nova Unidade</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Crie uma nova unidade de saúde. O ID será gerado automaticamente.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
+                            <input id="novaUnidadeNome" class="admin-input" placeholder="Digite o nome da unidade">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ID da Unidade (único):</label>
+                            <input id="novaUnidadeId" class="admin-input" placeholder="Digite um ID único (ex: usf_centro)">
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                Use apenas letras, números e underscores. Ex: usf_centro, psf_norte, upa_24h
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Configuração Inicial:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <input type="checkbox" id="addEspecialidades" checked style="margin-right: 10px;">
+                                    Adicionar exemplo de especialidades (Faltômetro)
+                                </label>
+                                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <input type="checkbox" id="addAtendimentos" checked style="margin-right: 10px;">
+                                    Adicionar exemplo de atendimentos
+                                </label>
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="addAvisos" checked style="margin-right: 10px;">
+                                    Adicionar aviso de boas-vindas
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="criarNovaUnidade()">
+                                <i class="fas fa-save"></i> Criar Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidades')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Cria uma nova unidade no Firebase
+         */
+        function criarNovaUnidade() {
+            const nome = document.getElementById('novaUnidadeNome').value.trim();
+            const unidadeId = document.getElementById('novaUnidadeId').value.trim().toLowerCase();
+            
+            if (!nome || !unidadeId) {
+                mostrarNotificacao('Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            // Validar ID (apenas letras, números e underscore)
+            if (!/^[a-z0-9_]+$/.test(unidadeId)) {
+                mostrarNotificacao('Use apenas letras minúsculas, números e underscore no ID!', 'error');
+                return;
+            }
+            
+            // Verificar se ID já existe
+            const idExistente = listaTodasUnidades.find(u => u.id === unidadeId);
+            if (idExistente) {
+                mostrarNotificacao('Este ID já está em uso! Escolha outro.', 'error');
+                return;
+            }
+            
+            // Verificar se já existe no Firebase
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    mostrarNotificacao('Esta unidade já existe no sistema!', 'error');
+                    return;
+                }
+                
+                // Criar estrutura básica da unidade
+                const novaUnidade = {
+                    unidade: {
+                        nome: nome,
+                        especialidades: [],
+                        atendimentos: []
+                    },
+                    avisos: [],
+                    ultima_atualizacao: Date.now(),
+                    ultima_sincronizacao: Date.now(),
+                    data_criacao: new Date().toISOString(),
+                    criado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                // Adicionar exemplos se selecionado
+                if (document.getElementById('addEspecialidades').checked) {
+                    novaUnidade.unidade.especialidades = [
+                        { nome: "Clínica Médica", faltas: 0 },
+                        { nome: "Pediatria", faltas: 0 },
+                        { nome: "Enfermagem", faltas: 0 }
+                    ];
+                }
+                
+                if (document.getElementById('addAtendimentos').checked) {
+                    novaUnidade.unidade.atendimentos = [
+                        { nome: "Consultas", valor: 0 },
+                        { nome: "Exames", valor: 0 },
+                        { nome: "Vacinas", valor: 0 }
+                    ];
+                }
+                
+                if (document.getElementById('addAvisos').checked) {
+                    novaUnidade.avisos = ["Bem-vindo à " + nome + "!"];
+                }
+                
+                db.ref('paineis/' + unidadeId).set(novaUnidade)
+                    .then(() => {
+                        mostrarNotificacao(`Unidade "${nome}" criada com sucesso!`, 'success');
+                        // Atualizar lista local
+                        carregarTodasUnidades();
+                        // Voltar para lista de unidades
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao criar unidade:', error);
+                        mostrarNotificacao('Erro ao criar unidade!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Edita uma unidade existente
+         */
+        function editarUnidade(unidadeId) {
+            const unidade = listaTodasUnidades.find(u => u.id === unidadeId);
+            
+            if (!unidade) {
+                mostrarNotificacao('Unidade não encontrada!', 'error');
+                return;
+            }
+            
+            // Carregar dados completos da unidade
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                const dadosUnidade = snapshot.val();
+                
+                const content = document.getElementById('adminContent');
+                
+                content.innerHTML = `
+                    <div class="admin-section">
+                        <h2><i class="fas fa-edit"></i> Editar Unidade: ${dadosUnidade.unidade.nome}</h2>
+                        <div class="section-info">
+                            <i class="fas fa-info-circle"></i> Edite os dados da unidade. Para excluir a unidade, role até o final da página.
+                        </div>
+                        
+                        <div style="max-width: 600px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
+                                <input id="editarUnidadeNome" class="admin-input" value="${dadosUnidade.unidade.nome}">
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ID da Unidade:</label>
+                                <input id="editarUnidadeId" class="admin-input" value="${unidadeId}" disabled>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    O ID não pode ser alterado após a criação.
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Estatísticas:</label>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #d32f2f;">${dadosUnidade.unidade.especialidades?.length || 0}</div>
+                                        <div style="font-size: 12px; color: #666;">Especialidades</div>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #2196f3;">${dadosUnidade.unidade.atendimentos?.length || 0}</div>
+                                        <div style="font-size: 12px; color: #666;">Atendimentos</div>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #7b1fa2;">${dadosUnidade.avisos?.length || 0}</div>
+                                        <div style="font-size: 12px; color: #666;">Avisos</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Última Atualização:</label>
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    ${dadosUnidade.ultima_atualizacao ? 
+                                        new Date(dadosUnidade.ultima_atualizacao).toLocaleString('pt-BR') : 
+                                        'Nunca atualizada'}
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                <button class="admin-btn" onclick="salvarEdicaoUnidade('${unidadeId}')">
+                                    <i class="fas fa-save"></i> Salvar Alterações
+                                </button>
+                                <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidades')">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 40px; padding: 20px; background: #ffebee; border-radius: 10px; border-left: 4px solid #d32f2f;">
+                                <h3 style="color: #d32f2f; margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Área de Perigo</h3>
+                                <p style="color: #666; margin-bottom: 15px;">
+                                    <strong>Atenção:</strong> A exclusão da unidade removerá todos os dados permanentemente.
+                                    Esta ação não pode ser desfeita!
+                                </p>
+                                <button class="admin-btn admin-btn-danger" onclick="excluirUnidade('${unidadeId}', '${dadosUnidade.unidade.nome}')">
+                                    <i class="fas fa-trash"></i> Excluir Esta Unidade
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        /**
+         * Salva a edição da unidade
+         */
+        function salvarEdicaoUnidade(unidadeId) {
+            const novoNome = document.getElementById('editarUnidadeNome').value.trim();
+            
+            if (!novoNome) {
+                mostrarNotificacao('Digite um nome para a unidade!', 'error');
+                return;
+            }
+            
+            // Buscar dados atuais
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                const dadosAtuais = snapshot.val();
+                
+                const dadosAtualizados = {
+                    ...dadosAtuais,
+                    unidade: {
+                        ...dadosAtuais.unidade,
+                        nome: novoNome
+                    },
+                    ultima_atualizacao: Date.now(),
+                    data_atualizacao: new Date().toISOString(),
+                    atualizado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                db.ref('paineis/' + unidadeId).set(dadosAtualizados)
+                    .then(() => {
+                        mostrarNotificacao('Unidade atualizada com sucesso!', 'success');
+                        // Atualizar lista local
+                        carregarTodasUnidades();
+                        // Voltar para lista de unidades
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar unidade:', error);
+                        mostrarNotificacao('Erro ao atualizar unidade!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Exclui uma unidade
+         */
+        function excluirUnidade(unidadeId, unidadeNome) {
+            if (unidadeId === 'geral') {
+                mostrarNotificacao('Não é possível excluir a matriz (geral)!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir a unidade "${unidadeNome}"?\n\nEsta ação removerá todos os dados permanentemente!\n\nID: ${unidadeId}`)) {
+                // Primeiro, remover a unidade do Firebase
+                db.ref('paineis/' + unidadeId).remove()
+                    .then(() => {
+                        mostrarNotificacao(`Unidade "${unidadeNome}" excluída com sucesso!`, 'success');
+                        // Atualizar lista local
+                        carregarTodasUnidades();
+                        // Voltar para lista de unidades
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir unidade:', error);
+                        mostrarNotificacao('Erro ao excluir unidade!', 'error');
+                    });
+            }
+        }
+
+        /**
          * Mostra o monitor de inatividade
          */
         function mostrarMonitorInatividade() {
             // Calcular inatividade
             const agora = Date.now();
             const unidadesComInatividade = listaTodasUnidades.map(unidade => {
-                const ultimaAtualizacao = unidade.ultima_atualizacao || 0;
-                const horasInatividade = ultimaAtualizacao ? Math.floor((agora - ultimaAtualizacao) / (1000 * 60 * 60)) : 999;
+                const ultimaSincronizacao = unidade.ultima_sincronizacao || 0;
+                const horasInatividade = ultimaSincronizacao ? Math.floor((agora - ultimaSincronizacao) / (1000 * 60 * 60)) : 999;
                 
                 let status = 'ativo';
                 let statusCor = '#2e7d32';
@@ -3012,8 +3774,8 @@
                     status: status,
                     statusCor: statusCor,
                     statusTexto: statusTexto,
-                    ultimaAtualizacaoFormatada: ultimaAtualizacao 
-                        ? new Date(ultimaAtualizacao).toLocaleString('pt-BR')
+                    ultimaSincronizacaoFormatada: ultimaSincronizacao 
+                        ? new Date(ultimaSincronizacao).toLocaleString('pt-BR')
                         : 'Nunca'
                 };
             }).sort((a, b) => b.horasInatividade - a.horasInatividade);
@@ -3029,6 +3791,7 @@
                     <div class="section-info">
                         <i class="fas fa-info-circle"></i> Monitoramento das unidades que não atualizaram dados recentemente.
                         Unidades inativas podem indicar problemas na conexão ou na TV.
+                        <br><strong>Sistema distribuído:</strong> Cada unidade sincroniza em horário diferente.
                     </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
@@ -3053,7 +3816,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3 style="margin: 0;">Detalhamento por Unidade</h3>
                         <button class="admin-btn" onclick="forcarSincronizacaoTodas()">
-                            <i class="fas fa-sync-alt"></i> Forçar Sincronização
+                            <i class="fas fa-sync-alt"></i> Forçar Sincronização em Todas
                         </button>
                     </div>
                     
@@ -3063,7 +3826,7 @@
                                 <th>Unidade</th>
                                 <th>Status</th>
                                 <th>Inatividade</th>
-                                <th>Última Atualização</th>
+                                <th>Última Sincronização</th>
                                 <th>Especialidades</th>
                                 <th>Ações</th>
                             </tr>
@@ -3106,7 +3869,7 @@
                                 <div style="font-weight: 600; color: ${unidade.statusCor};">${tempoInatividade}</div>
                             </td>
                             <td>
-                                <div style="font-size: 13px;">${unidade.ultimaAtualizacaoFormatada}</div>
+                                <div style="font-size: 13px;">${unidade.ultimaSincronizacaoFormatada}</div>
                             </td>
                             <td>
                                 <div style="font-size: 18px; font-weight: 700; color: #1565c0;">${unidade.especialidades}</div>
@@ -3134,6 +3897,56 @@
         }
 
         // =================================================================
+        // FUNÇÕES DE SINCRONIZAÇÃO FORÇADA
+        // =================================================================
+
+        /**
+         * Força sincronização de uma unidade específica
+         */
+        function forcarSincronizacaoUnidade(unidadeId) {
+            // Atualizar timestamp da unidade para forçar sincronização
+            const agora = Date.now();
+            
+            db.ref('paineis/' + unidadeId + '/ultima_atualizacao').set(agora)
+                .then(() => {
+                    mostrarNotificacao(`Sincronização forçada para unidade ${unidadeId} enviada!`, 'success');
+                })
+                .catch(error => {
+                    console.error('Erro ao forçar sincronização:', error);
+                    mostrarNotificacao('Erro ao forçar sincronização!', 'error');
+                });
+        }
+
+        /**
+         * Força sincronização de todas as unidades
+         */
+        function forcarSincronizacaoTodas() {
+            if (confirm('Forçar sincronização em TODAS as unidades?\n\nIsso enviará um comando para todas as TVs atualizarem seus dados imediatamente.\n\nAs TVs sincronizarão individualmente para evitar picos de rede.')) {
+                const agora = Date.now();
+                const promises = [];
+                
+                // Para todas as unidades na lista
+                listaTodasUnidades.forEach(unidade => {
+                    const promise = db.ref('paineis/' + unidade.id + '/ultima_atualizacao').set(agora);
+                    promises.push(promise);
+                });
+                
+                // Também para a matriz
+                promises.push(db.ref('paineis/geral/ultima_atualizacao').set(agora));
+                
+                Promise.all(promises)
+                    .then(() => {
+                        mostrarNotificacao(`Sincronização forçada para ${listaTodasUnidades.length + 1} unidades enviada!`, 'success');
+                        console.log(`⚡ Sincronização forçada enviada para ${listaTodasUnidades.length + 1} unidades`);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao forçar sincronização:', error);
+                        mostrarNotificacao('Erro ao forçar sincronização!', 'error');
+                    });
+            }
+        }
+
+        // =================================================================
         // INICIALIZAÇÃO DO SISTEMA
         // =================================================================
         
@@ -3141,90 +3954,6 @@
          * Inicializa o sistema quando a página carrega
          */
         window.onload = iniciarSistema;
-
-        // =================================================================
-        // FUNÇÕES AUXILIARES (para completar o código)
-        // =================================================================
-
-        /**
-         * Adiciona um novo usuário (interface)
-         */
-        function adicionarNovoUsuario() {
-            // Implementação simplificada
-            mostrarNotificacao('Funcionalidade em desenvolvimento', 'info');
-        }
-
-        /**
-         * Edita um usuário
-         */
-        function editarUsuario(usuarioId) {
-            // Implementação simplificada
-            mostrarNotificacao(`Editando usuário ${usuarioId}`, 'info');
-        }
-
-        /**
-         * Exclui um usuário
-         */
-        function excluirUsuario(usuarioId, usuarioNome) {
-            if (confirm(`Tem certeza que deseja excluir o usuário "${usuarioNome}"?`)) {
-                mostrarNotificacao(`Usuário ${usuarioNome} excluído`, 'success');
-            }
-        }
-
-        /**
-         * Atualiza a lista de unidades
-         */
-        function atualizarListaUnidades() {
-            carregarTodasUnidades();
-            setTimeout(() => mostrarTodasUnidades(), 500);
-            mostrarNotificacao('Lista de unidades atualizada!', 'success');
-        }
-
-        /**
-         * Acessa uma unidade específica
-         */
-        function acessarUnidade(unidadeId) {
-            const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
-            window.open(url, '_blank');
-        }
-
-        /**
-         * Adiciona uma nova unidade
-         */
-        function adicionarNovaUnidade() {
-            // Implementação simplificada
-            mostrarNotificacao('Funcionalidade em desenvolvimento', 'info');
-        }
-
-        /**
-         * Edita uma unidade
-         */
-        function editarUnidade(unidadeId) {
-            // Implementação simplificada
-            mostrarNotificacao(`Editando unidade ${unidadeId}`, 'info');
-        }
-
-        /**
-         * Força sincronização de uma unidade específica
-         */
-        function forcarSincronizacaoUnidade(unidadeId) {
-            mostrarNotificacao(`Forçando sincronização da unidade ${unidadeId}...`, 'info');
-            setTimeout(() => {
-                mostrarNotificacao(`Sincronização forçada para unidade ${unidadeId} solicitada!`, 'success');
-            }, 1000);
-        }
-
-        /**
-         * Força sincronização de todas as unidades
-         */
-        function forcarSincronizacaoTodas() {
-            if (confirm('Forçar sincronização em TODAS as unidades?\n\nIsso enviará um comando para todas as TVs atualizarem seus dados imediatamente.')) {
-                mostrarNotificacao('Forçando sincronização em todas as unidades...', 'info');
-                setTimeout(() => {
-                    mostrarNotificacao('Sincronização forçada solicitada para todas as unidades!', 'success');
-                }, 1500);
-            }
-        }
     </script>
 </body>
 </html>
