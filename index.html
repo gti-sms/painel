@@ -650,14 +650,6 @@
             line-height: 1;
         }
         
-        #syncStatus {
-            font-size: 12px;
-            color: #00e676;
-            text-align: right;
-            margin-top: 2px;
-            opacity: 0.9;
-        }
-        
         .header-text {
             display: flex;
             flex-direction: column;
@@ -698,7 +690,7 @@
         <div class="datetime-container">
             <div id="currentDate" style="font-size: 14px; color: white;"></div>
             <div id="currentTime" class="header-time"></div>
-            <div id="syncStatus" style="font-size: 12px; color: #00e676;"></div>
+            <!-- Removido o syncStatus daqui -->
         </div>
     </header>
 
@@ -891,26 +883,6 @@
                     }
                 }
                 return this.currentInterval;
-            },
-            
-            getStats() {
-                const interval = this.currentInterval;
-                const leiturasPorTVPorDia = Math.floor((24 * 60) / interval);
-                const leiturasPorDia = 40 * leiturasPorTVPorDia;
-                const leiturasPorMes = leiturasPorDia * 30;
-                const percentualFreeTier = (leiturasPorDia / 50000) * 100;
-                
-                return {
-                    interval,
-                    leiturasPorTVPorDia,
-                    leiturasPorDia,
-                    leiturasPorMes,
-                    percentualFreeTier,
-                    isFree: percentualFreeTier <= 100,
-                    estimatedCost: percentualFreeTier > 100 ? 
-                        `$${((leiturasPorMes - 1500000) * 0.06 / 100000).toFixed(2)}/mês` : 
-                        'GRÁTIS'
-                };
             }
         };
 
@@ -1022,8 +994,6 @@
                 if (!isMatriz) {
                     this.setupRealtimeListener();
                 }
-                
-                this.updateStatusDisplay();
             },
             
             async loadFromCache() {
@@ -1073,7 +1043,6 @@
                 
                 try {
                     console.log(`🔄 Sincronizando (${reason})...`);
-                    this.updateStatusDisplay('syncing');
                     
                     // Buscar dados do Firebase
                     const firebaseData = await this.fetchFromFirebase();
@@ -1126,13 +1095,8 @@
                         setTimeout(() => this.syncData('retry'), 10000);
                     }
                     
-                    this.updateStatusDisplay('error');
-                    
                 } finally {
                     this.isSyncing = false;
-                    if (reason !== 'error') {
-                        this.updateStatusDisplay();
-                    }
                 }
             },
             
@@ -1169,37 +1133,6 @@
             isEqualData(data1, data2) {
                 if (!data1 || !data2) return false;
                 return JSON.stringify(data1) === JSON.stringify(data2);
-            },
-            
-            updateStatusDisplay(status = 'normal') {
-                const syncElement = document.getElementById('syncStatus');
-                if (!syncElement) return;
-                
-                let statusText = '';
-                let statusColor = '#00e676';
-                
-                if (status === 'error') {
-                    statusText = '❌ Erro na sincronização';
-                    statusColor = '#ff5252';
-                } else if (status === 'syncing') {
-                    statusText = '🔄 Sincronizando...';
-                    statusColor = '#ff9800';
-                } else {
-                    const minutes = Math.floor((Date.now() - this.lastSyncTime) / 60000);
-                    if (this.lastSyncTime === 0) {
-                        statusText = '⏳ Aguardando primeira sincronização';
-                    } else if (minutes < 1) {
-                        statusText = '✅ Sincronizado agora mesmo';
-                    } else {
-                        statusText = `✅ Sincronizado há ${minutes} min`;
-                    }
-                    
-                    // Adicionar informação do intervalo
-                    statusText += ` | Próxima em ${syncConfig.currentInterval}min`;
-                }
-                
-                syncElement.innerHTML = statusText;
-                syncElement.style.color = statusColor;
             },
             
             changeInterval(newInterval) {
@@ -1344,8 +1277,7 @@
                 minute: '2-digit' 
             });
             
-            // Atualizar status de sincronização
-            syncManager.updateStatusDisplay();
+            // NOTA: Removida a chamada para atualizar o status de sincronização
         }
 
         function carregarVideo() {
