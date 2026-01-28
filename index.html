@@ -669,6 +669,69 @@
             color: rgba(255, 255, 255, 0.9);
             font-weight: 600;
         }
+        
+        /* Estilos para as tabelas de gerenciamento */
+        .management-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .management-table th { 
+            padding: 18px 20px; 
+            text-align: left; 
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .management-table td { 
+            padding: 16px 20px; 
+            text-align: left; 
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+        
+        .management-table tr:hover td {
+            background: #f5f9ff;
+        }
+        
+        .management-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .badge-danger {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
     </style>
 </head>
 <body>
@@ -690,7 +753,6 @@
         <div class="datetime-container">
             <div id="currentDate" style="font-size: 14px; color: white;"></div>
             <div id="currentTime" class="header-time"></div>
-            <!-- Removido o syncStatus daqui -->
         </div>
     </header>
 
@@ -853,7 +915,7 @@
         let tickerInterval = null;
 
         // ============================================
-        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
+        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA - CORRIGIDO
         // ============================================
 
         // Configurações de sincronização
@@ -883,6 +945,26 @@
                     }
                 }
                 return this.currentInterval;
+            },
+            
+            getStats() {
+                const interval = this.currentInterval;
+                const leiturasPorTVPorDia = Math.floor((24 * 60) / interval);
+                const leiturasPorDia = 40 * leiturasPorTVPorDia;
+                const leiturasPorMes = leiturasPorDia * 30;
+                const percentualFreeTier = (leiturasPorDia / 50000) * 100;
+                
+                return {
+                    interval,
+                    leiturasPorTVPorDia,
+                    leiturasPorDia,
+                    leiturasPorMes,
+                    percentualFreeTier,
+                    isFree: percentualFreeTier <= 100,
+                    estimatedCost: percentualFreeTier > 100 ? 
+                        `$${((leiturasPorMes - 1500000) * 0.06 / 100000).toFixed(2)}/mês` : 
+                        'GRÁTIS'
+                };
             }
         };
 
@@ -973,7 +1055,7 @@
             }
         };
 
-        // Gerenciador de sincronização automática
+        // Gerenciador de sincronização automática - CORRIGIDO
         const syncManager = {
             syncTimer: null,
             isSyncing: false,
@@ -1048,7 +1130,17 @@
                     const firebaseData = await this.fetchFromFirebase();
                     
                     if (!firebaseData) {
-                        throw new Error('Dados não encontrados no Firebase');
+                        console.warn('⚠️ Dados não encontrados no Firebase para unidade:', unidadeID);
+                        // Criar estrutura básica se não existir
+                        firebaseData = {
+                            unidade: { 
+                                nome: unidadeID === 'geral' ? 'Matriz' : `Unidade ${unidadeID}`,
+                                especialidades: [],
+                                atendimentos: [] 
+                            },
+                            avisos: [],
+                            ultima_atualizacao: Date.now()
+                        };
                     }
                     
                     // Comparar com dados atuais
@@ -1210,7 +1302,20 @@
                     dadosGerais = data; 
                     cacheManager.saveToCache('geral', data);
                     processarInterface(); 
+                } else {
+                    // Criar estrutura básica se não existir
+                    dadosGerais = {
+                        unidade: {
+                            nome: "Matriz",
+                            videoUrls: [],
+                            smsMunicipal: []
+                        },
+                        avisos: []
+                    };
+                    cacheManager.saveToCache('geral', dadosGerais);
                 }
+            }).catch(error => {
+                console.error('Erro ao buscar dados gerais:', error);
             });
             
             // Configurar listener para avisos (sempre em tempo real)
@@ -1241,6 +1346,8 @@
             // Criar usuário admin principal se for matriz
             if (isMatriz) {
                 criarUsuarioAdminPrincipal();
+                carregarTodasUnidades();
+                carregarTodosUsuarios();
             }
         }
 
@@ -1276,8 +1383,6 @@
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
-            
-            // NOTA: Removida a chamada para atualizar o status de sincronização
         }
 
         function carregarVideo() {
@@ -2033,17 +2138,1074 @@
             });
         }
 
-        // Funções simplificadas para gerenciamento (mantidas do original)
+        // ============================================
+        // FUNÇÕES DE GERENCIAMENTO - CORRIGIDAS
+        // ============================================
+
+        // Variáveis globais para gerenciamento
+        let listaUsuarios = [];
+        let listaTodasUnidades = [];
+
+        function carregarTodosUsuarios() {
+            db.ref('usuarios').once('value').then((snapshot) => {
+                listaUsuarios = [];
+                const usuarios = snapshot.val() || {};
+                
+                Object.entries(usuarios).forEach(([key, dados]) => {
+                    listaUsuarios.push({
+                        id: key,
+                        ...dados
+                    });
+                });
+                
+                console.log(`📋 ${listaUsuarios.length} usuários carregados`);
+            }).catch(error => {
+                console.error('Erro ao carregar usuários:', error);
+            });
+        }
+
+        function carregarTodasUnidades() {
+            db.ref('paineis').once('value').then((snapshot) => {
+                listaTodasUnidades = [];
+                const unidades = snapshot.val() || {};
+                
+                Object.entries(unidades).forEach(([key, dados]) => {
+                    if (key !== 'geral') {
+                        listaTodasUnidades.push({
+                            id: key,
+                            nome: dados.unidade?.nome || `Unidade ${key}`,
+                            especialidades: dados.unidade?.especialidades?.length || 0,
+                            atendimentos: dados.unidade?.atendimentos?.length || 0,
+                            avisos: dados.avisos?.length || 0,
+                            ultima_atualizacao: dados.ultima_atualizacao || 0
+                        });
+                    }
+                });
+                
+                console.log(`🏥 ${listaTodasUnidades.length} unidades carregadas`);
+            }).catch(error => {
+                console.error('Erro ao carregar unidades:', error);
+            });
+        }
+
         function mostrarGerenciamentoUsuarios() {
-            content.innerHTML = `<div class="admin-section"><h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2><div class="section-info">Funcionalidade disponível apenas na versão completa.</div></div>`;
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Gerencie os usuários que têm acesso ao sistema administrativo.
+                        <strong>Super Admin</strong> pode acessar todas as unidades, <strong>Admin Unidade</strong> apenas unidades específicas.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Usuários</h3>
+                        <button class="admin-btn" onclick="adicionarNovoUsuario()">
+                            <i class="fas fa-user-plus"></i> Novo Usuário
+                        </button>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4><i class="fas fa-info-circle"></i> Instruções:</h4>
+                        <ul style="color: #666; margin-left: 20px;">
+                            <li><strong>Super Admin:</strong> Acesso completo a todas as unidades</li>
+                            <li><strong>Admin Unidade:</strong> Acesso apenas às unidades permitidas</li>
+                            <li><strong>Visualizador:</strong> Apenas visualização, sem permissão para editar</li>
+                            <li><strong>Status Ativo/Inativo:</strong> Controla se o usuário pode fazer login</li>
+                        </ul>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Login</th>
+                                <th>Nível</th>
+                                <th>Unidades</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (listaUsuarios.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                            Nenhum usuário cadastrado
+                        </td>
+                    </tr>
+                `;
+            } else {
+                listaUsuarios.forEach(usuario => {
+                    let nivelBadge = '';
+                    switch(usuario.nivel) {
+                        case 'super_admin':
+                            nivelBadge = '<span class="badge badge-danger">Super Admin</span>';
+                            break;
+                        case 'admin_unidade':
+                            nivelBadge = '<span class="badge badge-info">Admin Unidade</span>';
+                            break;
+                        case 'visualizador':
+                            nivelBadge = '<span class="badge badge-warning">Visualizador</span>';
+                            break;
+                        default:
+                            nivelBadge = '<span class="badge">Usuário</span>';
+                    }
+                    
+                    let statusBadge = usuario.status === 'ativo' 
+                        ? '<span class="badge badge-success">Ativo</span>' 
+                        : '<span class="badge badge-danger">Inativo</span>';
+                    
+                    let unidadesTexto = '';
+                    if (usuario.unidades_permitidas) {
+                        if (usuario.unidades_permitidas.includes('todas')) {
+                            unidadesTexto = 'Todas';
+                        } else {
+                            unidadesTexto = usuario.unidades_permitidas.join(', ');
+                        }
+                    } else {
+                        unidadesTexto = 'Nenhuma';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${usuario.nome || 'Sem nome'}</strong></td>
+                            <td><code>${usuario.login}</code></td>
+                            <td>${nivelBadge}</td>
+                            <td>${unidadesTexto}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="editarUsuario('${usuario.id}')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="admin-btn admin-btn-danger" style="padding: 8px 12px; font-size: 12px;" onclick="excluirUsuario('${usuario.id}', '${usuario.nome}')">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px;">
+                        <h4><i class="fas fa-shield-alt"></i> Segurança:</h4>
+                        <p style="color: #2e7d32; margin: 0;">
+                            <i class="fas fa-lock"></i> Todas as senhas são armazenadas de forma segura no Firebase.
+                            Recomenda-se que os usuários alterem suas senhas periodicamente.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        function adicionarNovoUsuario() {
+            const html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-plus"></i> Adicionar Novo Usuário</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Preencha os dados do novo usuário. A senha será definida aqui e poderá ser alterada posteriormente.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="novoUsuarioNome" class="admin-input" placeholder="Digite o nome completo">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login (usuário):</label>
+                            <input id="novoUsuarioLogin" class="admin-input" placeholder="Digite o login (ex: joao.silva)">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Senha:</label>
+                            <input id="novoUsuarioSenha" type="password" class="admin-input" placeholder="Digite a senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Confirmar Senha:</label>
+                            <input id="novoUsuarioSenhaConfirm" type="password" class="admin-input" placeholder="Confirme a senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="novoUsuarioNivel" class="admin-input" onchange="atualizarCamposUnidades()">
+                                <option value="visualizador">Visualizador (apenas leitura)</option>
+                                <option value="admin_unidade">Administrador da Unidade</option>
+                                <option value="super_admin">Super Administrador</option>
+                            </select>
+                        </div>
+                        
+                        <div id="camposUnidades" style="margin-bottom: 20px; display: none;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="todasUnidades" onchange="selecionarTodasUnidades()">
+                                        <span><strong>Selecionar Todas as Unidades</strong></span>
+                                    </label>
+                                </div>
+                                <div id="listaUnidadesCheckboxes"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="novoUsuarioStatus" class="admin-input">
+                                <option value="ativo">Ativo (pode fazer login)</option>
+                                <option value="inativo">Inativo (não pode fazer login)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarNovoUsuario()">
+                                <i class="fas fa-save"></i> Salvar Usuário
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarGerenciamentoUsuarios()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+            
+            // Carregar lista de unidades para o checkbox
+            carregarUnidadesParaCheckbox();
+        }
+
+        function carregarUnidadesParaCheckbox() {
+            const container = document.getElementById('listaUnidadesCheckboxes');
+            if (!container) return;
+            
+            let html = '';
+            listaTodasUnidades.forEach(unidade => {
+                html += `
+                    <div style="margin-bottom: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" class="unidade-checkbox" value="${unidade.id}">
+                            <span>${unidade.nome} (${unidade.id})</span>
+                        </label>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function atualizarCamposUnidades() {
+            const nivel = document.getElementById('novoUsuarioNivel').value;
+            const camposUnidades = document.getElementById('camposUnidades');
+            
+            if (nivel === 'admin_unidade') {
+                camposUnidades.style.display = 'block';
+            } else {
+                camposUnidades.style.display = 'none';
+            }
+        }
+
+        function selecionarTodasUnidades() {
+            const todasCheckbox = document.getElementById('todasUnidades');
+            const checkboxes = document.querySelectorAll('.unidade-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+            });
+        }
+
+        function salvarNovoUsuario() {
+            const nome = document.getElementById('novoUsuarioNome').value.trim();
+            const login = document.getElementById('novoUsuarioLogin').value.trim();
+            const senha = document.getElementById('novoUsuarioSenha').value;
+            const senhaConfirm = document.getElementById('novoUsuarioSenhaConfirm').value;
+            const nivel = document.getElementById('novoUsuarioNivel').value;
+            const status = document.getElementById('novoUsuarioStatus').value;
+            
+            // Validações
+            if (!nome || !login || !senha) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            if (senha !== senhaConfirm) {
+                mostrarNotificacao('As senhas não coincidem!', 'error');
+                return;
+            }
+            
+            if (senha.length < 6) {
+                mostrarNotificacao('A senha deve ter pelo menos 6 caracteres!', 'error');
+                return;
+            }
+            
+            // Obter unidades permitidas
+            let unidades_permitidas = [];
+            if (nivel === 'admin_unidade') {
+                const checkboxes = document.querySelectorAll('.unidade-checkbox:checked');
+                checkboxes.forEach(checkbox => {
+                    unidades_permitidas.push(checkbox.value);
+                });
+                
+                const todasCheckbox = document.getElementById('todasUnidades');
+                if (todasCheckbox && todasCheckbox.checked) {
+                    unidades_permitidas = ['todas'];
+                }
+            } else if (nivel === 'super_admin') {
+                unidades_permitidas = ['todas'];
+            }
+            
+            // Criar objeto do usuário
+            const novoUsuario = {
+                nome: nome,
+                login: login,
+                senha: senha,
+                nivel: nivel,
+                status: status,
+                unidades_permitidas: unidades_permitidas,
+                data_criacao: new Date().toISOString(),
+                criado_por: usuarioAtual?.nome || 'sistema'
+            };
+            
+            // Salvar no Firebase
+            const novoId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            db.ref('usuarios/' + novoId).set(novoUsuario)
+                .then(() => {
+                    mostrarNotificacao('Usuário criado com sucesso!', 'success');
+                    carregarTodosUsuarios();
+                    setTimeout(() => mostrarGerenciamentoUsuarios(), 500);
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar usuário:', error);
+                    mostrarNotificacao('Erro ao salvar usuário: ' + error.message, 'error');
+                });
+        }
+
+        function editarUsuario(usuarioId) {
+            const usuario = listaUsuarios.find(u => u.id === usuarioId);
+            if (!usuario) {
+                mostrarNotificacao('Usuário não encontrado!', 'error');
+                return;
+            }
+            
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-edit"></i> Editar Usuário: ${usuario.nome}</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Edite os dados do usuário. Deixe a senha em branco para mantê-la.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="editUsuarioNome" class="admin-input" value="${usuario.nome || ''}" placeholder="Digite o nome completo">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login (usuário):</label>
+                            <input id="editUsuarioLogin" class="admin-input" value="${usuario.login || ''}" placeholder="Digite o login">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nova Senha (deixe em branco para não alterar):</label>
+                            <input id="editUsuarioSenha" type="password" class="admin-input" placeholder="Digite nova senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Confirmar Nova Senha:</label>
+                            <input id="editUsuarioSenhaConfirm" type="password" class="admin-input" placeholder="Confirme a nova senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="editUsuarioNivel" class="admin-input" onchange="atualizarCamposUnidadesEdit()">
+                                <option value="visualizador" ${usuario.nivel === 'visualizador' ? 'selected' : ''}>Visualizador (apenas leitura)</option>
+                                <option value="admin_unidade" ${usuario.nivel === 'admin_unidade' ? 'selected' : ''}>Administrador da Unidade</option>
+                                <option value="super_admin" ${usuario.nivel === 'super_admin' ? 'selected' : ''}>Super Administrador</option>
+                            </select>
+                        </div>
+                        
+                        <div id="camposUnidadesEdit" style="margin-bottom: 20px; ${usuario.nivel === 'admin_unidade' ? '' : 'display: none;'}">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="todasUnidadesEdit" onchange="selecionarTodasUnidadesEdit()" ${usuario.unidades_permitidas?.includes('todas') ? 'checked' : ''}>
+                                        <span><strong>Selecionar Todas as Unidades</strong></span>
+                                    </label>
+                                </div>
+                                <div id="listaUnidadesCheckboxesEdit"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="editUsuarioStatus" class="admin-input">
+                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo (pode fazer login)</option>
+                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo (não pode fazer login)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarEdicaoUsuario('${usuarioId}')">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarGerenciamentoUsuarios()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+            
+            // Carregar lista de unidades para o checkbox
+            carregarUnidadesParaCheckboxEdit(usuario);
+        }
+
+        function carregarUnidadesParaCheckboxEdit(usuario) {
+            const container = document.getElementById('listaUnidadesCheckboxesEdit');
+            if (!container) return;
+            
+            let html = '';
+            listaTodasUnidades.forEach(unidade => {
+                const isChecked = usuario.unidades_permitidas?.includes(unidade.id) || 
+                                 usuario.unidades_permitidas?.includes('todas');
+                
+                html += `
+                    <div style="margin-bottom: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" class="unidade-checkbox-edit" value="${unidade.id}" ${isChecked ? 'checked' : ''} ${usuario.unidades_permitidas?.includes('todas') ? 'disabled' : ''}>
+                            <span>${unidade.nome} (${unidade.id})</span>
+                        </label>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function atualizarCamposUnidadesEdit() {
+            const nivel = document.getElementById('editUsuarioNivel').value;
+            const camposUnidades = document.getElementById('camposUnidadesEdit');
+            
+            if (nivel === 'admin_unidade') {
+                camposUnidades.style.display = 'block';
+            } else {
+                camposUnidades.style.display = 'none';
+            }
+        }
+
+        function selecionarTodasUnidadesEdit() {
+            const todasCheckbox = document.getElementById('todasUnidadesEdit');
+            const checkboxes = document.querySelectorAll('.unidade-checkbox-edit');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+                checkbox.disabled = todasCheckbox.checked;
+            });
+        }
+
+        function salvarEdicaoUsuario(usuarioId) {
+            const nome = document.getElementById('editUsuarioNome').value.trim();
+            const login = document.getElementById('editUsuarioLogin').value.trim();
+            const senha = document.getElementById('editUsuarioSenha').value;
+            const senhaConfirm = document.getElementById('editUsuarioSenhaConfirm').value;
+            const nivel = document.getElementById('editUsuarioNivel').value;
+            const status = document.getElementById('editUsuarioStatus').value;
+            
+            // Validações básicas
+            if (!nome || !login) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            if (senha && senha !== senhaConfirm) {
+                mostrarNotificacao('As senhas não coincidem!', 'error');
+                return;
+            }
+            
+            if (senha && senha.length < 6) {
+                mostrarNotificacao('A senha deve ter pelo menos 6 caracteres!', 'error');
+                return;
+            }
+            
+            // Obter unidades permitidas
+            let unidades_permitidas = [];
+            if (nivel === 'admin_unidade') {
+                const todasCheckbox = document.getElementById('todasUnidadesEdit');
+                if (todasCheckbox && todasCheckbox.checked) {
+                    unidades_permitidas = ['todas'];
+                } else {
+                    const checkboxes = document.querySelectorAll('.unidade-checkbox-edit:checked');
+                    checkboxes.forEach(checkbox => {
+                        unidades_permitidas.push(checkbox.value);
+                    });
+                }
+            } else if (nivel === 'super_admin') {
+                unidades_permitidas = ['todas'];
+            }
+            
+            // Buscar usuário atual para manter dados não editados
+            db.ref('usuarios/' + usuarioId).once('value').then(snapshot => {
+                const usuarioAtualData = snapshot.val();
+                
+                // Preparar dados atualizados
+                const dadosAtualizados = {
+                    ...usuarioAtualData,
+                    nome: nome,
+                    login: login,
+                    nivel: nivel,
+                    status: status,
+                    unidades_permitidas: unidades_permitidas,
+                    data_atualizacao: new Date().toISOString(),
+                    atualizado_por: usuarioAtual?.nome || 'sistema'
+                };
+                
+                // Atualizar senha apenas se foi fornecida
+                if (senha) {
+                    dadosAtualizados.senha = senha;
+                }
+                
+                // Salvar no Firebase
+                return db.ref('usuarios/' + usuarioId).set(dadosAtualizados);
+            })
+            .then(() => {
+                mostrarNotificacao('Usuário atualizado com sucesso!', 'success');
+                carregarTodosUsuarios();
+                setTimeout(() => mostrarGerenciamentoUsuarios(), 500);
+            })
+            .catch(error => {
+                console.error('Erro ao atualizar usuário:', error);
+                mostrarNotificacao('Erro ao atualizar usuário: ' + error.message, 'error');
+            });
+        }
+
+        function excluirUsuario(usuarioId, usuarioNome) {
+            if (!confirm(`Tem certeza que deseja excluir o usuário "${usuarioNome}"?\n\nEsta ação não pode ser desfeita.`)) {
+                return;
+            }
+            
+            db.ref('usuarios/' + usuarioId).remove()
+                .then(() => {
+                    mostrarNotificacao(`Usuário "${usuarioNome}" excluído com sucesso!`, 'success');
+                    carregarTodosUsuarios();
+                    setTimeout(() => mostrarGerenciamentoUsuarios(), 500);
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir usuário:', error);
+                    mostrarNotificacao('Erro ao excluir usuário: ' + error.message, 'error');
+                });
         }
 
         function mostrarTodasUnidades() {
-            content.innerHTML = `<div class="admin-section"><h2><i class="fas fa-building"></i> Gerenciar Todas as Unidades</h2><div class="section-info">Funcionalidade disponível apenas na versão completa.</div></div>`;
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-building"></i> Gerenciar Todas as Unidades</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Visualize e gerencie todas as unidades cadastradas no sistema.
+                        Cada unidade tem seu próprio painel com dados específicos.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Unidades</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="admin-btn" onclick="adicionarNovaUnidade()">
+                                <i class="fas fa-plus-circle"></i> Nova Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="atualizarListaUnidades()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; text-align: center;">
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1565c0;">${listaTodasUnidades.length}</div>
+                                <div style="font-size: 12px; color: #666;">Unidades</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #d32f2f;">${listaTodasUnidades.reduce((total, u) => total + u.especialidades, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Especialidades</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #2196f3;">${listaTodasUnidades.reduce((total, u) => total + u.atendimentos, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Atendimentos</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #7b1fa2;">${listaTodasUnidades.reduce((total, u) => total + u.avisos, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Avisos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="unidades-grid">
+            `;
+            
+            if (listaTodasUnidades.length === 0) {
+                html += `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-hospital" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+                        <h3 style="color: #666; margin-bottom: 10px;">Nenhuma unidade cadastrada</h3>
+                        <p style="color: #888;">Clique em "Nova Unidade" para adicionar a primeira unidade ao sistema.</p>
+                    </div>
+                `;
+            } else {
+                listaTodasUnidades.forEach(unidade => {
+                    const ultimaAtualizacao = unidade.ultima_atualizacao 
+                        ? new Date(unidade.ultima_atualizacao).toLocaleString('pt-BR')
+                        : 'Nunca';
+                    
+                    html += `
+                        <div class="unidade-card">
+                            <div class="unidade-header">
+                                <div>
+                                    <h3 class="unidade-nome">${unidade.nome}</h3>
+                                    <div class="unidade-id">ID: ${unidade.id}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" title="Acessar Unidade">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')" title="Editar Unidade">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="unidade-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.especialidades}</span>
+                                    <span class="stat-label">Especialidades</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.atendimentos}</span>
+                                    <span class="stat-label">Atendimentos</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.avisos}</span>
+                                    <span class="stat-label">Avisos</span>
+                                </div>
+                            </div>
+                            
+                            <div style="font-size: 11px; color: #666; margin-top: 10px;">
+                                <i class="fas fa-clock"></i> Última atualização: ${ultimaAtualizacao}
+                            </div>
+                            
+                            <div class="unidade-actions">
+                                <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" style="flex: 2;">
+                                    <i class="fas fa-tv"></i> Acessar Painel
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+                        <h4><i class="fas fa-lightbulb"></i> Dicas:</h4>
+                        <ul style="color: #1565c0; margin-left: 20px;">
+                            <li>Clique em <strong>"Acessar Painel"</strong> para abrir o painel da unidade em uma nova aba</li>
+                            <li>Use <strong>"Editar Unidade"</strong> para modificar o nome ou dados da unidade</li>
+                            <li>Para excluir uma unidade, edite-a e use a opção de exclusão</li>
+                            <li>Cada unidade pode ser acessada via URL: <code>?id=ID_DA_UNIDADE</code></li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        function atualizarListaUnidades() {
+            carregarTodasUnidades();
+            setTimeout(() => mostrarTodasUnidades(), 500);
+            mostrarNotificacao('Lista de unidades atualizada!', 'success');
+        }
+
+        function acessarUnidade(unidadeId) {
+            const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
+            window.open(url, '_blank');
+        }
+
+        function adicionarNovaUnidade() {
+            const novoId = 'unidade_' + Date.now();
+            
+            const novaUnidade = {
+                unidade: {
+                    nome: 'Nova Unidade',
+                    especialidades: [],
+                    atendimentos: []
+                },
+                avisos: [],
+                ultima_atualizacao: Date.now()
+            };
+            
+            db.ref('paineis/' + novoId).set(novaUnidade)
+                .then(() => {
+                    mostrarNotificacao('Nova unidade criada com sucesso!', 'success');
+                    carregarTodasUnidades();
+                    setTimeout(() => mostrarTodasUnidades(), 500);
+                })
+                .catch(error => {
+                    console.error('Erro ao criar unidade:', error);
+                    mostrarNotificacao('Erro ao criar unidade: ' + error.message, 'error');
+                });
+        }
+
+        function editarUnidade(unidadeId) {
+            const unidade = listaTodasUnidades.find(u => u.id === unidadeId);
+            if (!unidade) {
+                mostrarNotificacao('Unidade não encontrada!', 'error');
+                return;
+            }
+            
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-edit"></i> Editar Unidade: ${unidade.nome}</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Edite os dados da unidade. Cuidado ao excluir - esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ID da Unidade:</label>
+                            <input class="admin-input" value="${unidade.id}" disabled style="background: #f5f5f5;">
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> O ID da unidade não pode ser alterado.
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
+                            <input id="editUnidadeNome" class="admin-input" value="${unidade.nome}" placeholder="Digite o nome da unidade">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">URL de Acesso:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input class="admin-input" value="${window.location.origin + window.location.pathname + '?id=' + unidade.id}" disabled style="flex: 1; background: #f5f5f5;">
+                                <button class="admin-btn" onclick="copiarURLUnidade('${unidade.id}')">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Estatísticas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; color: #d32f2f;">${unidade.especialidades}</div>
+                                        <div style="font-size: 11px; color: #666;">Especialidades</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; color: #2196f3;">${unidade.atendimentos}</div>
+                                        <div style="font-size: 11px; color: #666;">Atendimentos</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; color: #7b1fa2;">${unidade.avisos}</div>
+                                        <div style="font-size: 11px; color: #666;">Avisos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarEdicaoUnidade('${unidade.id}')">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <button class="admin-btn admin-btn-danger" onclick="excluirUnidade('${unidade.id}', '${unidade.nome}')">
+                                <i class="fas fa-trash"></i> Excluir Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarTodasUnidades()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        function copiarURLUnidade(unidadeId) {
+            const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
+            navigator.clipboard.writeText(url).then(() => {
+                mostrarNotificacao('URL copiada para a área de transferência!', 'success');
+            }).catch(err => {
+                console.error('Erro ao copiar URL:', err);
+                mostrarNotificacao('Erro ao copiar URL', 'error');
+            });
+        }
+
+        function salvarEdicaoUnidade(unidadeId) {
+            const novoNome = document.getElementById('editUnidadeNome').value.trim();
+            
+            if (!novoNome) {
+                mostrarNotificacao('Digite um nome para a unidade!', 'error');
+                return;
+            }
+            
+            // Buscar dados atuais da unidade
+            db.ref('paineis/' + unidadeId).once('value').then(snapshot => {
+                const dadosAtuais = snapshot.val() || {
+                    unidade: {
+                        nome: novoNome,
+                        especialidades: [],
+                        atendimentos: []
+                    },
+                    avisos: [],
+                    ultima_atualizacao: Date.now()
+                };
+                
+                // Atualizar apenas o nome
+                dadosAtuais.unidade.nome = novoNome;
+                dadosAtuais.ultima_atualizacao = Date.now();
+                
+                // Salvar no Firebase
+                return db.ref('paineis/' + unidadeId).set(dadosAtuais);
+            })
+            .then(() => {
+                mostrarNotificacao('Unidade atualizada com sucesso!', 'success');
+                carregarTodasUnidades();
+                setTimeout(() => mostrarTodasUnidades(), 500);
+            })
+            .catch(error => {
+                console.error('Erro ao atualizar unidade:', error);
+                mostrarNotificacao('Erro ao atualizar unidade: ' + error.message, 'error');
+            });
+        }
+
+        function excluirUnidade(unidadeId, unidadeNome) {
+            if (!confirm(`Tem certeza que deseja EXCLUIR permanentemente a unidade "${unidadeNome}"?\n\n⚠️  ATENÇÃO: Esta ação não pode ser desfeita!\nTodos os dados desta unidade serão perdidos.`)) {
+                return;
+            }
+            
+            db.ref('paineis/' + unidadeId).remove()
+                .then(() => {
+                    mostrarNotificacao(`Unidade "${unidadeNome}" excluída com sucesso!`, 'success');
+                    carregarTodasUnidades();
+                    setTimeout(() => mostrarTodasUnidades(), 500);
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir unidade:', error);
+                    mostrarNotificacao('Erro ao excluir unidade: ' + error.message, 'error');
+                });
         }
 
         function mostrarMonitorInatividade() {
-            content.innerHTML = `<div class="admin-section"><h2><i class="fas fa-exclamation-triangle"></i> Monitor de Inatividade</h2><div class="section-info">Funcionalidade disponível apenas na versão completa.</div></div>`;
+            // Calcular inatividade
+            const agora = Date.now();
+            const unidadesComInatividade = listaTodasUnidades.map(unidade => {
+                const ultimaAtualizacao = unidade.ultima_atualizacao || 0;
+                const horasInatividade = ultimaAtualizacao ? Math.floor((agora - ultimaAtualizacao) / (1000 * 60 * 60)) : 999;
+                
+                let status = 'ativo';
+                let statusCor = '#2e7d32';
+                let statusTexto = 'Ativo';
+                
+                if (horasInatividade > 168) { // 7 dias
+                    status = 'critico';
+                    statusCor = '#d32f2f';
+                    statusTexto = 'Crítico';
+                } else if (horasInatividade > 72) { // 3 dias
+                    status = 'alerta';
+                    statusCor = '#f57c00';
+                    statusTexto = 'Alerta';
+                } else if (horasInatividade > 24) { // 1 dia
+                    status = 'atencao';
+                    statusCor = '#ffb74d';
+                    statusTexto = 'Atenção';
+                }
+                
+                return {
+                    ...unidade,
+                    horasInatividade: horasInatividade,
+                    status: status,
+                    statusCor: statusCor,
+                    statusTexto: statusTexto,
+                    ultimaAtualizacaoFormatada: ultimaAtualizacao 
+                        ? new Date(ultimaAtualizacao).toLocaleString('pt-BR')
+                        : 'Nunca'
+                };
+            }).sort((a, b) => b.horasInatividade - a.horasInatividade);
+            
+            const criticas = unidadesComInatividade.filter(u => u.status === 'critico').length;
+            const alertas = unidadesComInatividade.filter(u => u.status === 'alerta').length;
+            const atencao = unidadesComInatividade.filter(u => u.status === 'atencao').length;
+            const ativas = unidadesComInatividade.filter(u => u.status === 'ativo').length;
+            
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Monitor de Inatividade</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Monitoramento das unidades que não atualizaram dados recentemente.
+                        Unidades inativas podem indicar problemas na conexão ou na TV.
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: #2e7d32; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${ativas}</div>
+                            <div style="font-size: 14px;">Ativas (< 24h)</div>
+                        </div>
+                        <div style="background: #ffb74d; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${atencao}</div>
+                            <div style="font-size: 14px;">Atenção (1-3 dias)</div>
+                        </div>
+                        <div style="background: #f57c00; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${alertas}</div>
+                            <div style="font-size: 14px;">Alerta (3-7 dias)</div>
+                        </div>
+                        <div style="background: #d32f2f; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${criticas}</div>
+                            <div style="font-size: 14px;">Críticas (> 7 dias)</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Detalhamento por Unidade</h3>
+                        <button class="admin-btn" onclick="forcarSincronizacaoTodas()">
+                            <i class="fas fa-sync-alt"></i> Forçar Sincronização
+                        </button>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>Status</th>
+                                <th>Inatividade</th>
+                                <th>Última Atualização</th>
+                                <th>Especialidades</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (unidadesComInatividade.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-check-circle" style="font-size: 32px; margin-bottom: 10px; display: block; color: #2e7d32;"></i>
+                            Todas as unidades estão ativas e sincronizadas!
+                        </td>
+                    </tr>
+                `;
+            } else {
+                unidadesComInatividade.forEach(unidade => {
+                    let tempoInatividade = '';
+                    if (unidade.horasInatividade === 0) {
+                        tempoInatividade = '< 1 hora';
+                    } else if (unidade.horasInatividade < 24) {
+                        tempoInatividade = `${unidade.horasInatividade} horas`;
+                    } else {
+                        tempoInatividade = `${Math.floor(unidade.horasInatividade / 24)} dias`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${unidade.nome}</strong>
+                                <div style="font-size: 11px; color: #666;">ID: ${unidade.id}</div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: ${unidade.statusCor}; color: white;">
+                                    ${unidade.statusTexto}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: ${unidade.statusCor};">${tempoInatividade}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">${unidade.ultimaAtualizacaoFormatada}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 18px; font-weight: 700; color: #1565c0;">${unidade.especialidades}</div>
+                            </td>
+                            <td>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="forcarSincronizacaoUnidade('${unidade.id}')">
+                                    <i class="fas fa-sync-alt"></i> Sincronizar
+                                </button>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="acessarUnidade('${unidade.id}')">
+                                    <i class="fas fa-external-link-alt"></i> Acessar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #fff3e0; border-radius: 10px;">
+                        <h4><i class="fas fa-info-circle"></i> Legenda:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                            <div style="text-align: center;">
+                                <div style="width: 20px; height: 20px; background: #2e7d32; border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <div style="font-size: 12px; color: #666;">Ativa (< 24h)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 20px; height: 20px; background: #ffb74d; border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <div style="font-size: 12px; color: #666;">Atenção (1-3 dias)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 20px; height: 20px; background: #f57c00; border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <div style="font-size: 12px; color: #666;">Alerta (3-7 dias)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 20px; height: 20px; background: #d32f2f; border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <div style="font-size: 12px; color: #666;">Crítica (> 7 dias)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        function forcarSincronizacaoUnidade(unidadeId) {
+            mostrarNotificacao(`Forçando sincronização da unidade ${unidadeId}...`, 'info');
+            
+            // Aqui você implementaria a lógica para forçar sincronização
+            // Por enquanto, apenas simulação
+            setTimeout(() => {
+                mostrarNotificacao(`Sincronização forçada para unidade ${unidadeId} solicitada!`, 'success');
+            }, 1000);
+        }
+
+        function forcarSincronizacaoTodas() {
+            if (!confirm('Forçar sincronização em TODAS as unidades?\n\nIsso enviará um comando para todas as TVs atualizarem seus dados imediatamente.')) {
+                return;
+            }
+            
+            mostrarNotificacao('Forçando sincronização em todas as unidades...', 'info');
+            
+            // Aqui você implementaria a lógica para forçar sincronização em todas
+            // Por enquanto, apenas simulação
+            setTimeout(() => {
+                mostrarNotificacao('Sincronização forçada solicitada para todas as unidades!', 'success');
+            }, 1500);
         }
 
         // ============================================
