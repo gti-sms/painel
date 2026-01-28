@@ -841,16 +841,16 @@
                 <div class="sidebar-item" id="menuAtend" onclick="mostrarSecao('atendimentos')">
                     <i class="fas fa-user-md"></i> Atendimentos da Unidade
                 </div>
-                <div class="sidebar-item" id="menuSMS" onclick="mostrarSecao('sms')" style="display: none;">
+                <div class="sidebar-item" id="menuSMS" onclick="mostrarSecao('sms')">
                     <i class="fas fa-city"></i> Produção Municipal
                 </div>
                 <div class="sidebar-item" onclick="mostrarSecao('avisos')">
                     <i class="fas fa-bullhorn"></i> Avisos
                 </div>
-                <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')" style="display: none;">
+                <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">
                     <i class="fas fa-video"></i> Vídeos
                 </div>
-                <div class="sidebar-item" onclick="mostrarSecao('sincronizacao')">
+                <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
                 <div class="sidebar-item" id="menuUsuarios" style="background: #e3f2fd; color: #1565c0; display:none" onclick="mostrarSecao('usuarios')">
@@ -899,7 +899,7 @@
         const isMatriz = (unidadeID === 'geral');
         
         let dadosUnidade = { unidade: { nome: "", especialidades: [], atendimentos: [] }, avisos: [] };
-        let dadosGerais = { unidade: { videoUrls: [], smsMunicipal: [] }, avisos: [] };
+        let dadosGerais = { unidade: { videoUrls: [], smsMunicipal: [], municipalFaltas: [], atendimentosMunicipais: [] }, avisos: [] };
         let logsAtualizacao = {};
         let todasUnidades = {};
         let logsDetalhados = {};
@@ -1127,7 +1127,7 @@
                     console.log(`🔄 Sincronizando (${reason})...`);
                     
                     // Buscar dados do Firebase
-                    const firebaseData = await this.fetchFromFirebase();
+                    let firebaseData = await this.fetchFromFirebase();
                     
                     if (!firebaseData) {
                         console.warn('⚠️ Dados não encontrados no Firebase para unidade:', unidadeID);
@@ -1269,6 +1269,15 @@
             loadingText.textContent = 'Iniciando sistema...';
             loadingDetails.textContent = 'Carregando configurações';
             
+            // Configurar interface baseada no tipo de unidade
+            if (isMatriz) {
+                document.getElementById('mainTitle').textContent = 'Matriz - Sistema de Saúde Municipal';
+                document.getElementById('headerSubtitle').textContent = 'Controle Central - PMPF';
+            } else {
+                document.getElementById('mainTitle').textContent = 'Unidade de Saúde';
+                document.getElementById('headerSubtitle').textContent = 'PMPF - Sistema de Saúde';
+            }
+            
             // Inicializar cache
             try {
                 await cacheManager.init();
@@ -1285,9 +1294,6 @@
             // Iniciar animações
             iniciarAnimacaoCarrossel();
             
-            // Configurar título inicial
-            document.getElementById('headerSubtitle').textContent = 'PMPF - Sistema de Saúde';
-            
             // Carregar dados gerais do cache
             const cacheGeral = await cacheManager.getFromCacheWithTTL('geral');
             if (cacheGeral.data) {
@@ -1300,7 +1306,14 @@
                 const data = snapshot.val();
                 if (data) { 
                     dadosGerais = data; 
-                    cacheManager.saveToCache('geral', data);
+                    // Inicializar estruturas municipais se não existirem
+                    if (isMatriz && !dadosGerais.unidade.municipalFaltas) {
+                        dadosGerais.unidade.municipalFaltas = [];
+                    }
+                    if (isMatriz && !dadosGerais.unidade.atendimentosMunicipais) {
+                        dadosGerais.unidade.atendimentosMunicipais = [];
+                    }
+                    cacheManager.saveToCache('geral', dadosGerais);
                     processarInterface(); 
                 } else {
                     // Criar estrutura básica se não existir
@@ -1308,7 +1321,9 @@
                         unidade: {
                             nome: "Matriz",
                             videoUrls: [],
-                            smsMunicipal: []
+                            smsMunicipal: [],
+                            municipalFaltas: [],
+                            atendimentosMunicipais: []
                         },
                         avisos: []
                     };
@@ -1354,7 +1369,11 @@
         function processarInterface() {
             // Atualizar título
             if (dadosUnidade && dadosUnidade.unidade && dadosUnidade.unidade.nome) {
-                document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome}`;
+                if (isMatriz) {
+                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome}`;
+                } else {
+                    document.getElementById('headerSubtitle').textContent = `PMPF - ${dadosUnidade.unidade.nome}`;
+                }
                 document.getElementById('adminUnidadeNome').textContent = dadosUnidade.unidade.nome;
             }
             
@@ -1365,7 +1384,7 @@
             
             // Se for matriz, atualizar dados gerais
             if (isMatriz && dadosGerais && dadosGerais.unidade) {
-                renderBloco('itemSMS', '<span style="color:white">ATENDIMENTOS NAS UNIDADES DE SAÚDE </span>', '<span style="color:white">Total mês anterior</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+                // Dados municipais já são renderizados em atualizarInterface()
             }
         }
 
@@ -1405,9 +1424,23 @@
         }
 
         function atualizarInterface() {
-            renderBloco('itemFaltometro', 'FALTÔMETRO - Falta dos pacientes às consultas', 'Total mês anterior', dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
-            renderBloco('itemAtendimentos', '<span style="color:white">ATENDIMENTOS NESTA UNIDADE</span>', '<span style="color:white">Total mês anterior</span>', dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-            renderBloco('itemSMS', '<span style="color:white">ATENDIMENTOS NAS UNIDADES DE SAÚDE </span>', '<span style="color:white">Total mês anterior</span>', dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            if (isMatriz) {
+                // Na matriz, mostrar dados municipais
+                renderBloco('itemFaltometro', 'FALTÔMETRO MUNICIPAL', 'Total faltas no mês', 
+                           dadosGerais.unidade.municipalFaltas || [], 'faltas', '#ff5252', '');
+                renderBloco('itemAtendimentos', 'ATENDIMENTOS POR UNIDADE DE SAÚDE', 'Total mês anterior', 
+                           dadosGerais.unidade.atendimentosMunicipais || [], 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+                renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL - SMS', 'Total mês anterior', 
+                           dadosGerais.unidade.smsMunicipal || [], 'valor', '#ba68c8', 'sms-title total-sms');
+            } else {
+                // Nas unidades, mostrar dados específicos
+                renderBloco('itemFaltometro', 'FALTÔMETRO - Falta dos pacientes às consultas', 'Total mês anterior', 
+                           dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
+                renderBloco('itemAtendimentos', 'ATENDIMENTOS NESTA UNIDADE', 'Total mês anterior', 
+                           dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+                renderBloco('itemSMS', 'ATENDIMENTOS NAS UNIDADES DE SAÚDE', 'Total mês anterior', 
+                           dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+            }
         }
 
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
@@ -1597,15 +1630,36 @@
             
             const nivel = permissoesUsuario.nivel;
             
-            document.getElementById('menuUsuarios').style.display = nivel === 'super_admin' ? 'block' : 'none';
-            document.getElementById('menuUnidades').style.display = nivel === 'super_admin' ? 'block' : 'none';
-            document.getElementById('menuMonitor').style.display = nivel === 'super_admin' ? 'block' : 'none';
+            // Controles visíveis apenas na matriz para super_admin
+            document.getElementById('menuUsuarios').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
+            document.getElementById('menuUnidades').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
+            document.getElementById('menuMonitor').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
+            document.getElementById('menuSMS').style.display = isMatriz ? 'block' : 'none';  // Apenas matriz
+            document.getElementById('menuVideo').style.display = isMatriz ? 'block' : 'none'; // Apenas matriz
             
-            document.getElementById('menuSMS').style.display = isMatriz ? 'block' : (nivel === 'super_admin' ? 'block' : 'none');
-            document.getElementById('menuVideo').style.display = isMatriz ? 'block' : (nivel === 'super_admin' ? 'block' : 'none');
+            // Controles de sincronização apenas na matriz para super_admin
+            document.getElementById('menuSincronizacao').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             
-            document.getElementById('menuFalto').style.display = nivel !== 'visualizador' ? 'block' : 'none';
-            document.getElementById('menuAtend').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+            // Controles de unidades específicos
+            if (isMatriz) {
+                // Na matriz, o "Faltômetro" e "Atendimentos" são para dados municipais
+                document.getElementById('menuFalto').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+                document.getElementById('menuFalto').innerHTML = '<i class="fas fa-city"></i> Dados Municipais';
+                document.getElementById('menuFalto').setAttribute('onclick', "mostrarSecao('municipal')");
+                
+                document.getElementById('menuAtend').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+                document.getElementById('menuAtend').innerHTML = '<i class="fas fa-hospital"></i> Unidades de Saúde';
+                document.getElementById('menuAtend').setAttribute('onclick', "mostrarSecao('unidades_saude')");
+            } else {
+                // Nas unidades, controles normais
+                document.getElementById('menuFalto').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+                document.getElementById('menuFalto').innerHTML = '<i class="fas fa-calendar-times"></i> Faltômetro';
+                document.getElementById('menuFalto').setAttribute('onclick', "mostrarSecao('faltometro')");
+                
+                document.getElementById('menuAtend').style.display = nivel !== 'visualizador' ? 'block' : 'none';
+                document.getElementById('menuAtend').innerHTML = '<i class="fas fa-user-md"></i> Atendimentos da Unidade';
+                document.getElementById('menuAtend').setAttribute('onclick', "mostrarSecao('atendimentos')");
+            }
         }
 
         function trocarUsuario() {
@@ -1627,15 +1681,17 @@
             if (permissoesUsuario.nivel === 'super_admin') return true;
             
             if (permissoesUsuario.nivel === 'visualizador') {
-                const secoesVisualizacao = ['unidade', 'avisos', 'sincronizacao'];
+                const secoesVisualizacao = ['unidade', 'avisos'];
                 return secoesVisualizacao.includes(secao);
             }
             
-            const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos', 'sincronizacao'];
-            if (secoesUnidade.includes(secao)) return true;
+            // Seções disponíveis para admin_unidade
+            const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos'];
+            if (!isMatriz && secoesUnidade.includes(secao)) return true;
             
-            const secoesMatriz = ['sms', 'video', 'unidades', 'monitor', 'usuarios'];
-            if (secoesMatriz.includes(secao) && isMatriz && permissoesUsuario.nivel === 'admin_unidade') {
+            // Seções disponíveis apenas para matriz
+            const secoesMatriz = ['municipal', 'unidades_saude', 'sms', 'video', 'unidades', 'monitor', 'usuarios', 'sincronizacao'];
+            if (isMatriz && secoesMatriz.includes(secao) && permissoesUsuario.nivel === 'admin_unidade') {
                 return true;
             }
             
@@ -1662,6 +1718,10 @@
                 mostrarTodasUnidades();
             } else if(secao === 'monitor') {
                 mostrarMonitorInatividade();
+            } else if(secao === 'municipal') {
+                mostrarDadosMunicipais();
+            } else if(secao === 'unidades_saude') {
+                mostrarUnidadesSaude();
             } else {
                 mostrarSecaoPadrao(secao, content);
             }
@@ -1767,6 +1827,54 @@
             document.getElementById('adminContent').innerHTML = html;
         }
 
+        function mostrarDadosMunicipais() {
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-city"></i> Dados Municipais - Faltômetro</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Configure os dados municipais de faltômetro que aparecerão em TODAS as unidades.
+                        <strong>Apenas matriz pode editar estes dados.</strong>
+                    </div>
+                    <div id="listaAdmin">
+                        ${(dadosGerais.unidade.municipalFaltas || []).map((e, i) => `
+                            <div class="item-row">
+                                <input type="text" value="${e.nome}" placeholder="Nome" onchange="atualizarItemMunicipal(${i}, 'municipalFaltas', this.value, 'nome')" class="admin-input">
+                                <input type="number" value="${e.faltas}" placeholder="Faltas" onchange="atualizarItemMunicipal(${i}, 'municipalFaltas', this.value, 'faltas')" class="admin-input">
+                                <button class="btn-remove" onclick="removerItemMunicipal(${i}, 'municipalFaltas')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="admin-btn" onclick="adicionarItemMunicipal('municipalFaltas', 'faltas')" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Adicionar Item Municipal
+                    </button>
+                </div>
+            `;
+        }
+
+        function mostrarUnidadesSaude() {
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-hospital"></i> Atendimentos por Unidade de Saúde</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Configure os atendimentos por unidade de saúde que aparecerão na visão municipal.
+                        <strong>Estes dados são diferentes dos atendimentos específicos de cada unidade.</strong>
+                    </div>
+                    <div id="listaAdmin">
+                        ${(dadosGerais.unidade.atendimentosMunicipais || []).map((e, i) => `
+                            <div class="item-row">
+                                <input type="text" value="${e.nome}" placeholder="Nome da Unidade" onchange="atualizarItemMunicipal(${i}, 'atendimentosMunicipais', this.value, 'nome')" class="admin-input">
+                                <input type="number" value="${e.valor}" placeholder="Atendimentos" onchange="atualizarItemMunicipal(${i}, 'atendimentosMunicipais', this.value, 'valor')" class="admin-input">
+                                <button class="btn-remove" onclick="removerItemMunicipal(${i}, 'atendimentosMunicipais')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="admin-btn" onclick="adicionarItemMunicipal('atendimentosMunicipais', 'valor')" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Adicionar Unidade de Saúde
+                    </button>
+                </div>
+            `;
+        }
+
         function mostrarSecaoPadrao(secao, content) {
             if(secao === 'unidade') {
                 content.innerHTML = `
@@ -1829,8 +1937,8 @@
                     </div>
                 `;
             } else if(secao === 'sms') {
-                if (!isMatriz && permissoesUsuario.nivel !== 'super_admin') {
-                    mostrarMensagemAcessoRestrito(content, secao, 'matriz');
+                if (!isMatriz) {
+                    mostrarMensagemAcessoRestrito(content, 'sms', 'matriz');
                     return;
                 }
                 content.innerHTML = `
@@ -1873,7 +1981,7 @@
                     </div>
                 `;
             } else if(secao === 'video') {
-                if (!isMatriz && permissoesUsuario.nivel !== 'super_admin') {
+                if (!isMatriz) {
                     mostrarMensagemAcessoRestrito(content, 'video', 'matriz');
                     return;
                 }
@@ -1891,6 +1999,48 @@
                     </div>
                 `;
             }
+        }
+
+        // Funções para gerenciar dados municipais (apenas matriz)
+        function atualizarItemMunicipal(index, chave, valor, tipo) {
+            if (!isMatriz) {
+                mostrarNotificacao('Apenas a matriz pode editar dados municipais!', 'error');
+                return;
+            }
+            
+            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
+            if (dadosGerais.unidade[chave][index]) {
+                dadosGerais.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
+                salvarDados(true, 'municipal');
+            }
+        }
+
+        function removerItemMunicipal(index, chave) {
+            if (!isMatriz) {
+                mostrarNotificacao('Apenas a matriz pode remover dados municipais!', 'error');
+                return;
+            }
+            
+            if (dadosGerais.unidade[chave] && dadosGerais.unidade[chave][index]) {
+                dadosGerais.unidade[chave].splice(index, 1);
+                mostrarSecao(chave === 'municipalFaltas' ? 'municipal' : 'unidades_saude');
+                salvarDados(true, 'municipal');
+            }
+        }
+
+        function adicionarItemMunicipal(chave, subChave) {
+            if (!isMatriz) {
+                mostrarNotificacao('Apenas a matriz pode adicionar dados municipais!', 'error');
+                return;
+            }
+            
+            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
+            dadosGerais.unidade[chave].push({ 
+                nome: chave === 'municipalFaltas' ? "Novo Item Municipal" : "Nova Unidade de Saúde", 
+                [subChave]: 0 
+            });
+            mostrarSecao(chave === 'municipalFaltas' ? 'municipal' : 'unidades_saude');
+            salvarDados(true, 'municipal');
         }
 
         function atualizarNomeUnidade() {
@@ -2084,7 +2234,6 @@
                     @keyframes slideOut {
                         from { transform: translateX(0); opacity: 1; }
                         to { transform: translateX(100%); opacity: 0; }
-                    }
                 `;
                 document.head.appendChild(style);
             }
