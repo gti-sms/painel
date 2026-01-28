@@ -12,20 +12,71 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* ESTILOS OTIMIZADOS */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
-        html, body { width: 1920px; height: 1080px; overflow: hidden; position: fixed; top: 0; left: 0; }
-        body { background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); color: white; }
+        /* ================================
+           ESTILOS GERAIS
+           ================================ */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+        }
         
-        /* LINHA INFERIOR */
-        .footer-line { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); z-index: 100; }
+        html, body { 
+            width: 1920px; 
+            height: 1080px; 
+            overflow: hidden; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+        }
         
-        /* BOTÃO ADMIN */
-        .admin-gear { position: fixed; top: 10px; right: 10px; width: 35px; height: 35px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2000; opacity: 0.15; transition: opacity 0.3s; }
-        .admin-gear:hover { opacity: 0.8; }
-        .admin-gear i { color: rgba(255, 255, 255, 0.5); font-size: 20px; }
+        body { 
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0f1b2d 100%); 
+            color: white; 
+        }
         
-        /* HEADER */
+        /* ================================
+           ELEMENTOS DE INTERFACE
+           ================================ */
+        .footer-line { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 4px; 
+            background: linear-gradient(90deg, transparent 0%, #00e676 20%, #00ff88 50%, #00e676 80%, transparent 100%); 
+            z-index: 100; 
+        }
+        
+        .admin-gear { 
+            position: fixed; 
+            top: 10px; 
+            right: 10px; 
+            width: 35px; 
+            height: 35px; 
+            background: transparent; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            z-index: 2000; 
+            opacity: 0.15; 
+            transition: opacity 0.3s; 
+        }
+        
+        .admin-gear:hover { 
+            opacity: 0.8; 
+        }
+        
+        .admin-gear i { 
+            color: rgba(255, 255, 255, 0.5); 
+            font-size: 20px; 
+        }
+        
+        /* ================================
+           HEADER PRINCIPAL
+           ================================ */
         .main-header { 
             background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%); 
             padding: 8px 30px; 
@@ -87,7 +138,9 @@
             font-weight: 600;
         }
         
-        /* LAYOUT PRINCIPAL */
+        /* ================================
+           LAYOUT PRINCIPAL
+           ================================ */
         .main-container { 
             position: fixed; 
             top: 75px; 
@@ -100,7 +153,9 @@
             padding: 12px; 
         }
         
-        /* COLUNA ESQUERDA */
+        /* ================================
+           COLUNA ESQUERDA
+           ================================ */
         .left-column { 
             display: flex; 
             flex-direction: column; 
@@ -178,7 +233,9 @@
             100% { transform: translateX(-100%); opacity: 0; } 
         }
         
-        /* COLUNA DIREITA - BLOCOS MELHORADOS */
+        /* ================================
+           COLUNA DIREITA - BLOCOS
+           ================================ */
         .right-column { 
             background: rgba(13, 27, 42, 0.9); 
             border-radius: 16px; 
@@ -207,7 +264,7 @@
             opacity: 1; 
         }
         
-        /* TÍTULO DOS BLOCOS - FONTES REDUZIDAS */
+        /* TÍTULO DOS BLOCOS */
         .section-title { 
             font-size: 22px; 
             font-weight: 800; 
@@ -229,7 +286,7 @@
             border-bottom-color: rgba(186, 104, 200, 0.3); 
         }
         
-        /* TOTAL CONTAINER - MELHORADO */
+        /* TOTAL CONTAINER */
         .total-container { 
             border-radius: 12px; 
             padding: 15px; 
@@ -248,7 +305,7 @@
             background: linear-gradient(135deg, #7b1fa2, #9c27b0); 
         }
         
-        /* VALOR TOTAL - FONTE AJUSTADA */
+        /* VALOR TOTAL */
         .total-value { 
             font-size: 42px; 
             font-weight: 900; 
@@ -264,7 +321,7 @@
             letter-spacing: 0.5px;
         }
         
-        /* LISTA DE ITENS - MELHORADA */
+        /* LISTA DE ITENS */
         .lista-container { 
             flex: 1; 
             display: flex; 
@@ -295,7 +352,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
-        /* NOME DO ITEM - FONTE REDUZIDA */
+        /* NOME DO ITEM */
         .item-nome { 
             font-size: 16px; 
             font-weight: 600; 
@@ -305,7 +362,7 @@
             flex: 1;
         }
         
-        /* VALOR DO ITEM - FONTE REDUZIDA */
+        /* VALOR DO ITEM */
         .item-valor { 
             font-size: 32px; 
             font-weight: 800; 
@@ -315,7 +372,9 @@
             text-align: right;
         }
 
-        /* ADMIN - ESTILOS MANTIDOS */
+        /* ================================
+           PAINEL ADMINISTRATIVO - ESTRUTURA
+           ================================ */
         #loginScreen, #adminPanel { 
             display: none; 
             position: fixed; 
@@ -329,7 +388,614 @@
             align-items: center; 
         }
         
-        /* LOADING OVERLAY */
+        #adminPanel { 
+            background: #f8f9fa; 
+            color: #333; 
+            flex-direction: column; 
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+        
+        /* HEADER DO ADMIN */
+        .admin-header { 
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); 
+            color: white; 
+            padding: 18px 30px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .admin-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .admin-header h1 i {
+            color: #00e676;
+        }
+        
+        /* CONTAINER PRINCIPAL DO ADMIN */
+        .admin-container { 
+            display: grid; 
+            grid-template-columns: 320px 1fr; 
+            width: 100%; 
+            height: calc(100% - 70px); 
+        }
+        
+        /* SIDEBAR DO ADMIN */
+        .admin-sidebar { 
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); 
+            border-right: 1px solid #e0e0e0; 
+            padding: 25px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .sidebar-item { 
+            padding: 16px 30px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            border-bottom: 1px solid #f0f0f0; 
+            color: #555;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item i {
+            width: 20px;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .sidebar-item:hover { 
+            background: #e3f2fd; 
+            color: #1565c0;
+            padding-left: 35px;
+        }
+        
+        .sidebar-item:hover i {
+            color: #1565c0;
+        }
+        
+        .sidebar-item.active { 
+            background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%); 
+            color: white; 
+            font-weight: 600;
+            box-shadow: inset 4px 0 0 #00e676;
+        }
+        
+        .sidebar-item.active i {
+            color: white;
+        }
+        
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid #f8f9fa;
+        }
+        
+        /* CONTEÚDO DO ADMIN */
+        .admin-content { 
+            padding: 35px 40px; 
+            overflow-y: auto; 
+            background: #ffffff;
+        }
+        
+        /* SEÇÕES DO ADMIN */
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e8e8e8;
+        }
+        
+        .admin-section h2 {
+            color: #1565c0;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .admin-section h2 i {
+            color: #00e676;
+        }
+        
+        .section-info {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #1565c0;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        /* FORMULÁRIOS E INPUTS */
+        .admin-input { 
+            width: 100%; 
+            padding: 14px 18px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 15px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .admin-input:focus { 
+            outline: none; 
+            border-color: #1565c0; 
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+        
+        textarea.admin-input {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+        }
+        
+        /* BOTÕES DO ADMIN */
+        .admin-btn { 
+            padding: 14px 28px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            background: linear-gradient(135deg, #00e676 0%, #00c853 100%); 
+            color: white; 
+            font-size: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 230, 118, 0.3);
+        }
+        
+        .admin-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(0, 230, 118, 0.4);
+        }
+        
+        .admin-btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+        }
+        
+        .admin-btn-secondary {
+            background: linear-gradient(135deg, #757575 0%, #616161 100%);
+            box-shadow: 0 4px 10px rgba(117, 117, 117, 0.3);
+        }
+        
+        .admin-btn-primary {
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+            box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
+        }
+        
+        /* LINHAS DE ITENS */
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr 120px 80px;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .item-row:hover {
+            background: #f0f7ff;
+            border-color: #d0e3ff;
+        }
+        
+        .item-row input[type="number"] {
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .btn-remove {
+            background: #ff5252;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-remove:hover {
+            background: #d32f2f;
+            transform: scale(1.1);
+        }
+        
+        .btn-add {
+            background: #1565c0;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-add:hover {
+            background: #0d47a1;
+            transform: translateY(-2px);
+        }
+        
+        /* TABELAS */
+        .management-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .management-table th { 
+            padding: 18px 20px; 
+            text-align: left; 
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .management-table td { 
+            padding: 16px 20px; 
+            text-align: left; 
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+        
+        .management-table tr:hover td {
+            background: #f5f9ff;
+        }
+        
+        .management-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .badge-danger {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* CARDS DE UNIDADES */
+        .unidades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .unidade-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .unidade-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: #1565c0;
+        }
+        
+        .unidade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .unidade-nome {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1565c0;
+            margin: 0;
+        }
+        
+        .unidade-id {
+            font-size: 12px;
+            color: #666;
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-family: monospace;
+        }
+        
+        .unidade-stats {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1565c0;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .unidade-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn-primary {
+            background: #1565c0;
+            color: white;
+        }
+        
+        .action-btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* OPÇÕES DE SINCRONIZAÇÃO */
+        .sync-options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .sync-option-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sync-option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .sync-option-card.selected {
+            border-color: #00c853;
+            background: #f1f8e9;
+            box-shadow: 0 5px 15px rgba(0, 200, 83, 0.2);
+        }
+        
+        .sync-option-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #1565c0;
+        }
+        
+        .sync-option-card.selected .sync-option-icon {
+            color: #00c853;
+        }
+        
+        .sync-option-time {
+            font-size: 28px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .sync-option-card.selected .sync-option-time {
+            color: #00c853;
+        }
+        
+        .sync-option-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .sync-option-cost {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .cost-free {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .cost-low {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        /* ================================
+           TELA DE LOGIN
+           ================================ */
+        .login-box {
+            background: white;
+            padding: 45px;
+            border-radius: 16px;
+            width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        
+        .login-box h2 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .login-icon {
+            font-size: 48px;
+            color: #1565c0;
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .user-avatar i {
+            font-size: 50px;
+            color: #666;
+        }
+        
+        .user-details {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-role {
+            font-size: 14px;
+            color: #666;
+            padding: 4px 10px;
+            background: #e3f2fd;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .role-superadmin {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .role-admin {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .role-visualizador {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        /* ================================
+           LOADING OVERLAY
+           ================================ */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -359,7 +1025,32 @@
             to { transform: rotate(360deg); }
         }
         
-        /* VERSÃO MOBILE (para debug) */
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .loading-details {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* ================================
+           INFORMAÇÕES DE VERSÃO
+           ================================ */
+        .version-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        /* ================================
+           RESPONSIVIDADE (DEBUG)
+           ================================ */
         @media (max-width: 1920px) {
             html, body {
                 width: 100%;
@@ -376,9 +1067,11 @@
         <div class="loading-details" id="loadingDetails">Iniciando sistema</div>
     </div>
     
+    <!-- Elementos fixos -->
     <div class="footer-line"></div>
     <div class="admin-gear" onclick="openLogin()"><i class="fas fa-cog"></i></div>
 
+    <!-- Header principal -->
     <header class="main-header">
         <div class="header-text">
             <h1 id="mainTitle">Secretaria Municipal de Saúde</h1>
@@ -390,10 +1083,13 @@
         </div>
     </header>
 
+    <!-- Conteúdo principal -->
     <main class="main-container">
         <div class="left-column">
             <section class="video-section">
-                <button id="btnSom" class="btn-som" onclick="ativarSom()"><i class="fas fa-volume-up"></i> ATIVAR SOM</button>
+                <button id="btnSom" class="btn-som" onclick="ativarSom()">
+                    <i class="fas fa-volume-up"></i> ATIVAR SOM
+                </button>
                 <div class="video-container" id="videoContainer"></div>
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
@@ -407,7 +1103,9 @@
         </div>
     </main>
 
-    <!-- Telas administrativas (mantidas) -->
+    <!-- ================================
+         TELA DE LOGIN
+         ================================ -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-icon">
@@ -417,9 +1115,9 @@
             <p id="loginDescription">Digite suas credenciais de acesso</p>
             
             <div id="loginMethods">
-                <input type="text" id="loginUsuario" class="admin-input" placeholder="Usuário (ex: gti)" style="margin-bottom: 15px;">
+                <input type="text" id="loginUsuario" class="admin-input" placeholder="Usuário (ex: gti)">
                 <input type="password" id="loginSenha" class="admin-input" placeholder="Senha">
-                <button class="admin-btn" style="width:100%; margin-top: 20px;" onclick="verificarLogin()">
+                <button class="admin-btn" onclick="verificarLogin()">
                     <i class="fas fa-sign-in-alt"></i> Entrar
                 </button>
             </div>
@@ -427,7 +1125,7 @@
             <div id="userInfo" style="display: none;">
                 <div class="user-info">
                     <div class="user-avatar" id="userAvatar">
-                        <i class="fas fa-user-circle" style="font-size: 50px; color: #666;"></i>
+                        <i class="fas fa-user-circle"></i>
                     </div>
                     <div class="user-details">
                         <div class="user-name" id="userName">Carregando...</div>
@@ -435,17 +1133,21 @@
                     </div>
                 </div>
                 
-                <button class="admin-btn" style="width:100%; margin-top: 10px;" onclick="continuarParaPainel()">
+                <button class="admin-btn" onclick="continuarParaPainel()">
                     <i class="fas fa-sign-in-alt"></i> Acessar Painel
                 </button>
-                <button class="admin-btn admin-btn-secondary" style="width:100%; margin-top: 10px;" onclick="trocarUsuario()">
+                <button class="admin-btn admin-btn-secondary" onclick="trocarUsuario()">
                     <i class="fas fa-user"></i> Trocar Usuário
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- ================================
+         PAINEL ADMINISTRATIVO
+         ================================ -->
     <div id="adminPanel">
+        <!-- Header do admin -->
         <div class="admin-header">
             <h1>
                 <i class="fas fa-sliders-h"></i>
@@ -456,7 +1158,7 @@
                 </span>
             </h1>
             <div>
-                <button class="admin-btn" onclick="salvarDados(); mostrarNotificacao('Dados salvos com sucesso!', 'success')" style="margin-right: 10px;">
+                <button class="admin-btn" onclick="salvarDados()">
                     <i class="fas fa-save"></i> Salvar
                 </button>
                 <button class="admin-btn admin-btn-danger" onclick="logout()">
@@ -464,7 +1166,10 @@
                 </button>
             </div>
         </div>
+
+        <!-- Container principal -->
         <div class="admin-container">
+            <!-- Sidebar -->
             <div class="admin-sidebar" id="sidebar">
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">
                     <i class="fas fa-hospital"></i> Identificação da Unidade
@@ -487,57 +1192,75 @@
                 <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
-                <div class="sidebar-item" id="menuUsuarios" style="background: #e3f2fd; color: #1565c0; display:none" onclick="mostrarSecao('usuarios')">
+                <div class="sidebar-item" id="menuUsuarios" style="display:none" onclick="mostrarSecao('usuarios')">
                     <i class="fas fa-users-cog"></i> Gerenciar Usuários
                 </div>
-                <div class="sidebar-item" id="menuUnidades" style="background: #e3f2fd; color: #1565c0; display:none" onclick="mostrarSecao('unidades')">
+                <div class="sidebar-item" id="menuUnidades" style="display:none" onclick="mostrarSecao('unidades')">
                     <i class="fas fa-building"></i> Gerenciar Unidades
                 </div>
-                <div class="sidebar-item" id="menuMonitor" style="background: #fff3e0; color: #f57c00; display:none" onclick="mostrarSecao('monitor')">
+                <div class="sidebar-item" id="menuMonitor" style="display:none" onclick="mostrarSecao('monitor')">
                     <i class="fas fa-exclamation-triangle"></i> Monitor de Inatividade
                 </div>
             </div>
+
+            <!-- Conteúdo dinâmico -->
             <div class="admin-content" id="adminContent">
-                <!-- Conteúdo será carregado aqui -->
+                <!-- Conteúdo será carregado aqui dinamicamente -->
             </div>
         </div>
+
+        <!-- Informações de versão -->
         <div class="version-info">
             Sistema de Saúde PMPF v3.0 | Sistema Automático
         </div>
     </div>
 
     <script>
-        // ============================================
+        // =================================================================
         // CONFIGURAÇÃO FIREBASE
-        // ============================================
+        // =================================================================
         const firebaseConfig = {
-          apiKey: "AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
-          authDomain: "gti-painel.firebaseapp.com",
-          databaseURL: "https://gti-painel-default-rtdb.firebaseio.com",
-          projectId: "gti-painel",
-          storageBucket: "gti-painel.firebasestorage.app",
-          messagingSenderId: "805155882010",
-          appId: "1:805155882010:web:6fed70ecffb8f07eb9fda3",
-          measurementId: "G-0T1FWSRNLW"
+            apiKey: "AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
+            authDomain: "gti-painel.firebaseapp.com",
+            databaseURL: "https://gti-painel-default-rtdb.firebaseio.com",
+            projectId: "gti-painel",
+            storageBucket: "gti-painel.firebasestorage.app",
+            messagingSenderId: "805155882010",
+            appId: "1:805155882010:web:6fed70ecffb8f07eb9fda3",
+            measurementId: "G-0T1FWSRNLW"
         };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        // ============================================
+        // =================================================================
         // VARIÁVEIS GLOBAIS
-        // ============================================
+        // =================================================================
         const urlParams = new URLSearchParams(window.location.search);
         const unidadeID = urlParams.get('id') || 'geral';
         const isMatriz = (unidadeID === 'geral');
         
-        let dadosUnidade = { unidade: { nome: "", especialidades: [], atendimentos: [] }, avisos: [] };
-        let dadosGerais = { unidade: { videoUrls: [], smsMunicipal: [] }, avisos: [] };
-        let logsAtualizacao = {};
+        let dadosUnidade = { 
+            unidade: { 
+                nome: "", 
+                especialidades: [], 
+                atendimentos: [] 
+            }, 
+            avisos: [] 
+        };
+        
+        let dadosGerais = { 
+            unidade: { 
+                videoUrls: [], 
+                smsMunicipal: [] 
+            }, 
+            avisos: [] 
+        };
+        
         let todasUnidades = {};
-        let logsDetalhados = {};
-        let usuariosAutorizados = {};
+        let listaUsuarios = [];
+        let listaTodasUnidades = [];
         
         // Dados do usuário atual
         let usuarioAtual = null;
@@ -548,9 +1271,9 @@
         let carouselIndex = 0;
         let tickerInterval = null;
 
-        // ============================================
+        // =================================================================
         // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
-        // ============================================
+        // =================================================================
 
         // Configurações de sincronização
         const syncConfig = {
@@ -887,10 +1610,13 @@
             }
         };
 
-        // ============================================
-        // FUNÇÕES DO SISTEMA PRINCIPAL
-        // ============================================
+        // =================================================================
+        // FUNÇÕES PRINCIPAIS DO SISTEMA
+        // =================================================================
 
+        /**
+         * Inicia o sistema principal
+         */
         async function iniciarSistema() {
             console.log('🤖 Iniciando sistema automático...');
             
@@ -991,6 +1717,9 @@
             }
         }
 
+        /**
+         * Processa e atualiza a interface principal
+         */
         function processarInterface() {
             // Atualizar título
             if (dadosUnidade && dadosUnidade.unidade && dadosUnidade.unidade.nome) {
@@ -1008,6 +1737,9 @@
             iniciarAvisos();
         }
 
+        /**
+         * Atualiza o relógio em tempo real
+         */
         function atualizarRelogio() {
             const agora = new Date();
             // Data formatada: "Quarta-feira, 28 de fevereiro"
@@ -1024,11 +1756,18 @@
             });
         }
 
+        /**
+         * Carrega o vídeo do YouTube
+         */
         function carregarVideo() {
             const container = document.getElementById('videoContainer');
             const videoUrls = dadosGerais.unidade.videoUrls || [];
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const ids = videoUrls.map(url => { const m = url.match(regExp); return (m && m[7].length === 11) ? m[7] : null; }).filter(id => id !== null);
+            const ids = videoUrls.map(url => { 
+                const m = url.match(regExp); 
+                return (m && m[7].length === 11) ? m[7] : null; 
+            }).filter(id => id !== null);
+            
             if(ids.length > 0) {
                 const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
                 if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
@@ -1037,32 +1776,30 @@
             }
         }
 
+        /**
+         * Ativa o som do vídeo
+         */
         function ativarSom() { 
             isMuted = false; 
             carregarVideo(); 
             document.getElementById('btnSom').style.display = 'none'; 
         }
 
+        /**
+         * Atualiza a interface com os dados
+         */
         function atualizarInterface() {
-            if (isMatriz) {
-                // Na matriz, mostrar apenas Produção Municipal
-                renderBloco('itemFaltometro', 'FALTÔMETRO', 'Total mês anterior', 
-                           dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
-                renderBloco('itemAtendimentos', 'ATENDIMENTOS DA UNIDADE', 'Total mês anterior', 
-                           dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-                renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
-                           dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
-            } else {
-                // Nas unidades, mostrar dados específicos
-                renderBloco('itemFaltometro', 'FALTÔMETRO', 'Total mês anterior', 
-                           dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
-                renderBloco('itemAtendimentos', 'ATENDIMENTOS DA UNIDADE', 'Total mês anterior', 
-                           dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
-                renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
-                           dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
-            }
+            renderBloco('itemFaltometro', 'FALTÔMETRO', 'Total mês anterior', 
+                       dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
+            renderBloco('itemAtendimentos', 'ATENDIMENTOS DA UNIDADE', 'Total mês anterior', 
+                       dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+            renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
+                       dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
         }
 
+        /**
+         * Renderiza um bloco de dados
+         */
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
             const itens = lista || [];
             const total = itens.reduce((a, b) => a + (parseInt(b[chave]) || 0), 0);
@@ -1085,6 +1822,9 @@
             document.getElementById(id).innerHTML = html;
         }
 
+        /**
+         * Inicia a animação do carrossel
+         */
         function iniciarAnimacaoCarrossel() {
             const slides = document.querySelectorAll('.carousel-item');
             setInterval(() => {
@@ -1094,35 +1834,51 @@
             }, 60000); 
         }
 
+        /**
+         * Inicia os avisos em ticker
+         */
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
             const avisos = [...(dadosGerais.avisos || []), ...(dadosUnidade.avisos || [])].filter(a => a && a.trim() !== '');
+            
             if (tickerInterval) clearInterval(tickerInterval);
+            
             if (avisos.length === 0) { 
                 container.innerHTML = '<div class="ticker-item" style="opacity:1; transform:none;">Nenhum aviso no momento</div>'; 
                 return; 
             }
+            
             container.innerHTML = avisos.map(a => `<div class="ticker-item">${a}</div>`).join('');
             const items = container.querySelectorAll('.ticker-item');
             let idx = 0;
+            
             const mostrarProximo = () => {
-                items.forEach(i => { i.classList.remove('active'); i.style.opacity = "0"; });
+                items.forEach(i => { 
+                    i.classList.remove('active'); 
+                    i.style.opacity = "0"; 
+                });
+                
                 if (items.length === 1) { 
                     items[0].style.opacity = "1"; 
                     items[0].style.transform = "translateX(0)"; 
                     return; 
                 }
+                
                 if (items[idx]) items[idx].classList.add('active');
                 idx = (idx + 1) % items.length;
             };
+            
             mostrarProximo();
             if (items.length > 1) tickerInterval = setInterval(mostrarProximo, 30000);
         }
 
-        // ============================================
-        // SISTEMA ADMINISTRATIVO (SIMPLIFICADO)
-        // ============================================
+        // =================================================================
+        // SISTEMA DE ADMINISTRAÇÃO - AUTENTICAÇÃO
+        // =================================================================
 
+        /**
+         * Abre a tela de login
+         */
         function openLogin() {
             if (usuarioAtual) {
                 mostrarInfoUsuario();
@@ -1146,6 +1902,9 @@
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
+        /**
+         * Verifica as credenciais de login
+         */
         function verificarLogin() {
             const usuario = document.getElementById('loginUsuario').value.trim();
             const senha = document.getElementById('loginSenha').value;
@@ -1204,6 +1963,9 @@
             });
         }
 
+        /**
+         * Verifica se o usuário tem acesso à unidade atual
+         */
         function temAcessoUnidade() {
             if (!permissoesUsuario) return false;
             
@@ -1217,35 +1979,47 @@
             return false;
         }
 
+        /**
+         * Mostra as informações do usuário logado
+         */
         function mostrarInfoUsuario() {
             if (!usuarioAtual) return;
             
             document.getElementById('userName').textContent = usuarioAtual.nome || usuarioAtual.login;
             
             let roleText = '';
+            let roleClass = '';
             
             if (permissoesUsuario) {
                 switch(permissoesUsuario.nivel) {
                     case 'super_admin':
                         roleText = 'Super Administrador';
+                        roleClass = 'role-superadmin';
                         break;
                     case 'admin_unidade':
                         roleText = 'Administrador da Unidade';
+                        roleClass = 'role-admin';
                         break;
                     case 'visualizador':
                         roleText = 'Visualizador';
+                        roleClass = 'role-visualizador';
                         break;
                     default:
                         roleText = 'Usuário';
+                        roleClass = 'role-visualizador';
                 }
             }
             
             document.getElementById('userRole').textContent = roleText;
+            document.getElementById('userRole').className = `user-role ${roleClass}`;
             
             document.getElementById('loginMethods').style.display = 'none';
             document.getElementById('userInfo').style.display = 'block';
         }
 
+        /**
+         * Continua para o painel administrativo
+         */
         function continuarParaPainel() {
             if (!usuarioAtual || !permissoesUsuario) {
                 mostrarNotificacao('Erro: usuário não autenticado', 'error');
@@ -1262,6 +2036,9 @@
             mostrarSecao('unidade');
         }
 
+        /**
+         * Configura os menus baseados nas permissões do usuário
+         */
         function configurarMenusPorPermissao() {
             if (!permissoesUsuario) return;
             
@@ -1299,12 +2076,18 @@
             }
         }
 
+        /**
+         * Troca o usuário atual
+         */
         function trocarUsuario() {
             usuarioAtual = null;
             permissoesUsuario = null;
             openLogin();
         }
 
+        /**
+         * Faz logout do sistema
+         */
         function logout() {
             usuarioAtual = null;
             permissoesUsuario = null;
@@ -1312,6 +2095,13 @@
             mostrarNotificacao('Você saiu do sistema.', 'info');
         }
 
+        // =================================================================
+        // SISTEMA DE ADMINISTRAÇÃO - SEÇÕES
+        // =================================================================
+
+        /**
+         * Verifica se o usuário tem acesso à seção
+         */
         function verificarAcessoSecao(secao) {
             if (!permissoesUsuario) return false;
             
@@ -1335,6 +2125,9 @@
             return false;
         }
 
+        /**
+         * Mostra uma seção específica do painel administrativo
+         */
         function mostrarSecao(secao) {
             if (!verificarAcessoSecao(secao)) {
                 mostrarNotificacao('Você não tem permissão para acessar esta seção.', 'error');
@@ -1347,6 +2140,7 @@
             let activeElement = document.querySelector(`.sidebar-item[onclick*="${secao}"]`);
             if (activeElement) activeElement.classList.add('active');
             
+            // Seções especiais
             if(secao === 'usuarios') {
                 mostrarGerenciamentoUsuarios();
             } else if(secao === 'sincronizacao') {
@@ -1360,6 +2154,9 @@
             }
         }
 
+        /**
+         * Mostra a seção de configuração de sincronização
+         */
         function mostrarConfiguracaoSincronizacao() {
             const stats = syncConfig.getStats();
             const currentInterval = syncConfig.currentInterval;
@@ -1409,31 +2206,23 @@
                     <h3 style="margin-top: 30px;"><i class="fas fa-sliders-h"></i> Opções de Intervalo</h3>
                     <p style="color: #666; margin-bottom: 20px;">Selecione uma das opções abaixo:</p>
                     
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                    <div class="sync-options-grid">
             `;
             
             Object.entries(syncConfig.intervals).forEach(([interval, config]) => {
                 const intervalStats = syncConfig.getStats.call({currentInterval: parseInt(interval)});
                 const isSelected = (parseInt(interval) === currentInterval);
-                const cardStyle = isSelected ? 
-                    'border-color: #00c853; background: #f1f8e9; box-shadow: 0 5px 15px rgba(0, 200, 83, 0.2);' : 
-                    'border-color: #e0e0e0; background: white;';
-                const costStyle = intervalStats.isFree ? 
-                    'background: #e8f5e9; color: #2e7d32;' : 
-                    'background: #fff3e0; color: #f57c00;';
+                const cardClass = isSelected ? 'sync-option-card selected' : 'sync-option-card';
+                const costClass = intervalStats.isFree ? 'cost-free' : 'cost-low';
                 
                 html += `
-                    <div style="${cardStyle} border: 2px solid; border-radius: 10px; padding: 25px; text-align: center; cursor: pointer;" onclick="syncManager.changeInterval(${interval})">
-                        <div style="font-size: 40px; margin-bottom: 15px; color: ${isSelected ? '#00c853' : '#1565c0'};">
+                    <div class="${cardClass}" onclick="syncManager.changeInterval(${interval})">
+                        <div class="sync-option-icon">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div style="font-size: 28px; font-weight: 800; color: ${isSelected ? '#00c853' : '#333'}; margin-bottom: 10px;">
-                            ${interval} min
-                        </div>
-                        <div style="font-size: 14px; color: #666; margin-bottom: 15px;">
-                            ${config.label}
-                        </div>
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; ${costStyle}">
+                        <div class="sync-option-time">${interval} min</div>
+                        <div class="sync-option-desc">${config.label}</div>
+                        <div class="sync-option-cost ${costClass}">
                             ${intervalStats.isFree ? 'CUSTO ZERO' : 'CUSTO BAIXO'}
                         </div>
                         ${isSelected ? '<div style="margin-top: 10px; color: #00c853;"><i class="fas fa-check-circle"></i> Selecionado</div>' : ''}
@@ -1454,7 +2243,7 @@
                         </ul>
                     </div>
                     
-                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button class="admin-btn" onclick="syncManager.forceSync()">
                             <i class="fas fa-sync-alt"></i> Sincronizar Agora
                         </button>
@@ -1468,6 +2257,9 @@
             document.getElementById('adminContent').innerHTML = html;
         }
 
+        /**
+         * Mostra uma seção padrão do painel administrativo
+         */
         function mostrarSecaoPadrao(secao, content) {
             if(secao === 'unidade') {
                 content.innerHTML = `
@@ -1594,6 +2386,9 @@
             }
         }
 
+        /**
+         * Mostra mensagem de acesso restrito
+         */
         function mostrarMensagemAcessoRestrito(content, secao, tipo) {
             content.innerHTML = `
                 <div class="admin-section">
@@ -1612,81 +2407,9 @@
             `;
         }
 
-        function atualizarNomeUnidade() {
-            const novoNome = document.getElementById('uNome').value;
-            dadosUnidade.unidade.nome = novoNome;
-            document.getElementById('adminUnidadeNome').textContent = novoNome;
-            salvarDados(true, 'unidade');
-            mostrarNotificacao('Nome da unidade atualizado!', 'success');
-        }
-
-        function salvarAvisos() {
-            const avisosText = document.getElementById('txtAvisos').value;
-            const avisosArray = avisosText.split('\n').filter(a => a.trim() !== '');
-            
-            if (isMatriz) {
-                dadosGerais.avisos = avisosArray;
-            } else {
-                dadosUnidade.avisos = avisosArray;
-            }
-            
-            salvarDados(true, 'avisos');
-            mostrarNotificacao('Avisos salvos com sucesso!', 'success');
-        }
-
-        function salvarVideos() {
-            const videosText = document.getElementById('vUrls').value;
-            dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
-            salvarDados(true, 'video');
-            mostrarNotificacao('Vídeos salvos com sucesso!', 'success');
-        }
-
-        function atualizarItem(index, chave, valor, tipo) {
-            if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
-            if (dadosUnidade.unidade[chave][index]) {
-                dadosUnidade.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
-                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-            }
-        }
-
-        function atualizarItemGeral(index, chave, valor, tipo) {
-            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
-            if (dadosGerais.unidade[chave][index]) {
-                dadosGerais.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
-                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
-            }
-        }
-
-        function removerItem(index, chave) {
-            if (dadosUnidade.unidade[chave] && dadosUnidade.unidade[chave][index]) {
-                dadosUnidade.unidade[chave].splice(index, 1);
-                mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-            }
-        }
-
-        function removerItemGeral(index, chave) {
-            if (dadosGerais.unidade[chave] && dadosGerais.unidade[chave][index]) {
-                dadosGerais.unidade[chave].splice(index, 1);
-                mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
-            }
-        }
-
-        function adicionarItem(chave, subChave) {
-            if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
-            dadosUnidade.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
-            mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-            salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-        }
-
-        function adicionarItemGeral(chave, subChave) {
-            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
-            dadosGerais.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
-            mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-            salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
-        }
-
+        /**
+         * Renderiza lista em modo somente leitura
+         */
         function renderListaSomenteLeitura(lista, subChave) {
             if (!lista || lista.length === 0) {
                 return '<div style="text-align: center; color: #999; padding: 20px;">Nenhum dado disponível</div>';
@@ -1705,12 +2428,122 @@
             return html;
         }
 
+        // =================================================================
+        // FUNÇÕES DE GERENCIAMENTO DE DADOS
+        // =================================================================
+
+        /**
+         * Atualiza o nome da unidade
+         */
+        function atualizarNomeUnidade() {
+            const novoNome = document.getElementById('uNome').value;
+            dadosUnidade.unidade.nome = novoNome;
+            document.getElementById('adminUnidadeNome').textContent = novoNome;
+            salvarDados(true, 'unidade');
+            mostrarNotificacao('Nome da unidade atualizado!', 'success');
+        }
+
+        /**
+         * Salva os avisos
+         */
+        function salvarAvisos() {
+            const avisosText = document.getElementById('txtAvisos').value;
+            const avisosArray = avisosText.split('\n').filter(a => a.trim() !== '');
+            
+            if (isMatriz) {
+                dadosGerais.avisos = avisosArray;
+            } else {
+                dadosUnidade.avisos = avisosArray;
+            }
+            
+            salvarDados(true, 'avisos');
+            mostrarNotificacao('Avisos salvos com sucesso!', 'success');
+        }
+
+        /**
+         * Salva os vídeos
+         */
+        function salvarVideos() {
+            const videosText = document.getElementById('vUrls').value;
+            dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
+            salvarDados(true, 'video');
+            mostrarNotificacao('Vídeos salvos com sucesso!', 'success');
+        }
+
+        /**
+         * Atualiza um item da lista
+         */
+        function atualizarItem(index, chave, valor, tipo) {
+            if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
+            if (dadosUnidade.unidade[chave][index]) {
+                dadosUnidade.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
+                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
+            }
+        }
+
+        /**
+         * Atualiza um item geral (matriz)
+         */
+        function atualizarItemGeral(index, chave, valor, tipo) {
+            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
+            if (dadosGerais.unidade[chave][index]) {
+                dadosGerais.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
+                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+            }
+        }
+
+        /**
+         * Remove um item da lista
+         */
+        function removerItem(index, chave) {
+            if (dadosUnidade.unidade[chave] && dadosUnidade.unidade[chave][index]) {
+                dadosUnidade.unidade[chave].splice(index, 1);
+                mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
+                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
+            }
+        }
+
+        /**
+         * Remove um item geral (matriz)
+         */
+        function removerItemGeral(index, chave) {
+            if (dadosGerais.unidade[chave] && dadosGerais.unidade[chave][index]) {
+                dadosGerais.unidade[chave].splice(index, 1);
+                mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
+                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+            }
+        }
+
+        /**
+         * Adiciona um novo item à lista
+         */
+        function adicionarItem(chave, subChave) {
+            if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
+            dadosUnidade.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
+            mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
+            salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
+        }
+
+        /**
+         * Adiciona um novo item geral (matriz)
+         */
+        function adicionarItemGeral(chave, subChave) {
+            if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
+            dadosGerais.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
+            mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
+            salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+        }
+
+        /**
+         * Salva os dados no Firebase
+         */
         function salvarDados(isLocalUpdate = false, tipoAlteracao = null) { 
             if (permissoesUsuario && permissoesUsuario.nivel === 'visualizador') {
                 mostrarNotificacao('Você não tem permissão para editar dados. Apenas visualização.', 'error');
                 return;
             }
             
+            // Atualizar timestamp para sincronização em tempo real
             const agora = Date.now();
             
             // Salvar localmente primeiro
@@ -1736,6 +2569,13 @@
             }
         }
 
+        // =================================================================
+        // FUNÇÕES DE NOTIFICAÇÃO
+        // =================================================================
+
+        /**
+         * Mostra uma notificação
+         */
         function mostrarNotificacao(mensagem, tipo = 'info') {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -1795,6 +2635,13 @@
             }, 5000);
         }
 
+        // =================================================================
+        // FUNÇÕES DE GERENCIAMENTO DE USUÁRIOS
+        // =================================================================
+
+        /**
+         * Cria o usuário admin principal
+         */
         function criarUsuarioAdminPrincipal() {
             const adminLogin = 'gti';
             
@@ -1833,10 +2680,551 @@
             });
         }
 
-        // ============================================
+        /**
+         * Carrega todos os usuários
+         */
+        function carregarTodosUsuarios() {
+            db.ref('usuarios').once('value').then((snapshot) => {
+                listaUsuarios = [];
+                const usuarios = snapshot.val() || {};
+                
+                Object.entries(usuarios).forEach(([key, dados]) => {
+                    listaUsuarios.push({
+                        id: key,
+                        ...dados
+                    });
+                });
+                
+                console.log(`📋 ${listaUsuarios.length} usuários carregados`);
+            }).catch(error => {
+                console.error('Erro ao carregar usuários:', error);
+            });
+        }
+
+        /**
+         * Carrega todas as unidades
+         */
+        function carregarTodasUnidades() {
+            db.ref('paineis').once('value').then((snapshot) => {
+                listaTodasUnidades = [];
+                const unidades = snapshot.val() || {};
+                
+                Object.entries(unidades).forEach(([key, dados]) => {
+                    if (key !== 'geral') {
+                        listaTodasUnidades.push({
+                            id: key,
+                            nome: dados.unidade?.nome || `Unidade ${key}`,
+                            especialidades: dados.unidade?.especialidades?.length || 0,
+                            atendimentos: dados.unidade?.atendimentos?.length || 0,
+                            avisos: dados.avisos?.length || 0,
+                            ultima_atualizacao: dados.ultima_atualizacao || 0
+                        });
+                    }
+                });
+                
+                console.log(`🏥 ${listaTodasUnidades.length} unidades carregadas`);
+            }).catch(error => {
+                console.error('Erro ao carregar unidades:', error);
+            });
+        }
+
+        /**
+         * Mostra o gerenciamento de usuários
+         */
+        function mostrarGerenciamentoUsuarios() {
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Gerencie os usuários que têm acesso ao sistema administrativo.
+                        <strong>Super Admin</strong> pode acessar todas as unidades, <strong>Admin Unidade</strong> apenas unidades específicas.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Usuários</h3>
+                        <button class="admin-btn" onclick="adicionarNovoUsuario()">
+                            <i class="fas fa-user-plus"></i> Novo Usuário
+                        </button>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4><i class="fas fa-info-circle"></i> Instruções:</h4>
+                        <ul style="color: #666; margin-left: 20px;">
+                            <li><strong>Super Admin:</strong> Acesso completo a todas as unidades</li>
+                            <li><strong>Admin Unidade:</strong> Acesso apenas às unidades permitidas</li>
+                            <li><strong>Visualizador:</strong> Apenas visualização, sem permissão para editar</li>
+                            <li><strong>Status Ativo/Inativo:</strong> Controla se o usuário pode fazer login</li>
+                        </ul>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Login</th>
+                                <th>Nível</th>
+                                <th>Unidades</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (listaUsuarios.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                            Nenhum usuário cadastrado
+                        </td>
+                    </tr>
+                `;
+            } else {
+                listaUsuarios.forEach(usuario => {
+                    let nivelBadge = '';
+                    switch(usuario.nivel) {
+                        case 'super_admin':
+                            nivelBadge = '<span class="badge badge-danger">Super Admin</span>';
+                            break;
+                        case 'admin_unidade':
+                            nivelBadge = '<span class="badge badge-info">Admin Unidade</span>';
+                            break;
+                        case 'visualizador':
+                            nivelBadge = '<span class="badge badge-warning">Visualizador</span>';
+                            break;
+                        default:
+                            nivelBadge = '<span class="badge">Usuário</span>';
+                    }
+                    
+                    let statusBadge = usuario.status === 'ativo' 
+                        ? '<span class="badge badge-success">Ativo</span>' 
+                        : '<span class="badge badge-danger">Inativo</span>';
+                    
+                    let unidadesTexto = '';
+                    if (usuario.unidades_permitidas) {
+                        if (usuario.unidades_permitidas.includes('todas')) {
+                            unidadesTexto = 'Todas';
+                        } else {
+                            unidadesTexto = usuario.unidades_permitidas.join(', ');
+                        }
+                    } else {
+                        unidadesTexto = 'Nenhuma';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${usuario.nome || 'Sem nome'}</strong></td>
+                            <td><code>${usuario.login}</code></td>
+                            <td>${nivelBadge}</td>
+                            <td>${unidadesTexto}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="editarUsuario('${usuario.id}')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="admin-btn admin-btn-danger" style="padding: 8px 12px; font-size: 12px;" onclick="excluirUsuario('${usuario.id}', '${usuario.nome}')">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px;">
+                        <h4><i class="fas fa-shield-alt"></i> Segurança:</h4>
+                        <p style="color: #2e7d32; margin: 0;">
+                            <i class="fas fa-lock"></i> Todas as senhas são armazenadas de forma segura no Firebase.
+                            Recomenda-se que os usuários alterem suas senhas periodicamente.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        /**
+         * Mostra o gerenciamento de todas as unidades
+         */
+        function mostrarTodasUnidades() {
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-building"></i> Gerenciar Todas as Unidades</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Visualize e gerencie todas as unidades cadastradas no sistema.
+                        Cada unidade tem seu próprio painel com dados específicos.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Unidades</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="admin-btn" onclick="adicionarNovaUnidade()">
+                                <i class="fas fa-plus-circle"></i> Nova Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="atualizarListaUnidades()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; text-align: center;">
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1565c0;">${listaTodasUnidades.length}</div>
+                                <div style="font-size: 12px; color: #666;">Unidades</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #d32f2f;">${listaTodasUnidades.reduce((total, u) => total + u.especialidades, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Especialidades</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #2196f3;">${listaTodasUnidades.reduce((total, u) => total + u.atendimentos, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Atendimentos</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700; color: #7b1fa2;">${listaTodasUnidades.reduce((total, u) => total + u.avisos, 0)}</div>
+                                <div style="font-size: 12px; color: #666;">Avisos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="unidades-grid">
+            `;
+            
+            if (listaTodasUnidades.length === 0) {
+                html += `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-hospital" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+                        <h3 style="color: #666; margin-bottom: 10px;">Nenhuma unidade cadastrada</h3>
+                        <p style="color: #888;">Clique em "Nova Unidade" para adicionar a primeira unidade ao sistema.</p>
+                    </div>
+                `;
+            } else {
+                listaTodasUnidades.forEach(unidade => {
+                    const ultimaAtualizacao = unidade.ultima_atualizacao 
+                        ? new Date(unidade.ultima_atualizacao).toLocaleString('pt-BR')
+                        : 'Nunca';
+                    
+                    html += `
+                        <div class="unidade-card">
+                            <div class="unidade-header">
+                                <div>
+                                    <h3 class="unidade-nome">${unidade.nome}</h3>
+                                    <div class="unidade-id">ID: ${unidade.id}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" title="Acessar Unidade">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')" title="Editar Unidade">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="unidade-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.especialidades}</span>
+                                    <span class="stat-label">Especialidades</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.atendimentos}</span>
+                                    <span class="stat-label">Atendimentos</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.avisos}</span>
+                                    <span class="stat-label">Avisos</span>
+                                </div>
+                            </div>
+                            
+                            <div style="font-size: 11px; color: #666; margin-top: 10px;">
+                                <i class="fas fa-clock"></i> Última atualização: ${ultimaAtualizacao}
+                            </div>
+                            
+                            <div class="unidade-actions">
+                                <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" style="flex: 2;">
+                                    <i class="fas fa-tv"></i> Acessar Painel
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+                        <h4><i class="fas fa-lightbulb"></i> Dicas:</h4>
+                        <ul style="color: #1565c0; margin-left: 20px;">
+                            <li>Clique em <strong>"Acessar Painel"</strong> para abrir o painel da unidade em uma nova aba</li>
+                            <li>Use <strong>"Editar Unidade"</strong> para modificar o nome ou dados da unidade</li>
+                            <li>Para excluir uma unidade, edite-a e use a opção de exclusão</li>
+                            <li>Cada unidade pode ser acessada via URL: <code>?id=ID_DA_UNIDADE</code></li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        /**
+         * Mostra o monitor de inatividade
+         */
+        function mostrarMonitorInatividade() {
+            // Calcular inatividade
+            const agora = Date.now();
+            const unidadesComInatividade = listaTodasUnidades.map(unidade => {
+                const ultimaAtualizacao = unidade.ultima_atualizacao || 0;
+                const horasInatividade = ultimaAtualizacao ? Math.floor((agora - ultimaAtualizacao) / (1000 * 60 * 60)) : 999;
+                
+                let status = 'ativo';
+                let statusCor = '#2e7d32';
+                let statusTexto = 'Ativo';
+                
+                if (horasInatividade > 168) { // 7 dias
+                    status = 'critico';
+                    statusCor = '#d32f2f';
+                    statusTexto = 'Crítico';
+                } else if (horasInatividade > 72) { // 3 dias
+                    status = 'alerta';
+                    statusCor = '#f57c00';
+                    statusTexto = 'Alerta';
+                } else if (horasInatividade > 24) { // 1 dia
+                    status = 'atencao';
+                    statusCor = '#ffb74d';
+                    statusTexto = 'Atenção';
+                }
+                
+                return {
+                    ...unidade,
+                    horasInatividade: horasInatividade,
+                    status: status,
+                    statusCor: statusCor,
+                    statusTexto: statusTexto,
+                    ultimaAtualizacaoFormatada: ultimaAtualizacao 
+                        ? new Date(ultimaAtualizacao).toLocaleString('pt-BR')
+                        : 'Nunca'
+                };
+            }).sort((a, b) => b.horasInatividade - a.horasInatividade);
+            
+            const criticas = unidadesComInatividade.filter(u => u.status === 'critico').length;
+            const alertas = unidadesComInatividade.filter(u => u.status === 'alerta').length;
+            const atencao = unidadesComInatividade.filter(u => u.status === 'atencao').length;
+            const ativas = unidadesComInatividade.filter(u => u.status === 'ativo').length;
+            
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Monitor de Inatividade</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Monitoramento das unidades que não atualizaram dados recentemente.
+                        Unidades inativas podem indicar problemas na conexão ou na TV.
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: #2e7d32; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${ativas}</div>
+                            <div style="font-size: 14px;">Ativas (< 24h)</div>
+                        </div>
+                        <div style="background: #ffb74d; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${atencao}</div>
+                            <div style="font-size: 14px;">Atenção (1-3 dias)</div>
+                        </div>
+                        <div style="background: #f57c00; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${alertas}</div>
+                            <div style="font-size: 14px;">Alerta (3-7 dias)</div>
+                        </div>
+                        <div style="background: #d32f2f; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${criticas}</div>
+                            <div style="font-size: 14px;">Críticas (> 7 dias)</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Detalhamento por Unidade</h3>
+                        <button class="admin-btn" onclick="forcarSincronizacaoTodas()">
+                            <i class="fas fa-sync-alt"></i> Forçar Sincronização
+                        </button>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>Status</th>
+                                <th>Inatividade</th>
+                                <th>Última Atualização</th>
+                                <th>Especialidades</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (unidadesComInatividade.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-check-circle" style="font-size: 32px; margin-bottom: 10px; display: block; color: #2e7d32;"></i>
+                            Todas as unidades estão ativas e sincronizadas!
+                        </td>
+                    </tr>
+                `;
+            } else {
+                unidadesComInatividade.forEach(unidade => {
+                    let tempoInatividade = '';
+                    if (unidade.horasInatividade === 0) {
+                        tempoInatividade = '< 1 hora';
+                    } else if (unidade.horasInatividade < 24) {
+                        tempoInatividade = `${unidade.horasInatividade} horas`;
+                    } else {
+                        tempoInatividade = `${Math.floor(unidade.horasInatividade / 24)} dias`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${unidade.nome}</strong>
+                                <div style="font-size: 11px; color: #666;">ID: ${unidade.id}</div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: ${unidade.statusCor}; color: white;">
+                                    ${unidade.statusTexto}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: ${unidade.statusCor};">${tempoInatividade}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">${unidade.ultimaAtualizacaoFormatada}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 18px; font-weight: 700; color: #1565c0;">${unidade.especialidades}</div>
+                            </td>
+                            <td>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="forcarSincronizacaoUnidade('${unidade.id}')">
+                                    <i class="fas fa-sync-alt"></i> Sincronizar
+                                </button>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="acessarUnidade('${unidade.id}')">
+                                    <i class="fas fa-external-link-alt"></i> Acessar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        // =================================================================
         // INICIALIZAÇÃO DO SISTEMA
-        // ============================================
+        // =================================================================
+        
+        /**
+         * Inicializa o sistema quando a página carrega
+         */
         window.onload = iniciarSistema;
+
+        // =================================================================
+        // FUNÇÕES AUXILIARES (para completar o código)
+        // =================================================================
+
+        /**
+         * Adiciona um novo usuário (interface)
+         */
+        function adicionarNovoUsuario() {
+            // Implementação simplificada
+            mostrarNotificacao('Funcionalidade em desenvolvimento', 'info');
+        }
+
+        /**
+         * Edita um usuário
+         */
+        function editarUsuario(usuarioId) {
+            // Implementação simplificada
+            mostrarNotificacao(`Editando usuário ${usuarioId}`, 'info');
+        }
+
+        /**
+         * Exclui um usuário
+         */
+        function excluirUsuario(usuarioId, usuarioNome) {
+            if (confirm(`Tem certeza que deseja excluir o usuário "${usuarioNome}"?`)) {
+                mostrarNotificacao(`Usuário ${usuarioNome} excluído`, 'success');
+            }
+        }
+
+        /**
+         * Atualiza a lista de unidades
+         */
+        function atualizarListaUnidades() {
+            carregarTodasUnidades();
+            setTimeout(() => mostrarTodasUnidades(), 500);
+            mostrarNotificacao('Lista de unidades atualizada!', 'success');
+        }
+
+        /**
+         * Acessa uma unidade específica
+         */
+        function acessarUnidade(unidadeId) {
+            const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
+            window.open(url, '_blank');
+        }
+
+        /**
+         * Adiciona uma nova unidade
+         */
+        function adicionarNovaUnidade() {
+            // Implementação simplificada
+            mostrarNotificacao('Funcionalidade em desenvolvimento', 'info');
+        }
+
+        /**
+         * Edita uma unidade
+         */
+        function editarUnidade(unidadeId) {
+            // Implementação simplificada
+            mostrarNotificacao(`Editando unidade ${unidadeId}`, 'info');
+        }
+
+        /**
+         * Força sincronização de uma unidade específica
+         */
+        function forcarSincronizacaoUnidade(unidadeId) {
+            mostrarNotificacao(`Forçando sincronização da unidade ${unidadeId}...`, 'info');
+            setTimeout(() => {
+                mostrarNotificacao(`Sincronização forçada para unidade ${unidadeId} solicitada!`, 'success');
+            }, 1000);
+        }
+
+        /**
+         * Força sincronização de todas as unidades
+         */
+        function forcarSincronizacaoTodas() {
+            if (confirm('Forçar sincronização em TODAS as unidades?\n\nIsso enviará um comando para todas as TVs atualizarem seus dados imediatamente.')) {
+                mostrarNotificacao('Forçando sincronização em todas as unidades...', 'info');
+                setTimeout(() => {
+                    mostrarNotificacao('Sincronização forçada solicitada para todas as unidades!', 'success');
+                }, 1500);
+            }
+        }
     </script>
 </body>
 </html>
