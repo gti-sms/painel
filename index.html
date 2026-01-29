@@ -277,13 +277,35 @@
         }
         
         .atendimentos-title { 
-            color: #2196f3; 
-            border-bottom-color: rgba(33, 150, 243, 0.3); 
+            color: #ffffff; 
+            border-bottom-color: rgba(255, 255, 255, 0.3); 
         }
         
         .sms-title { 
-            color: #ba68c8; 
-            border-bottom-color: rgba(186, 104, 200, 0.3); 
+            color: #ffffff; 
+            border-bottom-color: rgba(255, 255, 255, 0.3); 
+        }
+        
+        /* MODIFICAÇÃO PARA FONTES BRANCAS NOS TOTAIS */
+        .total-container .total-value,
+        .total-container .total-label {
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Garantir que as cores específicas não sobrescrevam */
+        .total-atendimentos .total-value,
+        .total-atendimentos .total-label,
+        .total-sms .total-value,
+        .total-sms .total-label {
+            color: white !important;
+        }
+        
+        /* Remover cores específicas dos títulos se necessário */
+        .section-title.atendimentos-title,
+        .section-title.sms-title {
+            color: white !important;
+            border-bottom-color: rgba(255, 255, 255, 0.3) !important;
         }
         
         /* TOTAL CONTAINER */
@@ -1202,6 +1224,9 @@
                 <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
+                <div class="sidebar-item" id="menuTVs" style="display:none" onclick="mostrarSecao('tvs')">
+                    <i class="fas fa-tv"></i> Monitoramento de TVs
+                </div>
                 <div class="sidebar-item" id="menuUsuarios" style="display:none" onclick="mostrarSecao('usuarios')">
                     <i class="fas fa-users-cog"></i> Gerenciar Usuários
                 </div>
@@ -1221,7 +1246,7 @@
 
         <!-- Informações de versão -->
         <div class="version-info">
-            Sistema de Saúde PMPF v3.0 | Sistema Automático
+            Sistema de Saúde PMPF v3.1 | Sistema Automático com Monitor de TVs
         </div>
     </div>
 
@@ -1432,6 +1457,193 @@
             }
         };
 
+        // Sistema de monitoramento de TVs (APENAS MONITORAMENTO)
+        let monitorTVs = {
+            tvs: {},
+            intervaloAtualizacao: null,
+            tvId: null,
+            
+            init() {
+                this.carregarTVsDoFirebase();
+                this.iniciarAtualizacaoPeriodica();
+                
+                // Registrar esta TV como ativa (apenas para monitoramento)
+                this.registrarTVAtiva();
+            },
+            
+            registrarTVAtiva() {
+                // Verificar se já existe um ID de TV no localStorage
+                let tvId = localStorage.getItem('tvId');
+                
+                if (!tvId) {
+                    tvId = 'tv_' + unidadeID + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('tvId', tvId);
+                }
+                
+                this.tvId = tvId;
+                
+                const dadosTV = {
+                    unidadeId: unidadeID,
+                    unidadeNome: dadosUnidade.unidade?.nome || `Unidade ${unidadeID}`,
+                    ultimaVisualizacao: Date.now(),
+                    ip: this.getClientIP(),
+                    userAgent: navigator.userAgent,
+                    status: 'online',
+                    dataRegistro: new Date().toISOString()
+                };
+                
+                // Salvar no Firebase apenas para monitoramento
+                db.ref('monitor_tvs/' + tvId).set(dadosTV);
+                
+                // Atualizar a cada 5 minutos (apenas para manter o status atualizado)
+                setInterval(() => {
+                    this.atualizarStatusTV(tvId);
+                }, 5 * 60 * 1000);
+                
+                // Atualizar quando a página ganhar foco
+                window.addEventListener('focus', () => {
+                    this.atualizarStatusTV(tvId);
+                });
+            },
+            
+            atualizarStatusTV(tvId) {
+                const dadosAtualizados = {
+                    ultimaVisualizacao: Date.now(),
+                    status: 'online'
+                };
+                
+                db.ref('monitor_tvs/' + tvId).update(dadosAtualizados);
+            },
+            
+            carregarTVsDoFirebase() {
+                db.ref('monitor_tvs').on('value', (snapshot) => {
+                    this.tvs = snapshot.val() || {};
+                    if (document.getElementById('tbodyTVs')) {
+                        this.atualizarTabelaTVs();
+                    }
+                });
+            },
+            
+            atualizarTabelaTVs() {
+                const tbody = document.getElementById('tbodyTVs');
+                if (!tbody) return;
+                
+                const agora = Date.now();
+                let totalTVs = 0;
+                let ativas = 0;
+                let inativas = 0;
+                let criticas = 0;
+                
+                let html = '';
+                
+                Object.entries(this.tvs).forEach(([tvId, dados]) => {
+                    totalTVs++;
+                    
+                    const ultimaVisualizacao = dados.ultimaVisualizacao || 0;
+                    const diferenca = agora - ultimaVisualizacao;
+                    const horas = Math.floor(diferenca / (1000 * 60 * 60));
+                    
+                    let status = '';
+                    let statusCor = '';
+                    let tempoOnline = '';
+                    
+                    if (horas < 1) {
+                        status = 'Online';
+                        statusCor = '#2e7d32';
+                        ativas++;
+                        tempoOnline = 'Agora mesmo';
+                    } else if (horas < 24) {
+                        status = 'Ativa';
+                        statusCor = '#4caf50';
+                        ativas++;
+                        tempoOnline = `${horas} horas atrás`;
+                    } else if (horas < 168) {
+                        status = 'Inativa';
+                        statusCor = '#ff9800';
+                        inativas++;
+                        tempoOnline = `${Math.floor(horas/24)} dias atrás`;
+                    } else {
+                        status = 'Crítica';
+                        statusCor = '#f44336';
+                        criticas++;
+                        tempoOnline = `${Math.floor(horas/24)} dias atrás`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${dados.unidadeNome || 'Desconhecida'}</strong>
+                                <div style="font-size: 11px; color: #666;">ID: ${dados.unidadeId}</div>
+                            </td>
+                            <td><code>${tvId.substring(0, 8)}...</code></td>
+                            <td>
+                                <span class="badge" style="background: ${statusCor}; color: white;">
+                                    ${status}
+                                </span>
+                            </td>
+                            <td>
+                                ${ultimaVisualizacao ? new Date(ultimaVisualizacao).toLocaleString('pt-BR') : 'Nunca'}
+                            </td>
+                            <td>${tempoOnline}</td>
+                            <td>
+                                <div style="font-size: 12px;">
+                                    ${dados.ip || 'IP não disponível'}
+                                </div>
+                                <div style="font-size: 10px; color: #666; margin-top: 2px;">
+                                    ${this.extrairNavegador(dados.userAgent)}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                if (totalTVs === 0) {
+                    html = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                <i class="fas fa-tv" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                                Nenhuma TV monitorada no momento.
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                tbody.innerHTML = html;
+                
+                // Atualizar totais
+                if (document.getElementById('totalTVs')) {
+                    document.getElementById('totalTVs').textContent = totalTVs;
+                    document.getElementById('tvAtivas').textContent = ativas;
+                    document.getElementById('tvInativas').textContent = inativas;
+                    document.getElementById('tvCriticas').textContent = criticas;
+                }
+            },
+            
+            extrairNavegador(userAgent) {
+                if (!userAgent) return 'Navegador desconhecido';
+                
+                if (userAgent.includes('Chrome')) return 'Chrome';
+                if (userAgent.includes('Firefox')) return 'Firefox';
+                if (userAgent.includes('Safari')) return 'Safari';
+                if (userAgent.includes('Edge')) return 'Edge';
+                
+                return 'Navegador padrão';
+            },
+            
+            getClientIP() {
+                // Esta função seria implementada com um serviço externo para pegar IP real
+                // Por enquanto retorna um placeholder
+                return 'IP dinâmico';
+            },
+            
+            iniciarAtualizacaoPeriodica() {
+                // Atualizar a cada 30 segundos (apenas para monitoramento)
+                this.intervaloAtualizacao = setInterval(() => {
+                    this.atualizarTabelaTVs();
+                }, 30000);
+            }
+        };
+
         // Gerenciador de sincronização automática
         const syncManager = {
             syncTimer: null,
@@ -1439,6 +1651,7 @@
             lastSyncTime: 0,
             hasInitialSync: false,
             realtimeListener: null,
+            avisosListener: null,
             unitSyncOffset: 0,
             
             init() {
@@ -1456,6 +1669,16 @@
                 // Configurar listener para atualizações em tempo real
                 if (!isMatriz) {
                     this.setupRealtimeListener();
+                }
+                
+                // Configurar listener específico para avisos
+                this.setupAvisosRealtimeListener();
+                
+                // Inicializar monitor de TVs se for matriz e super admin
+                if (isMatriz && permissoesUsuario && permissoesUsuario.nivel === 'super_admin') {
+                    setTimeout(() => {
+                        monitorTVs.init();
+                    }, 3000);
                 }
             },
             
@@ -1508,6 +1731,25 @@
                 this.syncTimer = setInterval(() => {
                     this.syncData('scheduled');
                 }, intervalMs);
+            },
+            
+            setupAvisosRealtimeListener() {
+                const avisosPath = `paineis/${unidadeID}/avisos`;
+                
+                if (this.avisosListener) {
+                    db.ref(avisosPath).off('value', this.avisosListener);
+                }
+                
+                this.avisosListener = db.ref(avisosPath).on('value', (snapshot) => {
+                    const novosAvisos = snapshot.val() || [];
+                    if (JSON.stringify(novosAvisos) !== JSON.stringify(dadosUnidade.avisos)) {
+                        dadosUnidade.avisos = novosAvisos;
+                        iniciarAvisos();
+                        console.log('📢 Avisos atualizados em tempo real');
+                    }
+                });
+                
+                console.log('👂 Listener de avisos configurado');
             },
             
             async syncData(reason = 'scheduled') {
@@ -1808,9 +2050,9 @@
             renderBloco('itemFaltometro', 'FALTÔMETRO', 'Total mês anterior', 
                        dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
             renderBloco('itemAtendimentos', 'ATENDIMENTOS DA UNIDADE', 'Total mês anterior', 
-                       dadosUnidade.unidade.atendimentos, 'valor', '#2196f3', 'atendimentos-title total-atendimentos');
+                       dadosUnidade.unidade.atendimentos, 'valor', '#ffffff', 'atendimentos-title total-atendimentos');
             renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
-                       dadosGerais.unidade.smsMunicipal, 'valor', '#ba68c8', 'sms-title total-sms');
+                       dadosGerais.unidade.smsMunicipal, 'valor', '#ffffff', 'sms-title total-sms');
         }
 
         /**
@@ -2063,6 +2305,7 @@
             document.getElementById('menuUsuarios').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             document.getElementById('menuUnidades').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             document.getElementById('menuMonitor').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
+            document.getElementById('menuTVs').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             
             document.getElementById('menuSincronizacao').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             
@@ -2083,6 +2326,7 @@
                 document.getElementById('menuSMS').style.display = 'none';
                 document.getElementById('menuVideo').style.display = 'none';
                 document.getElementById('menuSincronizacao').style.display = 'none';
+                document.getElementById('menuTVs').style.display = 'none';
             }
         }
 
@@ -2125,7 +2369,7 @@
             const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos'];
             if (!isMatriz && secoesUnidade.includes(secao)) return true;
             
-            const secoesMatriz = ['sms', 'video', 'unidades', 'monitor', 'usuarios', 'sincronizacao'];
+            const secoesMatriz = ['sms', 'video', 'unidades', 'monitor', 'usuarios', 'sincronizacao', 'tvs'];
             if (isMatriz && secoesMatriz.includes(secao) && permissoesUsuario.nivel === 'admin_unidade') {
                 return true;
             }
@@ -2156,6 +2400,8 @@
                 mostrarTodasUnidades();
             } else if(secao === 'monitor') {
                 mostrarMonitorInatividade();
+            } else if(secao === 'tvs') {
+                mostrarMonitoramentoTVs();
             } else {
                 mostrarSecaoPadrao(secao, content);
             }
@@ -2212,6 +2458,23 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px; border-left: 4px solid #00c853;">
+                        <h4><i class="fas fa-tv"></i> Status das TVs Conectadas</h4>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700; color: #2e7d32;">${Object.keys(monitorTVs.tvs).length}</div>
+                                <div style="font-size: 12px; color: #666;">TVs Monitoradas</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700; color: #4caf50;">${Object.values(monitorTVs.tvs).filter(tv => (Date.now() - (tv.ultimaVisualizacao || 0)) < 3600000).length}</div>
+                                <div style="font-size: 12px; color: #666;">Ativas Agora</div>
+                            </div>
+                        </div>
+                        <button class="admin-btn" onclick="mostrarSecao('tvs')" style="margin-top: 15px; padding: 10px 15px; font-size: 14px;">
+                            <i class="fas fa-external-link-alt"></i> Ver Detalhes das TVs
+                        </button>
                     </div>
                     
                     <h3 style="margin-top: 30px;"><i class="fas fa-sliders-h"></i> Opções de Intervalo</h3>
@@ -2274,6 +2537,99 @@
             `;
             
             document.getElementById('adminContent').innerHTML = html;
+        }
+
+        /**
+         * Mostra o monitoramento de TVs
+         */
+        function mostrarMonitoramentoTVs() {
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-tv"></i> Monitoramento de TVs Ativas</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Monitoramento em tempo real de todas as TVs conectadas ao sistema.
+                        <strong>Esta tela é apenas para visualização.</strong> Para gerenciar unidades, acesse a seção "Gerenciar Unidades".
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: #2e7d32; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;" id="totalTVs">0</div>
+                            <div style="font-size: 14px;">Total de TVs</div>
+                        </div>
+                        <div style="background: #2196f3; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;" id="tvAtivas">0</div>
+                            <div style="font-size: 14px;">Ativas (última hora)</div>
+                        </div>
+                        <div style="background: #ff9800; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;" id="tvInativas">0</div>
+                            <div style="font-size: 14px;">Inativas (> 24h)</div>
+                        </div>
+                        <div style="background: #f44336; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;" id="tvCriticas">0</div>
+                            <div style="font-size: 14px;">Críticas (> 7 dias)</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Detalhamento por Unidade/TV (Monitoramento em Tempo Real)</h3>
+                        <button class="admin-btn" onclick="atualizarMonitorTVs()">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                    </div>
+                    
+                    <table class="management-table" id="tabelaTVs">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>ID da TV</th>
+                                <th>Status</th>
+                                <th>Última Visualização</th>
+                                <th>Tempo Online</th>
+                                <th>IP/Localização</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyTVs">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                    Carregando dados das TVs...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <h4><i class="fas fa-info-circle"></i> Informações do Sistema de Monitoramento</h4>
+                        <ul style="color: #666; margin-left: 20px;">
+                            <li><strong>Sistema automático:</strong> Cada TV se registra automaticamente ao carregar</li>
+                            <li><strong>Atualização em tempo real:</strong> Status atualizado a cada 5 minutos</li>
+                            <li><strong>Monitoramento passivo:</strong> Sem impacto no desempenho das TVs</li>
+                            <li><strong>Apenas visualização:</strong> Esta tela não realiza nenhuma ação de gerenciamento</li>
+                            <li><strong>Para gerenciar:</strong> Use a seção "Gerenciar Unidades" para ações administrativas</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="admin-btn admin-btn-primary" onclick="mostrarSecao('unidades')">
+                            <i class="fas fa-building"></i> Ir para Gerenciar Unidades
+                        </button>
+                        <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidade')">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adminContent').innerHTML = html;
+            carregarDadosTVs();
+        }
+
+        function carregarDadosTVs() {
+            monitorTVs.atualizarTabelaTVs();
+        }
+
+        function atualizarMonitorTVs() {
+            monitorTVs.atualizarTabelaTVs();
+            mostrarNotificacao('Monitor de TVs atualizado!', 'success');
         }
 
         /**
