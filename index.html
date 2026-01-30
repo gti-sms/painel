@@ -1529,7 +1529,7 @@
         };
 
         // =================================================================
-        // SISTEMA DE SINCRONIZAÇÃO OTIMIZADO
+        // SISTEMA DE SINCRONIZAÇÃO OTIMIZADO - CORRIGIDO
         // =================================================================
         let syncManagerOtimizado = {
             syncTimer: null,
@@ -1542,7 +1542,7 @@
             batchTimer: null,
             
             init() {
-                console.log('🚀 Inicializando sistema otimizado para custo mínimo');
+                console.log('🚀 Inicializando sistema otimizado');
                 
                 // 1. Calcular offset inteligente
                 this.calculateUnitOffset();
@@ -1553,8 +1553,8 @@
                 // 3. Configurar sincronização automática com offset
                 this.startOptimizedSync();
                 
-                // 4. Configurar listener leve para avisos
-                this.setupAvisosListener();
+                // 4. Configurar listeners em tempo real para cada unidade
+                this.setupRealTimeListeners();
                 
                 console.log(`⏰ Sistema otimizado: ${otimizacaoCustos.syncConfig.currentInterval} min interval`);
             },
@@ -1578,9 +1578,6 @@
                     dadosUnidade = cacheData;
                     processarInterface();
                     this.cacheHits++;
-                    
-                    // Verifica se precisa atualizar (verificação leve)
-                    this.checkForUpdates();
                 } else {
                     console.log('🆕 Sem cache - sincronizando');
                     this.syncData('first_time');
@@ -1609,18 +1606,92 @@
                 console.log(`⏰ Sync configurada: ${otimizacaoCustos.syncConfig.currentInterval} min interval`);
             },
             
-            async checkForUpdates() {
-                // Verificação leve - apenas timestamp
+            // NOVA FUNÇÃO: Configurar listeners em tempo real
+            setupRealTimeListeners() {
+                console.log('👂 Configurando listeners em tempo real');
+                
+                // Listener para dados da unidade atual
+                db.ref('paineis/' + unidadeID).on('value', (snapshot) => {
+                    const novosDados = snapshot.val();
+                    if (novosDados) {
+                        console.log('📡 Dados atualizados em tempo real para unidade', unidadeID);
+                        this.processarAtualizacaoRemota(novosDados, 'local');
+                    }
+                });
+                
+                // Listener para dados gerais (matriz) - todas as unidades escutam
+                db.ref('paineis/geral').on('value', (snapshot) => {
+                    const novosDadosGerais = snapshot.val();
+                    if (novosDadosGerais) {
+                        console.log('📡 Dados gerais atualizados em tempo real');
+                        this.processarAtualizacaoRemota(novosDadosGerais, 'geral');
+                    }
+                });
+                
+                // Listener específico para avisos gerais (todas as unidades escutam)
+                db.ref('paineis/geral/avisos').on('value', (snapshot) => {
+                    const novosAvisosGerais = snapshot.val() || [];
+                    dadosGerais.avisos = novosAvisosGerais;
+                    iniciarAvisos();
+                });
+                
+                // Listener específico para vídeos gerais
+                db.ref('paineis/geral/unidade/videoUrls').on('value', (snapshot) => {
+                    const novosVideos = snapshot.val() || [];
+                    dadosGerais.unidade.videoUrls = novosVideos;
+                    carregarVideo();
+                });
+                
+                // Listener específico para produção municipal
+                db.ref('paineis/geral/unidade/smsMunicipal').on('value', (snapshot) => {
+                    const novosSMS = snapshot.val() || [];
+                    dadosGerais.unidade.smsMunicipal = novosSMS;
+                    atualizarInterface();
+                });
+            },
+            
+            processarAtualizacaoRemota(dadosRemotos, tipo) {
                 try {
-                    const snapshot = await db.ref('paineis/' + unidadeID + '/ultima_atualizacao').once('value');
-                    const ultimaRemota = snapshot.val() || 0;
+                    const agora = Date.now();
                     
-                    if (ultimaRemota > this.lastSyncTime) {
-                        console.log('📢 Atualização detectada - sincronizando');
-                        this.syncData('update_detected');
+                    if (tipo === 'local') {
+                        // Decomprime dados
+                        const dadosDecompressed = otimizacaoCustos.dataOptimizer.decompressData(dadosRemotos);
+                        
+                        // Atualiza apenas se os dados são diferentes
+                        if (JSON.stringify(dadosUnidade) !== JSON.stringify(dadosDecompressed)) {
+                            console.log('🔄 Atualizando dados locais em tempo real');
+                            dadosUnidade = dadosDecompressed;
+                            
+                            // Salva no cache
+                            cacheAgressivo.set(unidadeID, dadosUnidade);
+                            
+                            // Atualiza interface
+                            processarInterface();
+                            
+                            // Atualiza o timestamp
+                            this.lastSyncTime = agora;
+                        }
+                    } else if (tipo === 'geral') {
+                        // Decomprime dados gerais
+                        const dadosGeraisDecompressed = otimizacaoCustos.dataOptimizer.decompressData(dadosRemotos);
+                        
+                        // Atualiza apenas se os dados são diferentes
+                        if (JSON.stringify(dadosGerais) !== JSON.stringify(dadosGeraisDecompressed)) {
+                            console.log('🔄 Atualizando dados gerais em tempo real');
+                            dadosGerais = dadosGeraisDecompressed;
+                            
+                            // Salva no cache
+                            cacheAgressivo.set('geral', dadosGerais);
+                            
+                            // Atualiza interface (produção municipal e vídeos)
+                            processarInterface();
+                            carregarVideo();
+                            iniciarAvisos();
+                        }
                     }
                 } catch (error) {
-                    // Silencioso em caso de erro
+                    console.warn('❌ Erro ao processar atualização remota:', error);
                 }
             },
             
@@ -1703,17 +1774,6 @@
                 });
             },
             
-            setupAvisosListener() {
-                // Listener leve apenas para avisos
-                db.ref('paineis/' + unidadeID + '/avisos').on('value', (snapshot) => {
-                    const novosAvisos = snapshot.val() || [];
-                    if (JSON.stringify(novosAvisos) !== JSON.stringify(dadosUnidade.avisos)) {
-                        dadosUnidade.avisos = novosAvisos;
-                        iniciarAvisos();
-                    }
-                });
-            },
-            
             // BATCH UPDATES para admin (reduz número de writes)
             addToBatch(path, data) {
                 this.batchUpdates.push({ path, data, timestamp: Date.now() });
@@ -1747,9 +1807,14 @@
                 try {
                     await db.ref().update(updates);
                     console.log(`📦 Batch enviado: ${this.batchUpdates.length} updates`);
+                    
+                    // Notificar sucesso
+                    mostrarNotificacao(`Alterações enviadas para ${this.batchUpdates.length} item(s)`, 'success');
+                    
                     this.batchUpdates = [];
                 } catch (error) {
                     console.error('Erro no batch:', error);
+                    mostrarNotificacao('Erro ao salvar alterações!', 'error');
                 }
                 
                 this.batchTimer = null;
@@ -1824,16 +1889,7 @@
                 console.warn('Erro ao buscar dados gerais:', error);
             });
             
-            // 6. Listener para avisos gerais (leve)
-            db.ref('paineis/geral/avisos').on('value', (snapshot) => {
-                const avisos = snapshot.val() || [];
-                if (JSON.stringify(avisos) !== JSON.stringify(dadosGerais.avisos)) {
-                    dadosGerais.avisos = avisos;
-                    iniciarAvisos();
-                }
-            });
-            
-            // 7. Criar admin principal se for matriz
+            // 6. Criar admin principal se for matriz
             if (isMatriz) {
                 criarUsuarioAdminPrincipal();
                 setTimeout(() => {
@@ -1842,7 +1898,7 @@
                 }, 5000);
             }
             
-            // 8. Esconder loading após tempo razoável
+            // 7. Esconder loading após tempo razoável
             setTimeout(() => {
                 const loadingOverlay = document.getElementById('loadingOverlay');
                 if (loadingOverlay && loadingOverlay.style.display !== 'none') {
@@ -1972,7 +2028,10 @@
          */
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
-            const avisos = [...(dadosGerais.avisos || []), ...(dadosUnidade.avisos || [])].filter(a => a && a.trim() !== '');
+            // Combina avisos gerais (matriz) com avisos locais (unidade)
+            const avisosGerais = dadosGerais.avisos || [];
+            const avisosLocais = dadosUnidade.avisos || [];
+            const avisos = [...avisosGerais, ...avisosLocais].filter(a => a && a.trim() !== '');
             
             if (tickerInterval) clearInterval(tickerInterval);
             
@@ -2289,13 +2348,13 @@
                 <div class="admin-section">
                     <h2><i class="fas fa-sync-alt"></i> Configuração de Sincronização OTIMIZADA</h2>
                     <div class="section-info">
-                        <i class="fas fa-info-circle"></i> <strong>SISTEMA OTIMIZADO PARA CUSTO MÍNIMO</strong>
+                        <i class="fas fa-info-circle"></i> <strong>SISTEMA OTIMIZADO</strong>
                         <br>40 TVs | Atualização distribuída | Cache agressivo | Dados compactados
                     </div>
                     
                     <div style="display: flex; gap: 20px; margin-bottom: 30px;">
                         <div style="flex: 1; background: #00c853; color: white; padding: 20px; border-radius: 10px;">
-                            <div style="font-size: 32px; font-weight: 800;">GRÁTIS</div>
+                            <div style="font-size: 32px; font-weight: 800;">${stats.estimatedCost}</div>
                             <div style="font-size: 14px;">Custo Mensal Estimado</div>
                             <div style="font-size: 12px; margin-top: 10px; opacity: 0.9;">Firebase Free Tier</div>
                         </div>
@@ -2322,7 +2381,7 @@
                         </div>
                     </div>
                     
-                    <h3><i class="fas fa-sliders-h"></i> Opções de Intervalo (Custo Mínimo)</h3>
+                    <h3><i class="fas fa-sliders-h"></i> Opções de Intervalo</h3>
                     <p style="color: #666; margin-bottom: 20px;">Selecione o intervalo de sincronização:</p>
                     
                     <div class="sync-options-grid">
@@ -2357,7 +2416,7 @@
                             <li><strong>Distribuição Inteligente:</strong> Cada TV sincroniza em horário diferente</li>
                             <li><strong>Dados Compactados:</strong> Transferência reduzida em 60%</li>
                             <li><strong>Batch Updates:</strong> Múltiplas atualizações agrupadas</li>
-                            <li><strong>Verificação Leve:</strong> Só sincroniza quando há mudanças</li>
+                            <li><strong>Sincronização em Tempo Real:</strong> Listeners configurados para todas as unidades</li>
                         </ul>
                     </div>
                     
@@ -2557,35 +2616,82 @@
             const novoNome = document.getElementById('uNome').value;
             dadosUnidade.unidade.nome = novoNome;
             document.getElementById('adminUnidadeNome').textContent = novoNome;
-            salvarDadosOtimizado(true, 'unidade');
+            
+            const dadosParaEnviar = otimizacaoCustos.dataOptimizer.compressData(dadosUnidade);
+            syncManagerOtimizado.addToBatch(`paineis/${unidadeID}`, dadosParaEnviar);
+            
             mostrarNotificacao('Nome da unidade atualizado!', 'success');
         }
 
         /**
-         * Salva os avisos
+         * Salva os avisos (hibrido: central manda para todas, unidades podem adicionar)
          */
         function salvarAvisos() {
             const avisosText = document.getElementById('txtAvisos').value;
             const avisosArray = avisosText.split('\n').filter(a => a.trim() !== '');
             
             if (isMatriz) {
+                // Matriz: salva avisos gerais (para todas as unidades)
                 dadosGerais.avisos = avisosArray;
+                
+                // Salva no Firebase
+                syncManagerOtimizado.addToBatch('paineis/geral/avisos', avisosArray);
+                syncManagerOtimizado.addToBatch('paineis/geral/ultima_atualizacao', Date.now());
+                
+                mostrarNotificacao('Avisos gerais salvos com sucesso! Todas as unidades receberão.', 'success');
+                // Atualiza cache
+                cacheAgressivo.set('geral', dadosGerais);
+                    
             } else {
+                // Unidade: salva apenas avisos locais (apenas para esta unidade)
+                // Avisos gerais são preservados
                 dadosUnidade.avisos = avisosArray;
+                
+                const dadosParaEnviar = otimizacaoCustos.dataOptimizer.compressData(dadosUnidade);
+                syncManagerOtimizado.addToBatch(`paineis/${unidadeID}`, dadosParaEnviar);
+                
+                mostrarNotificacao('Avisos locais salvos com sucesso!', 'success');
+                // Atualiza cache
+                cacheAgressivo.set(unidadeID, dadosUnidade);
             }
-            
-            salvarDadosOtimizado(true, 'avisos');
-            mostrarNotificacao('Avisos salvos com sucesso!', 'success');
         }
 
         /**
-         * Salva os vídeos
+         * Salva os vídeos (apenas a central)
          */
         function salvarVideos() {
+            if (!isMatriz) {
+                mostrarNotificacao('Apenas a matriz pode configurar vídeos!', 'error');
+                return;
+            }
+            
             const videosText = document.getElementById('vUrls').value;
-            dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
-            salvarDadosOtimizado(true, 'video');
-            mostrarNotificacao('Vídeos salvos com sucesso!', 'success');
+            const videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
+            dadosGerais.unidade.videoUrls = videoUrls;
+            
+            syncManagerOtimizado.addToBatch('paineis/geral/unidade/videoUrls', videoUrls);
+            syncManagerOtimizado.addToBatch('paineis/geral/ultima_atualizacao', Date.now());
+            
+            mostrarNotificacao('Vídeos salvos com sucesso! Todas as unidades receberão.', 'success');
+            cacheAgressivo.set('geral', dadosGerais);
+        }
+
+        /**
+         * Salva a produção municipal (apenas a central)
+         */
+        function salvarDadosGerais() {
+            if (!isMatriz) {
+                mostrarNotificacao('Apenas a matriz pode configurar produção municipal!', 'error');
+                return;
+            }
+            
+            dadosGerais.ultima_atualizacao = Date.now();
+            const dadosGeraisComprimidos = otimizacaoCustos.dataOptimizer.compressData(dadosGerais);
+            
+            syncManagerOtimizado.addToBatch('paineis/geral', dadosGeraisComprimidos);
+            
+            mostrarNotificacao('Produção municipal salva com sucesso! Todas as unidades receberão.', 'success');
+            cacheAgressivo.set('geral', dadosGerais);
         }
 
         /**
@@ -2606,7 +2712,7 @@
             if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
             if (dadosGerais.unidade[chave][index]) {
                 dadosGerais.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
-                salvarDadosOtimizado(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+                salvarDadosGerais();
             }
         }
 
@@ -2628,7 +2734,7 @@
             if (dadosGerais.unidade[chave] && dadosGerais.unidade[chave][index]) {
                 dadosGerais.unidade[chave].splice(index, 1);
                 mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-                salvarDadosOtimizado(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+                salvarDadosGerais();
             }
         }
 
@@ -2649,7 +2755,7 @@
             if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
             dadosGerais.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
             mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-            salvarDadosOtimizado(true, chave === 'smsMunicipal' ? 'sms' : 'video');
+            salvarDadosGerais();
         }
 
         /**
@@ -2688,9 +2794,6 @@
                 mostrarNotificacao('Dados salvos! Serão enviados automaticamente para todas as TVs.', 'success');
                 console.log(`💾 Dados salvos (${tipoAlteracao}) - Envio automático configurado`);
             }
-            
-            // 6. Força uma verificação de atualizações nas outras TVs
-            // O timestamp 'ultima_atualizacao' fará as outras TVs sincronizarem
         }
 
         // =================================================================
@@ -3960,7 +4063,7 @@
             
             console.log('📊 ANÁLISE DE CUSTOS PARA 40 TVs:');
             console.log('--------------------------------');
-            console.log(`Intervalo: ${stats.intervalo} minutos`);
+            console.log(`Intervalo: ${stats.interval} minutos`);
             console.log(`Leituras/TV/dia: ${stats.leiturasPorTVPorDia}`);
             console.log(`Leituras totais/dia: ${stats.leiturasPorDia.toLocaleString()}`);
             console.log(`Free Tier usado: ${stats.percentualFreeTier.toFixed(1)}%`);
