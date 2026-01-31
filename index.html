@@ -697,7 +697,7 @@
         .management-table th { 
             padding: 18px 20px; 
             text-align: left; 
-            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); 
             color: white;
             font-weight: 600;
             font-size: 15px;
@@ -1473,6 +1473,7 @@
             hasInitialSync: false,
             realtimeListener: null,
             avisosListener: null,
+            smsListener: null,
             unitSyncOffset: 0,
             
             init() {
@@ -1494,6 +1495,9 @@
                 
                 // Configurar listener específico para avisos
                 this.setupAvisosRealtimeListener();
+                
+                // Configurar listener específico para SMS
+                this.setupSMSRealtimeListener();
             },
             
             calculateUnitOffset() {
@@ -1566,6 +1570,32 @@
                 console.log('👂 Listener de avisos configurado');
             },
             
+            setupSMSRealtimeListener() {
+                // Listener para SMS da matriz (para todas as unidades)
+                const smsPath = `paineis/geral/unidade/smsMunicipal`;
+                
+                if (this.smsListener) {
+                    db.ref(smsPath).off('value', this.smsListener);
+                }
+                
+                this.smsListener = db.ref(smsPath).on('value', (snapshot) => {
+                    const smsData = snapshot.val() || [];
+                    if (JSON.stringify(smsData) !== JSON.stringify(dadosGerais.unidade.smsMunicipal)) {
+                        dadosGerais.unidade.smsMunicipal = smsData;
+                        
+                        // Atualizar interface se o bloco SMS estiver ativo
+                        if (document.getElementById('itemSMS')) {
+                            renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
+                                       dadosGerais.unidade.smsMunicipal, 'valor', '#ffffff', 'sms-title total-sms');
+                        }
+                        
+                        console.log('📈 Produção Municipal atualizada em tempo real');
+                    }
+                });
+                
+                console.log('👂 Listener de SMS configurado');
+            },
+            
             async syncData(reason = 'scheduled') {
                 if (this.isSyncing) return;
                 
@@ -1590,6 +1620,21 @@
                     }
                     
                     firebaseData.ultima_sincronizacao = Date.now();
+                    
+                    // SEMPRE buscar dados da matriz para smsMunicipal
+                    if (!isMatriz) {
+                        try {
+                            const matrizSnapshot = await db.ref('paineis/geral').once('value');
+                            const matrizData = matrizSnapshot.val();
+                            if (matrizData && matrizData.unidade && matrizData.unidade.smsMunicipal) {
+                                dadosGerais.unidade.smsMunicipal = matrizData.unidade.smsMunicipal;
+                                // Salvar no cache também
+                                cacheManager.saveToCache('geral', matrizData);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Não foi possível buscar dados da matriz:', error);
+                        }
+                    }
                     
                     const cacheInfo = await cacheManager.getFromCacheWithTTL(unidadeID);
                     const dataChanged = !this.isEqualData(cacheInfo.data, firebaseData);
@@ -1737,18 +1782,26 @@
             
             iniciarAnimacaoCarrossel();
             
+            // IMPORTANTE: Carregar dados da matriz para SMS mesmo nas unidades
+            // Primeiro tentar do cache
             const cacheGeral = await cacheManager.getFromCacheWithTTL('geral');
             if (cacheGeral.data) {
                 dadosGerais = cacheGeral.data;
-                processarInterface();
+                console.log('📊 Dados da matriz carregados do cache para SMS');
             }
             
+            // Sempre buscar dados da matriz do Firebase para garantir SMS atualizado
             db.ref('paineis/geral').once('value').then((snapshot) => {
                 const data = snapshot.val();
                 if (data) { 
                     dadosGerais = data; 
                     cacheManager.saveToCache('geral', dadosGerais);
-                    processarInterface(); 
+                    console.log('📊 Dados da matriz atualizados do Firebase para SMS');
+                    
+                    // Atualizar interface se já tiver dados da unidade
+                    if (dadosUnidade) {
+                        processarInterface();
+                    }
                 } else {
                     dadosGerais = {
                         unidade: {
@@ -1764,6 +1817,17 @@
                 console.error('Erro ao buscar dados gerais:', error);
             });
             
+            // Listener para vídeos
+            db.ref('paineis/geral/unidade/videoUrls').on('value', (snapshot) => {
+                const videoUrls = snapshot.val() || [];
+                if (JSON.stringify(videoUrls) !== JSON.stringify(dadosGerais.unidade.videoUrls)) {
+                    dadosGerais.unidade.videoUrls = videoUrls;
+                    carregarVideo();
+                    console.log('🎬 Vídeos atualizados em tempo real');
+                }
+            });
+            
+            // Listener para avisos gerais
             db.ref('paineis/geral/avisos').on('value', (snapshot) => {
                 const avisos = snapshot.val() || [];
                 if (JSON.stringify(avisos) !== JSON.stringify(dadosGerais.avisos)) {
