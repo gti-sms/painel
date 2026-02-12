@@ -172,12 +172,7 @@
             position: relative; 
         }
         
-        .video-container { 
-            width: 100%; 
-            height: 100%; 
-        }
-        
-        .video-iframe { 
+        #youtube-player { 
             width: 100%; 
             height: 100%; 
             border: none; 
@@ -1136,7 +1131,8 @@
                 <button id="btnSom" class="btn-som" onclick="ativarSom()">
                     <i class="fas fa-volume-up"></i> ATIVAR SOM
                 </button>
-                <div class="video-container" id="videoContainer"></div>
+                <!-- Container para o player do YouTube (API) -->
+                <div id="youtube-player"></div>
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
         </div>
@@ -1305,7 +1301,15 @@
         let tickerInterval = null;
 
         // =================================================================
-        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
+        // VARIÁVEIS DO YOUTUBE PLAYER
+        // =================================================================
+        let ytPlayer = null;
+        let playlistIds = [];
+        let playerReady = false;
+        let youtubeAPIReady = false;
+
+        // =================================================================
+        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA (MANTIDO IGUAL)
         // =================================================================
         const syncConfig = {
             currentInterval: 10,
@@ -1366,7 +1370,7 @@
         syncConfig.load();
 
         // =================================================================
-        // CACHE MANAGER
+        // CACHE MANAGER (MANTIDO IGUAL)
         // =================================================================
         const cacheManager = {
             db: null,
@@ -1455,7 +1459,7 @@
         };
 
         // =================================================================
-        // SYNC MANAGER
+        // SYNC MANAGER (MANTIDO IGUAL, REMOVIDA A HEURÍSTICA DE VÍDEO)
         // =================================================================
         const syncManager = {
             syncTimer: null,
@@ -1715,6 +1719,404 @@
         };
 
         // =================================================================
+        // FUNÇÕES DO YOUTUBE PLAYER (NOVO)
+        // =================================================================
+
+        // Carrega a API do YouTube dinamicamente
+        function carregarYouTubeAPI() {
+            return new Promise((resolve) => {
+                if (window.YT && window.YT.Player) {
+                    youtubeAPIReady = true;
+                    resolve();
+                    return;
+                }
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                window.onYouTubeIframeAPIReady = () => {
+                    youtubeAPIReady = true;
+                    resolve();
+                };
+            });
+        }
+
+        // Extrai os IDs dos vídeos a partir das URLs do YouTube
+        function extrairIdsDosVideos(urls) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            return urls.map(url => { 
+                const m = url.match(regExp); 
+                return (m && m[7].length === 11) ? m[7] : null; 
+            }).filter(id => id !== null);
+        }
+
+        // Inicializa ou atualiza o player do YouTube
+        async function iniciarPlayerYouTube(ids) {
+            if (!ids || ids.length === 0) {
+                // Se não há vídeos, apenas esconde o container
+                const playerDiv = document.getElementById('youtube-player');
+                if (playerDiv) playerDiv.style.display = 'none';
+                return;
+            }
+
+            // Garante que a API está carregada
+            if (!youtubeAPIReady) {
+                await carregarYouTubeAPI();
+            }
+
+            playlistIds = ids;
+
+            if (!ytPlayer) {
+                // Cria o player pela primeira vez
+                ytPlayer = new YT.Player('youtube-player', {
+                    width: '100%',
+                    height: '100%',
+                    videoId: ids[0],
+                    playerVars: {
+                        autoplay: 1,
+                        mute: isMuted ? 1 : 0,
+                        controls: 0,
+                        disablekb: 1,
+                        fs: 0,
+                        modestbranding: 1,
+                        rel: 0,
+                        iv_load_policy: 3,
+                        cc_load_policy: 0
+                    },
+                    events: {
+                        onReady: onPlayerReady,
+                        onStateChange: onPlayerStateChange,
+                        onError: onPlayerError
+                    }
+                });
+            } else {
+                // Atualiza a playlist e carrega o primeiro vídeo
+                ytPlayer.loadVideoById(ids[0]);
+                // Ajusta o mute conforme o estado atual
+                if (isMuted) {
+                    ytPlayer.mute();
+                } else {
+                    ytPlayer.unMute();
+                }
+                // Garante que o container esteja visível
+                document.getElementById('youtube-player').style.display = 'block';
+            }
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            if (isMuted) {
+                event.target.mute();
+            } else {
+                event.target.unMute();
+            }
+            event.target.playVideo();
+            console.log('🎬 YouTube Player pronto');
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                // Obtém o ID do vídeo que acabou
+                const currentVideoId = event.target.getVideoData().video_id;
+                const idx = playlistIds.indexOf(currentVideoId);
+                
+                // Se for o último vídeo da playlist
+                if (idx === playlistIds.length - 1) {
+                    console.log('🎬 Fim da playlist - iniciando flayers');
+                    flayerSystem.iniciarCicloFlayers();
+                }
+                // Se não for o último, o YouTube tocará o próximo automaticamente (sem loop)
+            }
+        }
+
+        function onPlayerError(event) {
+            console.error('Erro no YouTube Player:', event.data);
+            // Em caso de erro, tenta carregar o próximo vídeo ou flayer
+            if (playlistIds.length > 1) {
+                const currentId = ytPlayer.getVideoData().video_id;
+                const idx = playlistIds.indexOf(currentId);
+                if (idx !== -1 && idx < playlistIds.length - 1) {
+                    ytPlayer.loadVideoById(playlistIds[idx + 1]);
+                } else {
+                    flayerSystem.iniciarCicloFlayers();
+                }
+            }
+        }
+
+        // Substitui a antiga carregarVideo()
+        function carregarVideo() {
+            if (flayerSystem && flayerSystem.isPlaying) {
+                console.log('🎬 Flayer ativo - vídeo bloqueado');
+                return;
+            }
+            const videoUrls = dadosGerais.unidade.videoUrls || [];
+            const ids = extrairIdsDosVideos(videoUrls);
+            if (ids.length > 0) {
+                iniciarPlayerYouTube(ids);
+            } else {
+                // Sem vídeos, apenas esconde o container
+                const playerDiv = document.getElementById('youtube-player');
+                if (playerDiv) playerDiv.style.display = 'none';
+            }
+        }
+
+        function ativarSom() {
+            isMuted = false;
+            if (ytPlayer) {
+                ytPlayer.unMute();
+            }
+            document.getElementById('btnSom').style.display = 'none';
+        }
+
+        // =================================================================
+        // SISTEMA DE FLAYERS - ADAPTADO PARA FUNCIONAR COM O NOVO PLAYER
+        // =================================================================
+        
+        const flayerSystem = {
+            enabled: true,
+            duration: 30000,
+            currentIndex: 0,
+            isPlaying: false,
+            timer: null,
+            flayersCombinados: [],
+            
+            flayersMatriz: [],
+            flayersUnidade: [],
+            
+            init() {
+                this.carregarDoFirebase();
+                this.setupRealtimeListener();
+                console.log('🖼️ Sistema de flayers híbrido inicializado');
+            },
+            
+            carregarDoFirebase() {
+                db.ref('paineis/geral/flayers').once('value')
+                    .then(snapshot => {
+                        this.flayersMatriz = snapshot.val() || [];
+                        console.log('🏢 Flayers da matriz (globais):', this.flayersMatriz.length);
+                    });
+                
+                if (!isMatriz) {
+                    db.ref('paineis/' + unidadeID + '/flayers').once('value')
+                        .then(snapshot => {
+                            this.flayersUnidade = snapshot.val() || [];
+                            console.log('🏥 Flayers da unidade (locais):', this.flayersUnidade.length);
+                        });
+                }
+            },
+            
+            setupRealtimeListener() {
+                db.ref('paineis/geral/flayers').on('value', (snapshot) => {
+                    this.flayersMatriz = snapshot.val() || [];
+                    console.log('🏢 Flayers da matriz atualizados:', this.flayersMatriz.length);
+                    
+                    if (isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
+                        mostrarSecaoFlayers();
+                    }
+                });
+                
+                if (!isMatriz) {
+                    db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
+                        this.flayersUnidade = snapshot.val() || [];
+                        console.log('🏥 Flayers da unidade atualizados:', this.flayersUnidade.length);
+                        
+                        if (!isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
+                            mostrarSecaoFlayers();
+                        }
+                    });
+                }
+            },
+            
+            getTodosFlayers() {
+                if (isMatriz) {
+                    return this.flayersMatriz;
+                } else {
+                    return [...this.flayersMatriz, ...this.flayersUnidade];
+                }
+            },
+            
+            getFlayersMatriz() {
+                return this.flayersMatriz;
+            },
+            
+            getFlayersUnidade() {
+                return this.flayersUnidade;
+            },
+            
+            salvarFlayersMatriz(urls) {
+                this.flayersMatriz = urls.filter(url => url.trim() !== '');
+                return db.ref('paineis/geral/flayers').set(this.flayersMatriz)
+                    .then(() => {
+                        console.log('✅ Flayers da matriz salvos:', this.flayersMatriz.length);
+                        return true;
+                    });
+            },
+            
+            salvarFlayersUnidade(urls) {
+                this.flayersUnidade = urls.filter(url => url.trim() !== '');
+                return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayersUnidade)
+                    .then(() => {
+                        console.log('✅ Flayers da unidade salvos:', this.flayersUnidade.length);
+                        return true;
+                    });
+            },
+            
+            // ========== NOVAS VERSÕES DOS MÉTODOS (ADAPTADAS) ==========
+            
+            pararVideoCompletamente() {
+                // Pausa o player e esconde o container
+                if (ytPlayer) {
+                    ytPlayer.pauseVideo();
+                }
+                const playerDiv = document.getElementById('youtube-player');
+                if (playerDiv) {
+                    playerDiv.style.display = 'none';
+                }
+                const btnSom = document.getElementById('btnSom');
+                if (btnSom) btnSom.style.display = 'none';
+                console.log('🎬 Vídeo PAUSADO e ocultado');
+            },
+            
+            iniciarCicloFlayers() {
+                if (this.isPlaying) return;
+                
+                const todosFlayers = this.getTodosFlayers();
+                if (todosFlayers.length === 0) {
+                    console.log('⚠️ Não há flayers para exibir, voltando ao vídeo');
+                    this.voltarParaVideo();
+                    return;
+                }
+                
+                console.log('🖼️ PARANDO VÍDEO - Iniciando flayers');
+                console.log('   📋 Total:', todosFlayers.length, 'flayers');
+                console.log('   🏢 Matriz:', this.flayersMatriz.length);
+                console.log('   🏥 Unidade:', this.flayersUnidade.length);
+                
+                this.pararVideoCompletamente();
+                
+                this.isPlaying = true;
+                this.currentIndex = 0;
+                this.flayersCombinados = todosFlayers;
+                
+                setTimeout(() => {
+                    this.proximoFlayer();
+                }, 100);
+            },
+            
+            proximoFlayer() {
+                if (!this.isPlaying) return;
+                
+                if (this.currentIndex >= this.flayersCombinados.length) {
+                    this.voltarParaVideo();
+                    return;
+                }
+                
+                this.mostrarFlayer(this.flayersCombinados[this.currentIndex]);
+                this.currentIndex++;
+                
+                if (this.timer) clearTimeout(this.timer);
+                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
+            },
+            
+            mostrarFlayer(url) {
+                const videoSection = document.querySelector('.video-section');
+                if (!videoSection) return;
+                
+                let flayerDiv = document.getElementById('flayerContainer');
+                if (!flayerDiv) {
+                    flayerDiv = document.createElement('div');
+                    flayerDiv.id = 'flayerContainer';
+                    videoSection.style.position = 'relative';
+                    videoSection.appendChild(flayerDiv);
+                }
+                
+                flayerDiv.innerHTML = `
+                    <img src="${url}" 
+                         alt="Flayer"
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem</div>';">`;
+                
+                flayerDiv.style.display = 'flex';
+                localStorage.setItem('ultimoFlayer_' + unidadeID, Date.now().toString());
+                
+                console.log('🖼️ Flayer:', this.currentIndex + 1, '/', this.flayersCombinados.length);
+            },
+            
+            voltarParaVideo() {
+                console.log('🎬 Fim dos flayers - reiniciando vídeo');
+                
+                this.isPlaying = false;
+                
+                // Oculta o container de flayers
+                const flayerDiv = document.getElementById('flayerContainer');
+                if (flayerDiv) {
+                    flayerDiv.style.display = 'none';
+                    flayerDiv.innerHTML = '';
+                }
+                
+                // Exibe o player e carrega o primeiro vídeo da playlist
+                const playerDiv = document.getElementById('youtube-player');
+                if (playerDiv) {
+                    playerDiv.style.display = 'block';
+                }
+                
+                if (ytPlayer && playlistIds.length > 0) {
+                    ytPlayer.loadVideoById(playlistIds[0]);
+                    // Garante que o mute está correto
+                    if (isMuted) {
+                        ytPlayer.mute();
+                    } else {
+                        ytPlayer.unMute();
+                    }
+                } else {
+                    // Se não há player, tenta recriar
+                    carregarVideo();
+                }
+                
+                localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
+                
+                const btnSom = document.getElementById('btnSom');
+                if (btnSom) {
+                    btnSom.style.display = isMuted === false ? 'none' : 'block';
+                }
+            },
+            
+            parar() {
+                console.log('🛑 Parando flayers');
+                this.isPlaying = false;
+                if (this.timer) {
+                    clearTimeout(this.timer);
+                    this.timer = null;
+                }
+                this.voltarParaVideo();
+            },
+            
+            iniciarTeste() {
+                const todosFlayers = this.getTodosFlayers();
+                if (todosFlayers.length === 0) {
+                    mostrarNotificacao('Não há flayers para testar!', 'warning');
+                    return false;
+                }
+                
+                console.log('🧪 Teste de flayers');
+                console.log('   📋 Total:', todosFlayers.length);
+                console.log('   🏢 Matriz:', this.flayersMatriz.length);
+                console.log('   🏥 Unidade:', this.flayersUnidade.length);
+                
+                this.pararVideoCompletamente();
+                this.isPlaying = true;
+                this.currentIndex = 0;
+                this.flayersCombinados = todosFlayers;
+                
+                setTimeout(() => {
+                    this.proximoFlayer();
+                }, 100);
+                
+                return true;
+            }
+        };
+
+        // =================================================================
         // FUNÇÕES PRINCIPAIS DO SISTEMA
         // =================================================================
 
@@ -1781,11 +2183,12 @@
                 console.error('Erro ao buscar dados gerais:', error);
             });
             
+            // Listener para atualização de vídeos em tempo real
             db.ref('paineis/geral/unidade/videoUrls').on('value', (snapshot) => {
                 const videoUrls = snapshot.val() || [];
                 if (JSON.stringify(videoUrls) !== JSON.stringify(dadosGerais.unidade.videoUrls)) {
                     dadosGerais.unidade.videoUrls = videoUrls;
-                    carregarVideo();
+                    carregarVideo(); // Agora usa a nova função
                     console.log('🎬 Vídeos atualizados em tempo real');
                 }
             });
@@ -1850,36 +2253,6 @@
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
-        }
-
-        function carregarVideo() {
-            if (flayerSystem && flayerSystem.isPlaying) {
-                console.log('🎬 Flayer ativo - vídeo bloqueado');
-                return;
-            }
-            
-            const container = document.getElementById('videoContainer');
-            const videoUrls = dadosGerais.unidade.videoUrls || [];
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const ids = videoUrls.map(url => { 
-                const m = url.match(regExp); 
-                return (m && m[7].length === 11) ? m[7] : null; 
-            }).filter(id => id !== null);
-            
-            if(ids.length > 0) {
-                const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
-                if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
-                    container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
-                    localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
-                    console.log('🎬 Vídeo carregado/recarregado');
-                }
-            }
-        }
-
-        function ativarSom() { 
-            isMuted = false; 
-            carregarVideo(); 
-            document.getElementById('btnSom').style.display = 'none'; 
         }
 
         function atualizarInterface() {
@@ -1958,317 +2331,7 @@
         }
 
         // =================================================================
-        // SISTEMA DE FLAYERS - HÍBRIDO COMPLETO (IGUAL AOS AVISOS)
-        // =================================================================
-        
-        const flayerSystem = {
-            enabled: true,
-            duration: 30000,
-            currentIndex: 0,
-            isPlaying: false,
-            timer: null,
-            videoCheckInterval: null,
-            flayersCombinados: [],
-            
-            flayersMatriz: [],
-            flayersUnidade: [],
-            
-            init() {
-                this.carregarDoFirebase();
-                this.setupRealtimeListener();
-                this.monitorarVideo();
-                this.bloquearVideoDuranteFlayer();
-                console.log('🖼️ Sistema de flayers híbrido inicializado');
-            },
-            
-            carregarDoFirebase() {
-                db.ref('paineis/geral/flayers').once('value')
-                    .then(snapshot => {
-                        this.flayersMatriz = snapshot.val() || [];
-                        console.log('🏢 Flayers da matriz (globais):', this.flayersMatriz.length);
-                    });
-                
-                if (!isMatriz) {
-                    db.ref('paineis/' + unidadeID + '/flayers').once('value')
-                        .then(snapshot => {
-                            this.flayersUnidade = snapshot.val() || [];
-                            console.log('🏥 Flayers da unidade (locais):', this.flayersUnidade.length);
-                        });
-                }
-            },
-            
-            setupRealtimeListener() {
-                db.ref('paineis/geral/flayers').on('value', (snapshot) => {
-                    this.flayersMatriz = snapshot.val() || [];
-                    console.log('🏢 Flayers da matriz atualizados:', this.flayersMatriz.length);
-                    
-                    if (isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
-                        mostrarSecaoFlayers();
-                    }
-                });
-                
-                if (!isMatriz) {
-                    db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
-                        this.flayersUnidade = snapshot.val() || [];
-                        console.log('🏥 Flayers da unidade atualizados:', this.flayersUnidade.length);
-                        
-                        if (!isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
-                            mostrarSecaoFlayers();
-                        }
-                    });
-                }
-            },
-            
-            getTodosFlayers() {
-                if (isMatriz) {
-                    return this.flayersMatriz;
-                } else {
-                    return [...this.flayersMatriz, ...this.flayersUnidade];
-                }
-            },
-            
-            getFlayersMatriz() {
-                return this.flayersMatriz;
-            },
-            
-            getFlayersUnidade() {
-                return this.flayersUnidade;
-            },
-            
-            salvarFlayersMatriz(urls) {
-                this.flayersMatriz = urls.filter(url => url.trim() !== '');
-                return db.ref('paineis/geral/flayers').set(this.flayersMatriz)
-                    .then(() => {
-                        console.log('✅ Flayers da matriz salvos:', this.flayersMatriz.length);
-                        return true;
-                    });
-            },
-            
-            salvarFlayersUnidade(urls) {
-                this.flayersUnidade = urls.filter(url => url.trim() !== '');
-                return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayersUnidade)
-                    .then(() => {
-                        console.log('✅ Flayers da unidade salvos:', this.flayersUnidade.length);
-                        return true;
-                    });
-            },
-            
-            monitorarVideo() {
-                this.videoCheckInterval = setInterval(() => {
-                    if (this.isPlaying) return;
-                    
-                    const todosFlayers = this.getTodosFlayers();
-                    if (todosFlayers.length === 0) return;
-                    
-                    this.verificarFimDoVideo();
-                }, 10000);
-            },
-            
-            verificarFimDoVideo() {
-                const ultimaTroca = localStorage.getItem('ultimaTrocaVideo_' + unidadeID);
-                const ultimoFlayer = localStorage.getItem('ultimoFlayer_' + unidadeID);
-                const agora = Date.now();
-                
-                if (ultimaTroca) {
-                    const tempoDesdeTroca = agora - parseInt(ultimaTroca);
-                    
-                    if (tempoDesdeTroca > 300000) {
-                        if (ultimoFlayer) {
-                            const tempoDesdeFlayer = agora - parseInt(ultimoFlayer);
-                            if (tempoDesdeFlayer < 310000) {
-                                return;
-                            }
-                        }
-                        
-                        console.log('🎬 Fim do vídeo - iniciando flayers');
-                        this.iniciarCicloFlayers();
-                    }
-                }
-            },
-            
-            iniciarCicloFlayers() {
-                if (this.isPlaying) return;
-                
-                const todosFlayers = this.getTodosFlayers();
-                if (todosFlayers.length === 0) return;
-                
-                console.log('🎬 PARANDO VÍDEO - Iniciando flayers');
-                console.log('   📋 Total:', todosFlayers.length, 'flayers');
-                console.log('   🏢 Matriz:', this.flayersMatriz.length);
-                console.log('   🏥 Unidade:', this.flayersUnidade.length);
-                
-                this.pararVideoCompletamente();
-                
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.flayersCombinados = todosFlayers;
-                
-                setTimeout(() => {
-                    this.proximoFlayer();
-                }, 100);
-            },
-            
-            pararVideoCompletamente() {
-                const videoContainer = document.getElementById('videoContainer');
-                const btnSom = document.getElementById('btnSom');
-                
-                if (videoContainer) {
-                    videoContainer.innerHTML = '';
-                    videoContainer.style.display = 'none';
-                }
-                
-                if (btnSom) btnSom.style.display = 'none';
-                
-                const iframes = document.querySelectorAll('iframe');
-                iframes.forEach(iframe => {
-                    if (iframe.classList.contains('video-iframe') || 
-                        iframe.src.includes('youtube')) {
-                        iframe.remove();
-                    }
-                });
-                
-                console.log('🎬 Vídeo PARADO e removido');
-            },
-            
-            proximoFlayer() {
-                if (!this.isPlaying) return;
-                
-                if (this.currentIndex >= this.flayersCombinados.length) {
-                    this.voltarParaVideo();
-                    return;
-                }
-                
-                this.mostrarFlayer(this.flayersCombinados[this.currentIndex]);
-                this.currentIndex++;
-                
-                if (this.timer) clearTimeout(this.timer);
-                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
-            },
-            
-            mostrarFlayer(url) {
-                const videoSection = document.querySelector('.video-section');
-                
-                if (!videoSection) return;
-                
-                const videoContainer = document.getElementById('videoContainer');
-                if (videoContainer) {
-                    videoContainer.style.display = 'none';
-                }
-                
-                let flayerDiv = document.getElementById('flayerContainer');
-                if (!flayerDiv) {
-                    flayerDiv = document.createElement('div');
-                    flayerDiv.id = 'flayerContainer';
-                    videoSection.style.position = 'relative';
-                    videoSection.appendChild(flayerDiv);
-                }
-                
-                flayerDiv.innerHTML = `
-                    <img src="${url}" 
-                         alt="Flayer"
-                         style="width: 100%; height: 100%; object-fit: cover;"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem</div>';">
-                `;
-                
-                flayerDiv.style.display = 'flex';
-                localStorage.setItem('ultimoFlayer_' + unidadeID, Date.now().toString());
-                
-                console.log('🖼️ Flayer:', this.currentIndex, '/', this.flayersCombinados.length);
-            },
-            
-            voltarParaVideo() {
-                console.log('🎬 Fim dos flayers - reiniciando vídeo');
-                
-                this.isPlaying = false;
-                
-                const flayerDiv = document.getElementById('flayerContainer');
-                if (flayerDiv) {
-                    flayerDiv.style.display = 'none';
-                    flayerDiv.innerHTML = '';
-                }
-                
-                const videoContainer = document.getElementById('videoContainer');
-                if (videoContainer) {
-                    videoContainer.style.display = 'block';
-                }
-                
-                setTimeout(() => {
-                    if (videoContainer) {
-                        videoContainer.innerHTML = '';
-                    }
-                    carregarVideo();
-                    localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
-                    console.log('🎬 Vídeo reiniciado');
-                }, 200);
-                
-                const btnSom = document.getElementById('btnSom');
-                if (btnSom) {
-                    btnSom.style.display = isMuted === false ? 'none' : 'block';
-                }
-            },
-            
-            parar() {
-                console.log('🛑 Parando flayers');
-                this.isPlaying = false;
-                if (this.timer) {
-                    clearTimeout(this.timer);
-                    this.timer = null;
-                }
-                this.voltarParaVideo();
-            },
-            
-            iniciarTeste() {
-                const todosFlayers = this.getTodosFlayers();
-                if (todosFlayers.length === 0) {
-                    mostrarNotificacao('Não há flayers para testar!', 'warning');
-                    return false;
-                }
-                
-                console.log('🧪 Teste de flayers');
-                console.log('   📋 Total:', todosFlayers.length);
-                console.log('   🏢 Matriz:', this.flayersMatriz.length);
-                console.log('   🏥 Unidade:', this.flayersUnidade.length);
-                
-                this.pararVideoCompletamente();
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.flayersCombinados = todosFlayers;
-                
-                setTimeout(() => {
-                    this.proximoFlayer();
-                }, 100);
-                
-                return true;
-            },
-            
-            bloquearVideoDuranteFlayer() {
-                setInterval(() => {
-                    if (this.isPlaying) {
-                        const videoContainer = document.getElementById('videoContainer');
-                        const flayerDiv = document.getElementById('flayerContainer');
-                        
-                        if (videoContainer) {
-                            videoContainer.style.display = 'none';
-                        }
-                        
-                        if (flayerDiv && this.flayersCombinados.length > 0) {
-                            flayerDiv.style.display = 'flex';
-                        }
-                        
-                        const iframes = document.querySelectorAll('iframe');
-                        iframes.forEach(iframe => {
-                            if (iframe.classList.contains('video-iframe') || 
-                                iframe.src.includes('youtube')) {
-                                iframe.remove();
-                            }
-                        });
-                    }
-                }, 1000);
-            }
-        };
-
-        // =================================================================
-        // SEÇÃO ADMIN - FLAYERS HÍBRIDO
+        // SEÇÃO ADMIN - FLAYERS HÍBRIDO (MANTIDA IGUAL)
         // =================================================================
 
         function mostrarSecaoFlayers() {
@@ -2506,7 +2569,7 @@ https://exemplo.com/flayer-unidade2.png"
         }
 
         // =================================================================
-        // FUNÇÕES DE ADMINISTRAÇÃO - AUTENTICAÇÃO
+        // FUNÇÕES DE ADMINISTRAÇÃO - AUTENTICAÇÃO (MANTIDAS IGUAIS)
         // =================================================================
 
         function openLogin() {
@@ -2729,7 +2792,7 @@ https://exemplo.com/flayer-unidade2.png"
         }
 
         // =================================================================
-        // VERIFICAÇÃO DE ACESSO ÀS SEÇÕES
+        // VERIFICAÇÃO DE ACESSO ÀS SEÇÕES (MANTIDA IGUAL)
         // =================================================================
 
         function verificarAcessoSecao(secao) {
@@ -3007,7 +3070,7 @@ https://exemplo.com/flayer-unidade2.png"
         }
 
         // =================================================================
-        // FUNÇÕES DE GERENCIAMENTO DE DADOS
+        // FUNÇÕES DE GERENCIAMENTO DE DADOS (MANTIDAS IGUAIS)
         // =================================================================
 
         function atualizarNomeUnidade() {
@@ -3036,6 +3099,8 @@ https://exemplo.com/flayer-unidade2.png"
             const videosText = document.getElementById('vUrls').value;
             dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
             salvarDados(true, 'video');
+            // Atualiza o player com os novos vídeos
+            carregarVideo();
             mostrarNotificacao('Vídeos salvos!', 'success');
         }
 
