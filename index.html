@@ -172,7 +172,12 @@
             position: relative; 
         }
         
-        #youtube-player { 
+        .video-container { 
+            width: 100%; 
+            height: 100%; 
+        }
+        
+        .video-iframe { 
             width: 100%; 
             height: 100%; 
             border: none; 
@@ -281,12 +286,14 @@
             border-bottom-color: rgba(255, 255, 255, 0.3); 
         }
         
+        /* MODIFICAÇÃO PARA FONTES BRANCAS NOS TOTAIS */
         .total-container .total-value,
         .total-container .total-label {
             color: white !important;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         
+        /* Garantir que as cores específicas não sobrescrevam */
         .total-atendimentos .total-value,
         .total-atendimentos .total-label,
         .total-sms .total-value,
@@ -294,12 +301,14 @@
             color: white !important;
         }
         
+        /* Remover cores específicas dos títulos se necessário */
         .section-title.atendimentos-title,
         .section-title.sms-title {
             color: white !important;
             border-bottom-color: rgba(255, 255, 255, 0.3) !important;
         }
         
+        /* TOTAL CONTAINER */
         .total-container { 
             border-radius: 12px; 
             padding: 15px; 
@@ -318,6 +327,7 @@
             background: linear-gradient(135deg, #7b1fa2, #9c27b0); 
         }
         
+        /* VALOR TOTAL */
         .total-value { 
             font-size: 42px; 
             font-weight: 900; 
@@ -333,6 +343,7 @@
             letter-spacing: 0.5px;
         }
         
+        /* LISTA DE ITENS */
         .lista-container { 
             flex: 1; 
             display: flex; 
@@ -363,6 +374,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
+        /* NOME DO ITEM */
         .item-nome { 
             font-size: 16px; 
             font-weight: 600; 
@@ -372,6 +384,7 @@
             flex: 1;
         }
         
+        /* VALOR DO ITEM */
         .item-valor { 
             font-size: 32px; 
             font-weight: 800; 
@@ -382,7 +395,7 @@
         }
 
         /* ================================
-           PAINEL ADMINISTRATIVO
+           PAINEL ADMINISTRATIVO - ESTRUTURA
            ================================ */
         #loginScreen, #adminPanel { 
             display: none; 
@@ -404,6 +417,7 @@
             font-family: 'Inter', 'Segoe UI', sans-serif;
         }
         
+        /* HEADER DO ADMIN */
         .admin-header { 
             background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); 
             color: white; 
@@ -429,6 +443,7 @@
             color: #00e676;
         }
         
+        /* CONTAINER PRINCIPAL DO ADMIN */
         .admin-container { 
             display: grid; 
             grid-template-columns: 320px 1fr; 
@@ -436,6 +451,7 @@
             height: calc(100% - 70px); 
         }
         
+        /* SIDEBAR DO ADMIN */
         .admin-sidebar { 
             background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); 
             border-right: 1px solid #e0e0e0; 
@@ -498,12 +514,14 @@
             border-right: 8px solid #f8f9fa;
         }
         
+        /* CONTEÚDO DO ADMIN */
         .admin-content { 
             padding: 35px 40px; 
             overflow-y: auto; 
             background: #ffffff;
         }
         
+        /* SEÇÕES DO ADMIN */
         .admin-section {
             background: white;
             border-radius: 12px;
@@ -539,6 +557,7 @@
             color: #555;
         }
         
+        /* FORMULÁRIOS E INPUTS */
         .admin-input { 
             width: 100%; 
             padding: 14px 18px; 
@@ -563,6 +582,7 @@
             line-height: 1.5;
         }
         
+        /* BOTÕES DO ADMIN */
         .admin-btn { 
             padding: 14px 28px; 
             border: none; 
@@ -599,6 +619,7 @@
             box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
         }
         
+        /* LINHAS DE ITENS */
         .item-row {
             display: grid;
             grid-template-columns: 1fr 120px 80px;
@@ -662,6 +683,7 @@
             transform: translateY(-2px);
         }
         
+        /* TABELAS */
         .management-table {
             width: 100%;
             border-collapse: collapse;
@@ -696,6 +718,7 @@
             border-bottom: none;
         }
         
+        /* BADGES */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -724,6 +747,7 @@
             color: #1565c0;
         }
         
+        /* CARDS DE UNIDADES */
         .unidades-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -846,6 +870,7 @@
             box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
         }
         
+        /* OPÇÕES DE SINCRONIZAÇÃO */
         .sync-options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -929,6 +954,9 @@
             color: #558b2f;
         }
         
+        /* ================================
+           TELA DE LOGIN
+           ================================ */
         .login-box {
             background: white;
             padding: 45px;
@@ -1008,6 +1036,9 @@
             color: #f57c00;
         }
         
+        /* ================================
+           LOADING OVERLAY
+           ================================ */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -1049,6 +1080,9 @@
             margin-top: 5px;
         }
         
+        /* ================================
+           INFORMAÇÕES DE VERSÃO
+           ================================ */
         .version-info {
             position: fixed;
             bottom: 20px;
@@ -1092,6 +1126,9 @@
             to { transform: scale(1); opacity: 1; }
         }
         
+        /* ================================
+           RESPONSIVIDADE (DEBUG)
+           ================================ */
         @media (max-width: 1920px) {
             html, body {
                 width: 100%;
@@ -1131,8 +1168,8 @@
                 <button id="btnSom" class="btn-som" onclick="ativarSom()">
                     <i class="fas fa-volume-up"></i> ATIVAR SOM
                 </button>
-                <!-- Container para o player do YouTube (API) -->
-                <div id="youtube-player"></div>
+                <div class="video-container" id="videoContainer"></div>
+                <!-- Container para flayers será inserido aqui via JavaScript -->
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
         </div>
@@ -1145,7 +1182,9 @@
         </div>
     </main>
 
-    <!-- TELA DE LOGIN -->
+    <!-- ================================
+         TELA DE LOGIN
+         ================================ -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-icon">
@@ -1183,8 +1222,11 @@
         </div>
     </div>
 
-    <!-- PAINEL ADMINISTRATIVO -->
+    <!-- ================================
+         PAINEL ADMINISTRATIVO
+         ================================ -->
     <div id="adminPanel">
+        <!-- Header do admin -->
         <div class="admin-header">
             <h1>
                 <i class="fas fa-sliders-h"></i>
@@ -1204,7 +1246,9 @@
             </div>
         </div>
 
+        <!-- Container principal -->
         <div class="admin-container">
+            <!-- Sidebar -->
             <div class="admin-sidebar" id="sidebar">
                 <div class="sidebar-item active" onclick="mostrarSecao('unidade')">
                     <i class="fas fa-hospital"></i> Identificação da Unidade
@@ -1224,7 +1268,7 @@
                 <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">
                     <i class="fas fa-video"></i> Vídeos
                 </div>
-                <!-- Item Flayers será inserido via JavaScript -->
+                <!-- Item Flayers será inserido aqui via JavaScript -->
                 <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
@@ -1239,11 +1283,15 @@
                 </div>
             </div>
 
-            <div class="admin-content" id="adminContent"></div>
+            <!-- Conteúdo dinâmico -->
+            <div class="admin-content" id="adminContent">
+                <!-- Conteúdo será carregado aqui dinamicamente -->
+            </div>
         </div>
 
+        <!-- Informações de versão -->
         <div class="version-info">
-            Sistema de Saúde PMPF v3.2 | Sistema Automático com Flayers Híbridos
+            Sistema de Saúde PMPF v3.2 | Sistema Automático com Flayers
         </div>
     </div>
 
@@ -1262,6 +1310,7 @@
             measurementId: "G-0T1FWSRNLW"
         };
 
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
@@ -1293,26 +1342,22 @@
         let listaUsuarios = [];
         let listaTodasUnidades = [];
         
+        // Dados do usuário atual
         let usuarioAtual = null;
         let permissoesUsuario = null;
         
+        // Configuração do frontend
         let isMuted = true;
         let carouselIndex = 0;
         let tickerInterval = null;
 
         // =================================================================
-        // VARIÁVEIS DO YOUTUBE PLAYER
+        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
         // =================================================================
-        let ytPlayer = null;
-        let playlistIds = [];
-        let playerReady = false;
-        let youtubeAPIReady = false;
 
-        // =================================================================
-        // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA (MANTIDO IGUAL)
-        // =================================================================
+        // Configurações de sincronização com múltiplos intervalos
         const syncConfig = {
-            currentInterval: 10,
+            currentInterval: 10, // minutos (padrão: 10)
             intervals: {
                 3: { label: "3 minutos", cost: "Alto", color: "#ff5252" },
                 6: { label: "6 minutos", cost: "Médio", color: "#ff9800" },
@@ -1367,11 +1412,10 @@
             }
         };
 
+        // Carregar configuração salva
         syncConfig.load();
 
-        // =================================================================
-        // CACHE MANAGER (MANTIDO IGUAL)
-        // =================================================================
+        // Sistema de cache local
         const cacheManager = {
             db: null,
             
@@ -1458,9 +1502,7 @@
             }
         };
 
-        // =================================================================
-        // SYNC MANAGER (MANTIDO IGUAL, REMOVIDA A HEURÍSTICA DE VÍDEO)
-        // =================================================================
+        // Gerenciador de sincronização automática
         const syncManager = {
             syncTimer: null,
             isSyncing: false,
@@ -1473,24 +1515,37 @@
             
             init() {
                 console.log('🚀 Inicializando sistema automático');
+                
+                // Calcular offset baseado no ID da unidade
                 this.calculateUnitOffset();
+                
+                // Carregar cache primeiro para mostrar dados rapidamente
                 this.loadFromCache();
+                
+                // Configurar sincronização automática
                 this.startAutomaticSync();
+                
+                // Configurar listener para atualizações em tempo real
                 if (!isMatriz) {
                     this.setupRealtimeListener();
                 }
+                
+                // Configurar listener específico para avisos
                 this.setupAvisosRealtimeListener();
+                
+                // Configurar listener específico para SMS
                 this.setupSMSRealtimeListener();
             },
             
             calculateUnitOffset() {
+                // Usar hash do ID da unidade para calcular offset
                 let hash = 0;
                 for (let i = 0; i < unidadeID.length; i++) {
                     hash = ((hash << 5) - hash) + unidadeID.charCodeAt(i);
                     hash = hash & hash;
                 }
                 this.unitSyncOffset = Math.abs(hash % syncConfig.currentInterval);
-                console.log(`⏱️ Offset para ${unidadeID}: ${this.unitSyncOffset} minutos`);
+                console.log(`⏱️  Offset para ${unidadeID}: ${this.unitSyncOffset} minutos`);
             },
             
             async loadFromCache() {
@@ -1512,6 +1567,7 @@
             },
             
             startAutomaticSync() {
+                // Parar timer anterior
                 if (this.syncTimer) {
                     clearInterval(this.syncTimer);
                 }
@@ -1521,10 +1577,12 @@
                 
                 console.log(`⏰ Sync configurada: ${syncConfig.currentInterval} min com offset de ${this.unitSyncOffset} min`);
                 
+                // Primeira sincronização com offset
                 setTimeout(() => {
                     this.syncData('first_with_offset');
                 }, initialDelay);
                 
+                // Sincronizações periódicas
                 this.syncTimer = setInterval(() => {
                     this.syncData('scheduled');
                 }, intervalMs);
@@ -1550,6 +1608,7 @@
             },
             
             setupSMSRealtimeListener() {
+                // Listener para SMS da matriz (para todas as unidades)
                 const smsPath = `paineis/geral/unidade/smsMunicipal`;
                 
                 if (this.smsListener) {
@@ -1561,6 +1620,7 @@
                     if (JSON.stringify(smsData) !== JSON.stringify(dadosGerais.unidade.smsMunicipal)) {
                         dadosGerais.unidade.smsMunicipal = smsData;
                         
+                        // Atualizar interface se o bloco SMS estiver ativo
                         if (document.getElementById('itemSMS')) {
                             renderBloco('itemSMS', 'PRODUÇÃO MUNICIPAL', 'Total mês anterior', 
                                        dadosGerais.unidade.smsMunicipal, 'valor', '#ffffff', 'sms-title total-sms');
@@ -1598,12 +1658,14 @@
                     
                     firebaseData.ultima_sincronizacao = Date.now();
                     
+                    // SEMPRE buscar dados da matriz para smsMunicipal
                     if (!isMatriz) {
                         try {
                             const matrizSnapshot = await db.ref('paineis/geral').once('value');
                             const matrizData = matrizSnapshot.val();
                             if (matrizData && matrizData.unidade && matrizData.unidade.smsMunicipal) {
                                 dadosGerais.unidade.smsMunicipal = matrizData.unidade.smsMunicipal;
+                                // Salvar no cache também
                                 cacheManager.saveToCache('geral', matrizData);
                             }
                         } catch (error) {
@@ -1621,7 +1683,7 @@
                         processarInterface();
                         console.log('✅ Dados atualizados');
                     } else {
-                        console.log('⏭️ Dados idênticos');
+                        console.log('⏭️  Dados idênticos');
                     }
                     
                     this.lastSyncTime = Date.now();
@@ -1719,407 +1781,12 @@
         };
 
         // =================================================================
-        // FUNÇÕES DO YOUTUBE PLAYER (NOVO)
-        // =================================================================
-
-        // Carrega a API do YouTube dinamicamente
-        function carregarYouTubeAPI() {
-            return new Promise((resolve) => {
-                if (window.YT && window.YT.Player) {
-                    youtubeAPIReady = true;
-                    resolve();
-                    return;
-                }
-                const tag = document.createElement('script');
-                tag.src = 'https://www.youtube.com/iframe_api';
-                const firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-                window.onYouTubeIframeAPIReady = () => {
-                    youtubeAPIReady = true;
-                    resolve();
-                };
-            });
-        }
-
-        // Extrai os IDs dos vídeos a partir das URLs do YouTube
-        function extrairIdsDosVideos(urls) {
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            return urls.map(url => { 
-                const m = url.match(regExp); 
-                return (m && m[7].length === 11) ? m[7] : null; 
-            }).filter(id => id !== null);
-        }
-
-        // Inicializa ou atualiza o player do YouTube
-        async function iniciarPlayerYouTube(ids) {
-            if (!ids || ids.length === 0) {
-                // Se não há vídeos, apenas esconde o container
-                const playerDiv = document.getElementById('youtube-player');
-                if (playerDiv) playerDiv.style.display = 'none';
-                return;
-            }
-
-            // Garante que a API está carregada
-            if (!youtubeAPIReady) {
-                await carregarYouTubeAPI();
-            }
-
-            playlistIds = ids;
-
-            if (!ytPlayer) {
-                // Cria o player pela primeira vez
-                ytPlayer = new YT.Player('youtube-player', {
-                    width: '100%',
-                    height: '100%',
-                    videoId: ids[0],
-                    playerVars: {
-                        autoplay: 1,
-                        mute: isMuted ? 1 : 0,
-                        controls: 0,
-                        disablekb: 1,
-                        fs: 0,
-                        modestbranding: 1,
-                        rel: 0,
-                        iv_load_policy: 3,
-                        cc_load_policy: 0
-                    },
-                    events: {
-                        onReady: onPlayerReady,
-                        onStateChange: onPlayerStateChange,
-                        onError: onPlayerError
-                    }
-                });
-            } else {
-                // Atualiza a playlist e carrega o primeiro vídeo
-                ytPlayer.loadVideoById(ids[0]);
-                // Ajusta o mute conforme o estado atual
-                if (isMuted) {
-                    ytPlayer.mute();
-                } else {
-                    ytPlayer.unMute();
-                }
-                // Garante que o container esteja visível
-                document.getElementById('youtube-player').style.display = 'block';
-            }
-        }
-
-        function onPlayerReady(event) {
-            playerReady = true;
-            if (isMuted) {
-                event.target.mute();
-            } else {
-                event.target.unMute();
-            }
-            event.target.playVideo();
-            console.log('🎬 YouTube Player pronto');
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.ENDED) {
-                // Obtém o ID do vídeo que acabou
-                const currentVideoId = event.target.getVideoData().video_id;
-                const idx = playlistIds.indexOf(currentVideoId);
-                
-                // Se for o último vídeo da playlist
-                if (idx === playlistIds.length - 1) {
-                    console.log('🎬 Fim da playlist - iniciando flayers');
-                    flayerSystem.iniciarCicloFlayers();
-                }
-                // Se não for o último, o YouTube tocará o próximo automaticamente (sem loop)
-            }
-        }
-
-        function onPlayerError(event) {
-            console.error('Erro no YouTube Player:', event.data);
-            // Em caso de erro, tenta carregar o próximo vídeo ou flayer
-            if (playlistIds.length > 1) {
-                const currentId = ytPlayer.getVideoData().video_id;
-                const idx = playlistIds.indexOf(currentId);
-                if (idx !== -1 && idx < playlistIds.length - 1) {
-                    ytPlayer.loadVideoById(playlistIds[idx + 1]);
-                } else {
-                    flayerSystem.iniciarCicloFlayers();
-                }
-            }
-        }
-
-        // Substitui a antiga carregarVideo()
-        function carregarVideo() {
-            if (flayerSystem && flayerSystem.isPlaying) {
-                console.log('🎬 Flayer ativo - vídeo bloqueado');
-                return;
-            }
-            const videoUrls = dadosGerais.unidade.videoUrls || [];
-            const ids = extrairIdsDosVideos(videoUrls);
-            if (ids.length > 0) {
-                iniciarPlayerYouTube(ids);
-            } else {
-                // Sem vídeos, apenas esconde o container
-                const playerDiv = document.getElementById('youtube-player');
-                if (playerDiv) playerDiv.style.display = 'none';
-            }
-        }
-
-        function ativarSom() {
-            isMuted = false;
-            if (ytPlayer) {
-                ytPlayer.unMute();
-            }
-            document.getElementById('btnSom').style.display = 'none';
-        }
-
-        // =================================================================
-        // SISTEMA DE FLAYERS - ADAPTADO PARA FUNCIONAR COM O NOVO PLAYER
-        // =================================================================
-        
-        const flayerSystem = {
-            enabled: true,
-            duration: 30000,
-            currentIndex: 0,
-            isPlaying: false,
-            timer: null,
-            flayersCombinados: [],
-            
-            flayersMatriz: [],
-            flayersUnidade: [],
-            
-            init() {
-                this.carregarDoFirebase();
-                this.setupRealtimeListener();
-                console.log('🖼️ Sistema de flayers híbrido inicializado');
-            },
-            
-            carregarDoFirebase() {
-                db.ref('paineis/geral/flayers').once('value')
-                    .then(snapshot => {
-                        this.flayersMatriz = snapshot.val() || [];
-                        console.log('🏢 Flayers da matriz (globais):', this.flayersMatriz.length);
-                    });
-                
-                if (!isMatriz) {
-                    db.ref('paineis/' + unidadeID + '/flayers').once('value')
-                        .then(snapshot => {
-                            this.flayersUnidade = snapshot.val() || [];
-                            console.log('🏥 Flayers da unidade (locais):', this.flayersUnidade.length);
-                        });
-                }
-            },
-            
-            setupRealtimeListener() {
-                db.ref('paineis/geral/flayers').on('value', (snapshot) => {
-                    this.flayersMatriz = snapshot.val() || [];
-                    console.log('🏢 Flayers da matriz atualizados:', this.flayersMatriz.length);
-                    
-                    if (isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
-                        mostrarSecaoFlayers();
-                    }
-                });
-                
-                if (!isMatriz) {
-                    db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
-                        this.flayersUnidade = snapshot.val() || [];
-                        console.log('🏥 Flayers da unidade atualizados:', this.flayersUnidade.length);
-                        
-                        if (!isMatriz && document.querySelector('.sidebar-item.active')?.getAttribute('onclick')?.includes('flayers')) {
-                            mostrarSecaoFlayers();
-                        }
-                    });
-                }
-            },
-            
-            getTodosFlayers() {
-                if (isMatriz) {
-                    return this.flayersMatriz;
-                } else {
-                    return [...this.flayersMatriz, ...this.flayersUnidade];
-                }
-            },
-            
-            getFlayersMatriz() {
-                return this.flayersMatriz;
-            },
-            
-            getFlayersUnidade() {
-                return this.flayersUnidade;
-            },
-            
-            salvarFlayersMatriz(urls) {
-                this.flayersMatriz = urls.filter(url => url.trim() !== '');
-                return db.ref('paineis/geral/flayers').set(this.flayersMatriz)
-                    .then(() => {
-                        console.log('✅ Flayers da matriz salvos:', this.flayersMatriz.length);
-                        return true;
-                    });
-            },
-            
-            salvarFlayersUnidade(urls) {
-                this.flayersUnidade = urls.filter(url => url.trim() !== '');
-                return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayersUnidade)
-                    .then(() => {
-                        console.log('✅ Flayers da unidade salvos:', this.flayersUnidade.length);
-                        return true;
-                    });
-            },
-            
-            // ========== NOVAS VERSÕES DOS MÉTODOS (ADAPTADAS) ==========
-            
-            pararVideoCompletamente() {
-                // Pausa o player e esconde o container
-                if (ytPlayer) {
-                    ytPlayer.pauseVideo();
-                }
-                const playerDiv = document.getElementById('youtube-player');
-                if (playerDiv) {
-                    playerDiv.style.display = 'none';
-                }
-                const btnSom = document.getElementById('btnSom');
-                if (btnSom) btnSom.style.display = 'none';
-                console.log('🎬 Vídeo PAUSADO e ocultado');
-            },
-            
-            iniciarCicloFlayers() {
-                if (this.isPlaying) return;
-                
-                const todosFlayers = this.getTodosFlayers();
-                if (todosFlayers.length === 0) {
-                    console.log('⚠️ Não há flayers para exibir, voltando ao vídeo');
-                    this.voltarParaVideo();
-                    return;
-                }
-                
-                console.log('🖼️ PARANDO VÍDEO - Iniciando flayers');
-                console.log('   📋 Total:', todosFlayers.length, 'flayers');
-                console.log('   🏢 Matriz:', this.flayersMatriz.length);
-                console.log('   🏥 Unidade:', this.flayersUnidade.length);
-                
-                this.pararVideoCompletamente();
-                
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.flayersCombinados = todosFlayers;
-                
-                setTimeout(() => {
-                    this.proximoFlayer();
-                }, 100);
-            },
-            
-            proximoFlayer() {
-                if (!this.isPlaying) return;
-                
-                if (this.currentIndex >= this.flayersCombinados.length) {
-                    this.voltarParaVideo();
-                    return;
-                }
-                
-                this.mostrarFlayer(this.flayersCombinados[this.currentIndex]);
-                this.currentIndex++;
-                
-                if (this.timer) clearTimeout(this.timer);
-                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
-            },
-            
-            mostrarFlayer(url) {
-                const videoSection = document.querySelector('.video-section');
-                if (!videoSection) return;
-                
-                let flayerDiv = document.getElementById('flayerContainer');
-                if (!flayerDiv) {
-                    flayerDiv = document.createElement('div');
-                    flayerDiv.id = 'flayerContainer';
-                    videoSection.style.position = 'relative';
-                    videoSection.appendChild(flayerDiv);
-                }
-                
-                flayerDiv.innerHTML = `
-                    <img src="${url}" 
-                         alt="Flayer"
-                         style="width: 100%; height: 100%; object-fit: cover;"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem</div>';">`;
-                
-                flayerDiv.style.display = 'flex';
-                localStorage.setItem('ultimoFlayer_' + unidadeID, Date.now().toString());
-                
-                console.log('🖼️ Flayer:', this.currentIndex + 1, '/', this.flayersCombinados.length);
-            },
-            
-            voltarParaVideo() {
-                console.log('🎬 Fim dos flayers - reiniciando vídeo');
-                
-                this.isPlaying = false;
-                
-                // Oculta o container de flayers
-                const flayerDiv = document.getElementById('flayerContainer');
-                if (flayerDiv) {
-                    flayerDiv.style.display = 'none';
-                    flayerDiv.innerHTML = '';
-                }
-                
-                // Exibe o player e carrega o primeiro vídeo da playlist
-                const playerDiv = document.getElementById('youtube-player');
-                if (playerDiv) {
-                    playerDiv.style.display = 'block';
-                }
-                
-                if (ytPlayer && playlistIds.length > 0) {
-                    ytPlayer.loadVideoById(playlistIds[0]);
-                    // Garante que o mute está correto
-                    if (isMuted) {
-                        ytPlayer.mute();
-                    } else {
-                        ytPlayer.unMute();
-                    }
-                } else {
-                    // Se não há player, tenta recriar
-                    carregarVideo();
-                }
-                
-                localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
-                
-                const btnSom = document.getElementById('btnSom');
-                if (btnSom) {
-                    btnSom.style.display = isMuted === false ? 'none' : 'block';
-                }
-            },
-            
-            parar() {
-                console.log('🛑 Parando flayers');
-                this.isPlaying = false;
-                if (this.timer) {
-                    clearTimeout(this.timer);
-                    this.timer = null;
-                }
-                this.voltarParaVideo();
-            },
-            
-            iniciarTeste() {
-                const todosFlayers = this.getTodosFlayers();
-                if (todosFlayers.length === 0) {
-                    mostrarNotificacao('Não há flayers para testar!', 'warning');
-                    return false;
-                }
-                
-                console.log('🧪 Teste de flayers');
-                console.log('   📋 Total:', todosFlayers.length);
-                console.log('   🏢 Matriz:', this.flayersMatriz.length);
-                console.log('   🏥 Unidade:', this.flayersUnidade.length);
-                
-                this.pararVideoCompletamente();
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.flayersCombinados = todosFlayers;
-                
-                setTimeout(() => {
-                    this.proximoFlayer();
-                }, 100);
-                
-                return true;
-            }
-        };
-
-        // =================================================================
         // FUNÇÕES PRINCIPAIS DO SISTEMA
         // =================================================================
 
+        /**
+         * Inicia o sistema principal
+         */
         async function iniciarSistema() {
             console.log('🤖 Iniciando sistema...');
             
@@ -2152,12 +1819,15 @@
             
             iniciarAnimacaoCarrossel();
             
+            // IMPORTANTE: Carregar dados da matriz para SMS mesmo nas unidades
+            // Primeiro tentar do cache
             const cacheGeral = await cacheManager.getFromCacheWithTTL('geral');
             if (cacheGeral.data) {
                 dadosGerais = cacheGeral.data;
                 console.log('📊 Dados da matriz carregados do cache para SMS');
             }
             
+            // Sempre buscar dados da matriz do Firebase para garantir SMS atualizado
             db.ref('paineis/geral').once('value').then((snapshot) => {
                 const data = snapshot.val();
                 if (data) { 
@@ -2165,6 +1835,7 @@
                     cacheManager.saveToCache('geral', dadosGerais);
                     console.log('📊 Dados da matriz atualizados do Firebase para SMS');
                     
+                    // Atualizar interface se já tiver dados da unidade
                     if (dadosUnidade) {
                         processarInterface();
                     }
@@ -2183,16 +1854,17 @@
                 console.error('Erro ao buscar dados gerais:', error);
             });
             
-            // Listener para atualização de vídeos em tempo real
+            // Listener para vídeos
             db.ref('paineis/geral/unidade/videoUrls').on('value', (snapshot) => {
                 const videoUrls = snapshot.val() || [];
                 if (JSON.stringify(videoUrls) !== JSON.stringify(dadosGerais.unidade.videoUrls)) {
                     dadosGerais.unidade.videoUrls = videoUrls;
-                    carregarVideo(); // Agora usa a nova função
+                    carregarVideo();
                     console.log('🎬 Vídeos atualizados em tempo real');
                 }
             });
             
+            // Listener para avisos gerais
             db.ref('paineis/geral/avisos').on('value', (snapshot) => {
                 const avisos = snapshot.val() || [];
                 if (JSON.stringify(avisos) !== JSON.stringify(dadosGerais.avisos)) {
@@ -2205,6 +1877,7 @@
                 loadingDetails.textContent = 'Iniciando sincronização automática...';
                 syncManager.init();
                 
+                // Inicializar sistema de flayers após carregar tudo
                 setTimeout(() => {
                     flayerSystem.init();
                 }, 2000);
@@ -2226,6 +1899,9 @@
             }
         }
 
+        /**
+         * Processa e atualiza a interface principal
+         */
         function processarInterface() {
             if (dadosUnidade && dadosUnidade.unidade && dadosUnidade.unidade.nome) {
                 if (isMatriz) {
@@ -2241,6 +1917,9 @@
             iniciarAvisos();
         }
 
+        /**
+         * Atualiza o relógio em tempo real
+         */
         function atualizarRelogio() {
             const agora = new Date();
             document.getElementById('currentDate').textContent = agora.toLocaleDateString('pt-BR', { 
@@ -2255,6 +1934,47 @@
             });
         }
 
+        /**
+         * Carrega o vídeo do YouTube
+         */
+        function carregarVideo() {
+            // Verificar se está tocando flayer - não recarregar vídeo
+            if (flayerSystem && flayerSystem.isPlaying) {
+                return;
+            }
+            
+            const container = document.getElementById('videoContainer');
+            const videoUrls = dadosGerais.unidade.videoUrls || [];
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const ids = videoUrls.map(url => { 
+                const m = url.match(regExp); 
+                return (m && m[7].length === 11) ? m[7] : null; 
+            }).filter(id => id !== null);
+            
+            if(ids.length > 0) {
+                const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
+                if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
+                    container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
+                    
+                    // Registrar que o vídeo foi carregado
+                    localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
+                    console.log('🎬 Vídeo carregado/recarregado');
+                }
+            }
+        }
+
+        /**
+         * Ativa o som do vídeo
+         */
+        function ativarSom() { 
+            isMuted = false; 
+            carregarVideo(); 
+            document.getElementById('btnSom').style.display = 'none'; 
+        }
+
+        /**
+         * Atualiza a interface com os dados
+         */
         function atualizarInterface() {
             renderBloco('itemFaltometro', 'FALTÔMETRO', 'Total mês anterior', 
                        dadosUnidade.unidade.especialidades, 'faltas', '#ff5252', '');
@@ -2264,6 +1984,9 @@
                        dadosGerais.unidade.smsMunicipal, 'valor', '#ffffff', 'sms-title total-sms');
         }
 
+        /**
+         * Renderiza um bloco de dados
+         */
         function renderBloco(id, titulo, label, lista, chave, cor, classe) {
             const itens = lista || [];
             const total = itens.reduce((a, b) => a + (parseInt(b[chave]) || 0), 0);
@@ -2286,6 +2009,9 @@
             document.getElementById(id).innerHTML = html;
         }
 
+        /**
+         * Inicia a animação do carrossel
+         */
         function iniciarAnimacaoCarrossel() {
             const slides = document.querySelectorAll('.carousel-item');
             setInterval(() => {
@@ -2295,6 +2021,9 @@
             }, 60000); 
         }
 
+        /**
+         * Inicia os avisos em ticker
+         */
         function iniciarAvisos() {
             const container = document.getElementById('tickerContainer');
             const avisos = [...(dadosGerais.avisos || []), ...(dadosUnidade.avisos || [])].filter(a => a && a.trim() !== '');
@@ -2331,247 +2060,12 @@
         }
 
         // =================================================================
-        // SEÇÃO ADMIN - FLAYERS HÍBRIDO (MANTIDA IGUAL)
+        // SISTEMA DE ADMINISTRAÇÃO - AUTENTICAÇÃO
         // =================================================================
 
-        function mostrarSecaoFlayers() {
-            if (!verificarAcessoSecao('flayers')) {
-                mostrarNotificacao('Você não tem permissão para acessar esta seção.', 'error');
-                return;
-            }
-            
-            const content = document.getElementById('adminContent');
-            
-            if (isMatriz) {
-                const urls = flayerSystem.getFlayersMatriz() || [];
-                
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2><i class="fas fa-globe"></i> Flayers GLOBAIS (Matriz)</h2>
-                        <div class="section-info">
-                            <i class="fas fa-info-circle"></i> 
-                            <strong>Controle CENTRAL - Flayers que aparecem em TODAS as unidades</strong><br>
-                            • Apenas a MATRIZ pode adicionar/remover estes flayers<br>
-                            • As unidades NÃO podem remover ou alterar<br>
-                            • Aparecem em todas as TVs da rede municipal
-                        </div>
-                        
-                        <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                                <i class="fas fa-link"></i> URLs das Imagens GLOBAIS:
-                            </label>
-                            <textarea id="flayerUrls" class="admin-input" 
-                                placeholder="https://exemplo.com/flayer1.jpg
-https://exemplo.com/flayer2.png" 
-                                style="min-height: 180px; font-family: monospace; border-left: 4px solid #1565c0;">${urls.join('\n')}</textarea>
-                        </div>
-                        
-                        <div style="display: flex; gap: 15px; margin-bottom: 30px;">
-                            <button class="admin-btn" onclick="salvarFlayersMatriz()">
-                                <i class="fas fa-save"></i> Salvar Flayers GLOBAIS
-                            </button>
-                            <button class="admin-btn admin-btn-primary" onclick="testarFlayersAgora()">
-                                <i class="fas fa-play"></i> Testar Agora
-                            </button>
-                            <button class="admin-btn admin-btn-secondary" onclick="pararFlayersAgora()">
-                                <i class="fas fa-stop"></i> Voltar Vídeo
-                            </button>
-                        </div>
-                        
-                        <div style="background: #e3f2fd; padding: 20px; border-radius: 12px;">
-                            <h3 style="color: #1565c0; margin-bottom: 15px;">
-                                <i class="fas fa-globe-americas"></i> Flayers GLOBAIS (${urls.length})
-                            </h3>
-                            ${previewFlayers(urls, 'matriz')}
-                        </div>
-                    </div>
-                `;
-                
-            } else {
-                const urlsMatriz = flayerSystem.getFlayersMatriz() || [];
-                const urlsUnidade = flayerSystem.getFlayersUnidade() || [];
-                
-                content.innerHTML = `
-                    <div class="admin-section">
-                        <h2><i class="fas fa-images"></i> Flayers da Unidade</h2>
-                        
-                        <div style="background: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #1565c0;">
-                            <h3 style="color: #1565c0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                                <i class="fas fa-globe"></i> Flayers GLOBAIS (Controlados pela Matriz)
-                                <span style="background: #1565c0; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px;">
-                                    Somente Leitura
-                                </span>
-                            </h3>
-                            <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
-                                <i class="fas fa-info-circle"></i> Estes flayers são definidos pela matriz e aparecem em TODAS as unidades. 
-                                Você não pode removê-los ou editá-los.
-                            </p>
-                            ${previewFlayers(urlsMatriz, 'matriz', true)}
-                        </div>
-                        
-                        <div style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #00c853;">
-                            <h3 style="color: #00c853; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                                <i class="fas fa-hospital"></i> Flayers LOCAIS (Apenas sua Unidade)
-                                <span style="background: #00c853; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px;">
-                                    Editável
-                                </span>
-                            </h3>
-                            
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                                    <i class="fas fa-link"></i> URLs das Imagens LOCAIS:
-                                </label>
-                                <textarea id="flayerUrlsUnidade" class="admin-input" 
-                                    placeholder="https://exemplo.com/flayer-unidade1.jpg
-https://exemplo.com/flayer-unidade2.png" 
-                                    style="min-height: 150px; font-family: monospace; border-left: 4px solid #00c853;">${urlsUnidade.join('\n')}</textarea>
-                            </div>
-                            
-                            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                                <button class="admin-btn" onclick="salvarFlayersUnidade()" style="background: linear-gradient(135deg, #00c853, #00e676);">
-                                    <i class="fas fa-save"></i> Salvar Flayers LOCAIS
-                                </button>
-                                <button class="admin-btn admin-btn-primary" onclick="testarFlayersAgora()">
-                                    <i class="fas fa-play"></i> Testar Todos
-                                </button>
-                                <button class="admin-btn admin-btn-secondary" onclick="pararFlayersAgora()">
-                                    <i class="fas fa-stop"></i> Voltar Vídeo
-                                </button>
-                            </div>
-                            
-                            <h4 style="color: #555; margin: 20px 0 10px;">Seus Flayers Locais (${urlsUnidade.length})</h4>
-                            ${previewFlayers(urlsUnidade, 'unidade', false)}
-                        </div>
-                        
-                        <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px;">
-                            <h4 style="color: #2e7d32; display: flex; align-items: center; gap: 10px;">
-                                <i class="fas fa-play-circle"></i> Sequência de Exibição:
-                            </h4>
-                            <p style="color: #555;">
-                                <strong>Total: ${urlsMatriz.length + urlsUnidade.length} flayers</strong><br>
-                                • ${urlsMatriz.length} flayers GLOBAIS (matriz) + ${urlsUnidade.length} flayers LOCAIS (sua unidade)<br>
-                                • Todos serão exibidos em sequência de 30 segundos<br>
-                                • Ordem: Primeiro os GLOBAIS, depois os LOCAIS
-                            </p>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function previewFlayers(urls, tipo, somenteLeitura = false) {
-            if (urls.length === 0) {
-                return `<div style="text-align: center; padding: 30px; color: #999; background: white; border-radius: 8px;">
-                    <i class="fas fa-images" style="font-size: 32px; margin-bottom: 10px;"></i>
-                    <p>Nenhum flayer ${tipo === 'matriz' ? 'global' : 'local'} configurado</p>
-                </div>`;
-            }
-            
-            let html = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">`;
-            
-            urls.forEach((url, index) => {
-                html += `
-                    <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;">
-                        <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 5px;">
-                            <img src="${url}" 
-                                 style="max-width: 100%; max-height: 100%; object-fit: contain;"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iMTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiPkVycm88L3RleHQ+PC9zdmc+';">
-                        </div>
-                        <div style="padding: 8px;">
-                            <div style="font-size: 10px; color: #666; word-break: break-all;">
-                                ${url.length > 25 ? url.substring(0, 25) + '...' : url}
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                                <span style="font-size: 10px; background: ${tipo === 'matriz' ? '#1565c0' : '#00c853'}; color: white; padding: 2px 6px; border-radius: 10px;">
-                                    ${index + 1}
-                                </span>
-                                ${!somenteLeitura ? `
-                                    <button onclick="removerFlayerEspecifico(${index})" 
-                                            style="background: none; border: none; color: #d32f2f; cursor: pointer; padding: 2px;">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                ` : '<span style="color: #999; font-size: 10px;"><i class="fas fa-lock"></i> Matriz</span>'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += `</div>`;
-            return html;
-        }
-
-        function salvarFlayersMatriz() {
-            const textarea = document.getElementById('flayerUrls');
-            if (!textarea) return;
-            
-            const urls = textarea.value.split('\n')
-                .map(url => url.trim())
-                .filter(url => url !== '');
-            
-            flayerSystem.salvarFlayersMatriz(urls).then(() => {
-                mostrarNotificacao(`${urls.length} flayer(s) globais salvos!`, 'success');
-                mostrarSecaoFlayers();
-            });
-        }
-
-        function salvarFlayersUnidade() {
-            const textarea = document.getElementById('flayerUrlsUnidade');
-            if (!textarea) return;
-            
-            const urls = textarea.value.split('\n')
-                .map(url => url.trim())
-                .filter(url => url !== '');
-            
-            flayerSystem.salvarFlayersUnidade(urls).then(() => {
-                mostrarNotificacao(`${urls.length} flayer(s) locais salvos!`, 'success');
-                mostrarSecaoFlayers();
-            });
-        }
-
-        function removerFlayerEspecifico(index) {
-            if (isMatriz) {
-                mostrarNotificacao('Use o editor de flayers globais da matriz', 'warning');
-                return;
-            }
-            
-            const urls = [...flayerSystem.getFlayersUnidade()];
-            urls.splice(index, 1);
-            
-            flayerSystem.salvarFlayersUnidade(urls).then(() => {
-                mostrarNotificacao('Flayer local removido!', 'success');
-                mostrarSecaoFlayers();
-            });
-        }
-
-        function testarFlayersAgora() {
-            const todosFlayers = flayerSystem.getTodosFlayers();
-            
-            if (todosFlayers.length === 0) {
-                mostrarNotificacao('Não há flayers para testar!', 'warning');
-                return;
-            }
-            
-            mostrarNotificacao(`Testando ${todosFlayers.length} flayers...`, 'success');
-            
-            if (document.getElementById('adminPanel').style.display === 'flex') {
-                setTimeout(() => {
-                    document.getElementById('adminPanel').style.display = 'none';
-                }, 300);
-            }
-            
-            flayerSystem.iniciarTeste();
-        }
-
-        function pararFlayersAgora() {
-            flayerSystem.parar();
-            mostrarNotificacao('Voltando para vídeo...', 'info');
-        }
-
-        // =================================================================
-        // FUNÇÕES DE ADMINISTRAÇÃO - AUTENTICAÇÃO (MANTIDAS IGUAIS)
-        // =================================================================
-
+        /**
+         * Abre a tela de login
+         */
         function openLogin() {
             if (usuarioAtual) {
                 mostrarInfoUsuario();
@@ -2595,6 +2089,9 @@ https://exemplo.com/flayer-unidade2.png"
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
+        /**
+         * Verifica as credenciais de login
+         */
         function verificarLogin() {
             const usuario = document.getElementById('loginUsuario').value.trim();
             const senha = document.getElementById('loginSenha').value;
@@ -2653,16 +2150,25 @@ https://exemplo.com/flayer-unidade2.png"
             });
         }
 
+        /**
+         * Verifica se o usuário tem acesso à unidade atual
+         */
         function temAcessoUnidade() {
             if (!permissoesUsuario) return false;
+            
             if (permissoesUsuario.nivel === 'super_admin') return true;
+            
             if (permissoesUsuario.unidades_permitidas) {
                 if (permissoesUsuario.unidades_permitidas.includes('todas')) return true;
                 if (permissoesUsuario.unidades_permitidas.includes(unidadeID)) return true;
             }
+            
             return false;
         }
 
+        /**
+         * Mostra as informações do usuário logado
+         */
         function mostrarInfoUsuario() {
             if (!usuarioAtual) return;
             
@@ -2698,6 +2204,9 @@ https://exemplo.com/flayer-unidade2.png"
             document.getElementById('userInfo').style.display = 'block';
         }
 
+        /**
+         * Continua para o painel administrativo
+         */
         function continuarParaPainel() {
             if (!usuarioAtual || !permissoesUsuario) {
                 mostrarNotificacao('Erro: usuário não autenticado', 'error');
@@ -2714,6 +2223,9 @@ https://exemplo.com/flayer-unidade2.png"
             mostrarSecao('unidade');
         }
 
+        /**
+         * Configura os menus baseados nas permissões do usuário
+         */
         function configurarMenusPorPermissao() {
             if (!permissoesUsuario) return;
             
@@ -2743,13 +2255,18 @@ https://exemplo.com/flayer-unidade2.png"
                 document.getElementById('menuSincronizacao').style.display = 'none';
             }
             
+            // Adicionar item Flayers ao menu
             adicionarMenuItemFlayers();
         }
 
+        /**
+         * Adiciona o item Flayers no menu lateral
+         */
         function adicionarMenuItemFlayers() {
             const sidebar = document.querySelector('.admin-sidebar');
             if (!sidebar) return;
             
+            // Verificar se já existe
             if (document.querySelector('.sidebar-item[onclick*="Flayers"]') || 
                 document.querySelector('.sidebar-item[onclick*="flayers"]')) {
                 return;
@@ -2761,6 +2278,7 @@ https://exemplo.com/flayer-unidade2.png"
             flayerMenuItem.setAttribute('onclick', 'mostrarSecaoFlayers()');
             flayerMenuItem.innerHTML = '<i class="fas fa-images"></i> Encartes/Flayers';
             
+            // Inserir após o menu de vídeo
             const videoMenu = document.getElementById('menuVideo');
             const syncMenu = document.getElementById('menuSincronizacao');
             
@@ -2772,18 +2290,25 @@ https://exemplo.com/flayer-unidade2.png"
                 sidebar.appendChild(flayerMenuItem);
             }
             
+            // Mostrar/esconder baseado nas permissões
             if (permissoesUsuario) {
                 const nivel = permissoesUsuario.nivel;
                 flayerMenuItem.style.display = (nivel === 'super_admin' || nivel === 'admin_unidade') ? 'block' : 'none';
             }
         }
 
+        /**
+         * Troca o usuário atual
+         */
         function trocarUsuario() {
             usuarioAtual = null;
             permissoesUsuario = null;
             openLogin();
         }
 
+        /**
+         * Faz logout do sistema
+         */
         function logout() {
             usuarioAtual = null;
             permissoesUsuario = null;
@@ -2792,11 +2317,15 @@ https://exemplo.com/flayer-unidade2.png"
         }
 
         // =================================================================
-        // VERIFICAÇÃO DE ACESSO ÀS SEÇÕES (MANTIDA IGUAL)
+        // SISTEMA DE ADMINISTRAÇÃO - SEÇÕES
         // =================================================================
 
+        /**
+         * Verifica se o usuário tem acesso à seção
+         */
         function verificarAcessoSecao(secao) {
             if (!permissoesUsuario) return false;
+            
             if (permissoesUsuario.nivel === 'super_admin') return true;
             
             if (secao === 'flayers') {
@@ -2819,6 +2348,9 @@ https://exemplo.com/flayer-unidade2.png"
             return false;
         }
 
+        /**
+         * Mostra uma seção específica do painel administrativo
+         */
         function mostrarSecao(secao) {
             if (!verificarAcessoSecao(secao)) {
                 mostrarNotificacao('Você não tem permissão para acessar esta seção.', 'error');
@@ -2846,6 +2378,9 @@ https://exemplo.com/flayer-unidade2.png"
             }
         }
 
+        /**
+         * Mostra a seção de configuração de sincronização
+         */
         function mostrarConfiguracaoSincronizacao() {
             const stats = syncConfig.getStats();
             const currentInterval = syncConfig.currentInterval;
@@ -2855,6 +2390,8 @@ https://exemplo.com/flayer-unidade2.png"
                     <h2><i class="fas fa-sync-alt"></i> Configuração de Sincronização</h2>
                     <div class="section-info">
                         <i class="fas fa-info-circle"></i> Configure o intervalo de sincronização automática.
+                        <strong>Sistema 100% automático com atualização individual</strong>
+                        <br><strong>Atualização distribuída:</strong> Cada unidade sincroniza em horário diferente.
                     </div>
                     
                     <div style="margin-bottom: 30px;">
@@ -2868,7 +2405,7 @@ https://exemplo.com/flayer-unidade2.png"
                                     ${syncConfig.intervals[currentInterval].label}
                                 </div>
                                 <div style="margin-top: 10px; font-size: 13px; color: #666;">
-                                    <i class="fas fa-clock"></i> Offset: ${syncManager.unitSyncOffset} minutos
+                                    <i class="fas fa-clock"></i> Esta unidade sincroniza com offset de ${syncManager.unitSyncOffset} minutos
                                 </div>
                             </div>
                             <div style="flex: 2;">
@@ -2878,8 +2415,12 @@ https://exemplo.com/flayer-unidade2.png"
                                         <strong>${stats.leiturasPorTVPorDia}</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span>Leituras totais/dia:</span>
+                                        <span>Leituras totais/dia (40 TVs):</span>
                                         <strong>${stats.leiturasPorDia.toLocaleString()}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Free Tier usado:</span>
+                                        <strong>${stats.percentualFreeTier.toFixed(1)}%</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between;">
                                         <span>Custo estimado:</span>
@@ -2891,12 +2432,20 @@ https://exemplo.com/flayer-unidade2.png"
                     </div>
                     
                     <h3 style="margin-top: 30px;"><i class="fas fa-sliders-h"></i> Opções de Intervalo</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Selecione uma das opções abaixo:</p>
+                    
                     <div class="sync-options-grid">
             `;
             
             Object.entries(syncConfig.intervals).forEach(([interval, config]) => {
+                const intervalStats = syncConfig.getStats.call({currentInterval: parseInt(interval)});
                 const isSelected = (parseInt(interval) === currentInterval);
                 const cardClass = isSelected ? 'sync-option-card selected' : 'sync-option-card';
+                let costClass = 'cost-minimal';
+                
+                if (interval <= 3) costClass = 'cost-very-low';
+                if (interval <= 6) costClass = 'cost-low';
+                if (interval <= 10) costClass = 'cost-free';
                 
                 html += `
                     <div class="${cardClass}" onclick="syncManager.changeInterval(${interval})">
@@ -2905,8 +2454,8 @@ https://exemplo.com/flayer-unidade2.png"
                         </div>
                         <div class="sync-option-time">${interval} min</div>
                         <div class="sync-option-desc">${config.label}</div>
-                        <div class="sync-option-cost cost-free">
-                            ${config.cost}
+                        <div class="sync-option-cost ${costClass}">
+                            ${config.cost.toUpperCase()}
                         </div>
                         ${isSelected ? '<div style="margin-top: 10px; color: #00c853;"><i class="fas fa-check-circle"></i> Selecionado</div>' : ''}
                     </div>
@@ -2916,9 +2465,23 @@ https://exemplo.com/flayer-unidade2.png"
             html += `
                     </div>
                     
+                    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <h4><i class="fas fa-lightbulb"></i> Como funciona (Sistema Distribuído):</h4>
+                        <ul style="color: #666; margin-left: 20px;">
+                            <li><strong>Atualização individual</strong> - Cada TV atualiza em horário diferente</li>
+                            <li><strong>Distribuição inteligente</strong> - Offsets calculados para evitar picos</li>
+                            <li><strong>Cache inteligente</strong> - Dados aparecem instantaneamente</li>
+                            <li><strong>Atualização em tempo real</strong> - Quando admin altera dados</li>
+                            <li><strong>Sincronização periódica</strong> - Mantém dados atualizados</li>
+                        </ul>
+                    </div>
+                    
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button class="admin-btn" onclick="syncManager.forceSync()">
-                            <i class="fas fa-sync-alt"></i> Sincronizar Agora
+                            <i class="fas fa-sync-alt"></i> Sincronizar Esta Unidade
+                        </button>
+                        <button class="admin-btn admin-btn-primary" onclick="forcarSincronizacaoTodas()">
+                            <i class="fas fa-sync"></i> Sincronizar Todas
                         </button>
                         <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidade')">
                             <i class="fas fa-arrow-left"></i> Voltar
@@ -2930,19 +2493,24 @@ https://exemplo.com/flayer-unidade2.png"
             document.getElementById('adminContent').innerHTML = html;
         }
 
+        /**
+         * Mostra uma seção padrão do painel administrativo
+         */
         function mostrarSecaoPadrao(secao, content) {
             if(secao === 'unidade') {
+                // Todas as unidades podem editar seu próprio nome
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2><i class="fas fa-hospital"></i> Identificação da ${isMatriz ? 'Matriz' : 'Unidade'}</h2>
                         <div class="section-info">
-                            <i class="fas fa-info-circle"></i> Configure o nome da ${isMatriz ? 'matriz' : 'unidade'}.
+                            <i class="fas fa-info-circle"></i> Configure o nome da ${isMatriz ? 'matriz' : 'unidade'} que aparecerá no painel
+                            ${isMatriz ? ' <strong>(Controle Central)</strong>' : ''}
                         </div>
                         <div style="max-width: 500px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome:</label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da ${isMatriz ? 'Matriz' : 'Unidade'}:</label>
                             <input id="uNome" class="admin-input" value="${dadosUnidade.unidade.nome}" placeholder="Digite o nome">
                             <button class="admin-btn" onclick="atualizarNomeUnidade()" style="margin-top: 20px;">
-                                <i class="fas fa-save"></i> Salvar
+                                <i class="fas fa-save"></i> Salvar Alterações
                             </button>
                         </div>
                     </div>
@@ -2951,11 +2519,13 @@ https://exemplo.com/flayer-unidade2.png"
                 if (permissoesUsuario.nivel === 'visualizador') {
                     content.innerHTML = `
                         <div class="admin-section">
-                            <h2><i class="fas fa-eye"></i> ${secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos'}</h2>
+                            <h2><i class="fas fa-eye"></i> ${secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos da Unidade'}</h2>
                             <div class="section-info">
-                                <i class="fas fa-info-circle"></i> Visualização apenas.
+                                <i class="fas fa-info-circle"></i> Você tem permissão de <strong>apenas visualização</strong> nesta seção.
                             </div>
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            
+                            <h3 style="margin-top: 25px; color: #555;">Dados Atuais (Somente Leitura):</h3>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 10px;">
                                 ${renderListaSomenteLeitura(dadosUnidade.unidade[secao === 'faltometro' ? 'especialidades' : 'atendimentos'] || [], secao === 'faltometro' ? 'faltas' : 'valor')}
                             </div>
                         </div>
@@ -2965,11 +2535,15 @@ https://exemplo.com/flayer-unidade2.png"
                 
                 let chave = secao === 'faltometro' ? 'especialidades' : 'atendimentos';
                 let subChave = secao === 'faltometro' ? 'faltas' : 'valor';
-                let titulo = secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos';
+                let titulo = secao === 'faltometro' ? 'Faltômetro' : 'Atendimentos da Unidade';
                 
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2><i class="fas fa-edit"></i> ${titulo}</h2>
+                        <div class="section-info">
+                            Configure os dados que aparecerão no painel desta unidade.
+                            <strong>Sistema automático:</strong> Alterações são enviadas para as TVs automaticamente.
+                        </div>
                         <div id="listaAdmin">
                             ${(dadosUnidade.unidade[chave] || []).map((e, i) => `
                                 <div class="item-row">
@@ -2980,7 +2554,7 @@ https://exemplo.com/flayer-unidade2.png"
                             `).join('')}
                         </div>
                         <button class="admin-btn" onclick="adicionarItem('${chave}', '${subChave}')" style="margin-top: 20px;">
-                            <i class="fas fa-plus"></i> Adicionar
+                            <i class="fas fa-plus"></i> Adicionar Item
                         </button>
                     </div>
                 `;
@@ -2992,6 +2566,9 @@ https://exemplo.com/flayer-unidade2.png"
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2><i class="fas fa-edit"></i> Produção Municipal</h2>
+                        <div class="section-info">
+                            Configure os dados que aparecerão em TODAS as unidades <strong>(Apenas matriz)</strong>.
+                        </div>
                         <div id="listaAdmin">
                             ${(dadosGerais.unidade.smsMunicipal || []).map((e, i) => `
                                 <div class="item-row">
@@ -3002,20 +2579,26 @@ https://exemplo.com/flayer-unidade2.png"
                             `).join('')}
                         </div>
                         <button class="admin-btn" onclick="adicionarItemGeral('smsMunicipal', 'valor')" style="margin-top: 20px;">
-                            <i class="fas fa-plus"></i> Adicionar
+                            <i class="fas fa-plus"></i> Adicionar Item
                         </button>
                     </div>
                 `;
             } else if(secao === 'avisos') {
                 let target = isMatriz ? dadosGerais : dadosUnidade;
-                let tipo = isMatriz ? 'Globais' : 'Locais';
+                let tipo = isMatriz ? 'Globais (Matriz)' : 'Locais (Unidade)';
+                let descricao = isMatriz ? 
+                    'Avisos globais que aparecerão em TODAS as unidades' : 
+                    'Avisos locais que aparecerão APENAS nesta unidade';
                 
                 content.innerHTML = `
                     <div class="admin-section">
                         <h2><i class="fas fa-bullhorn"></i> Avisos ${tipo}</h2>
-                        <textarea id="txtAvisos" class="admin-input" placeholder="Digite um aviso por linha...">${(target.avisos || []).join('\n')}</textarea>
+                        <div class="section-info">
+                            <i class="fas fa-info-circle"></i> ${descricao}. Digite um aviso por linha.
+                        </div>
+                        <textarea id="txtAvisos" class="admin-input" placeholder="Digite seus avisos aqui, um por linha...">${(target.avisos || []).join('\n')}</textarea>
                         <button class="admin-btn" onclick="salvarAvisos()" style="margin-top: 20px;">
-                            <i class="fas fa-save"></i> Salvar
+                            <i class="fas fa-save"></i> Salvar Avisos
                         </button>
                     </div>
                 `;
@@ -3024,43 +2607,56 @@ https://exemplo.com/flayer-unidade2.png"
                     mostrarMensagemAcessoRestrito(content, 'Vídeos', 'matriz');
                     return;
                 }
+                
                 content.innerHTML = `
                     <div class="admin-section">
-                        <h2><i class="fas fa-video"></i> Vídeos</h2>
-                        <textarea id="vUrls" class="admin-input" placeholder="URLs do YouTube (uma por linha)">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea>
+                        <h2><i class="fas fa-video"></i> Vídeos Globais</h2>
+                        <div class="section-info">
+                            <i class="fas fa-info-circle"></i> Cole as URLs dos vídeos do YouTube (um por linha). Os vídeos serão reproduzidos em TODAS as unidades.
+                        </div>
+                        <textarea id="vUrls" class="admin-input" placeholder="Cole as URLs dos vídeos do YouTube aqui...">${(dadosGerais.unidade.videoUrls || []).join('\n')}</textarea>
                         <button class="admin-btn" onclick="salvarVideos()" style="margin-top: 20px;">
-                            <i class="fas fa-save"></i> Salvar
+                            <i class="fas fa-save"></i> Salvar Vídeos
                         </button>
                     </div>
                 `;
             }
         }
 
+        /**
+         * Mostra mensagem de acesso restrito
+         */
         function mostrarMensagemAcessoRestrito(content, secao, tipo) {
             content.innerHTML = `
                 <div class="admin-section">
                     <h2><i class="fas fa-ban"></i> Acesso Restrito</h2>
                     <div style="text-align: center; padding: 40px;">
                         <i class="fas fa-lock" style="font-size: 64px; margin-bottom: 20px; color: #1565c0;"></i>
-                        <h3 style="color: #555; margin-bottom: 15px;">Apenas disponível na ${tipo}</h3>
+                        <h3 style="color: #555; margin-bottom: 15px;">Esta seção está disponível apenas na ${tipo}</h3>
+                        <p style="color: #666; max-width: 500px; margin: 0 auto 25px;">
+                            A configuração de <strong>${secao}</strong> só pode ser realizada através do painel da matriz.
+                        </p>
                         <button class="admin-btn" onclick="mostrarSecao('unidade')">
-                            <i class="fas fa-arrow-left"></i> Voltar
+                            <i class="fas fa-arrow-left"></i> Voltar para Configurações da Unidade
                         </button>
                     </div>
                 </div>
             `;
         }
 
+        /**
+         * Renderiza lista em modo somente leitura
+         */
         function renderListaSomenteLeitura(lista, subChave) {
             if (!lista || lista.length === 0) {
-                return '<div style="text-align: center; color: #999; padding: 20px;">Nenhum dado</div>';
+                return '<div style="text-align: center; color: #999; padding: 20px;">Nenhum dado disponível</div>';
             }
             
             let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">';
             lista.forEach(e => {
                 html += `
                     <div style="background: white; padding: 10px; border-radius: 6px; border: 1px solid #e0e0e0;">
-                        <div style="font-weight: 600; color: #333;">${e.nome}</div>
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">${e.nome}</div>
                         <div style="font-size: 18px; font-weight: 700; color: #1565c0;">${e[subChave]}</div>
                     </div>
                 `;
@@ -3070,17 +2666,23 @@ https://exemplo.com/flayer-unidade2.png"
         }
 
         // =================================================================
-        // FUNÇÕES DE GERENCIAMENTO DE DADOS (MANTIDAS IGUAIS)
+        // FUNÇÕES DE GERENCIAMENTO DE DADOS
         // =================================================================
 
+        /**
+         * Atualiza o nome da unidade
+         */
         function atualizarNomeUnidade() {
             const novoNome = document.getElementById('uNome').value;
             dadosUnidade.unidade.nome = novoNome;
             document.getElementById('adminUnidadeNome').textContent = novoNome;
             salvarDados(true, 'unidade');
-            mostrarNotificacao('Nome atualizado!', 'success');
+            mostrarNotificacao('Nome da unidade atualizado!', 'success');
         }
 
+        /**
+         * Salva os avisos
+         */
         function salvarAvisos() {
             const avisosText = document.getElementById('txtAvisos').value;
             const avisosArray = avisosText.split('\n').filter(a => a.trim() !== '');
@@ -3092,67 +2694,89 @@ https://exemplo.com/flayer-unidade2.png"
             }
             
             salvarDados(true, 'avisos');
-            mostrarNotificacao('Avisos salvos!', 'success');
+            mostrarNotificacao('Avisos salvos com sucesso!', 'success');
         }
 
+        /**
+         * Salva os vídeos
+         */
         function salvarVideos() {
             const videosText = document.getElementById('vUrls').value;
             dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
             salvarDados(true, 'video');
-            // Atualiza o player com os novos vídeos
-            carregarVideo();
-            mostrarNotificacao('Vídeos salvos!', 'success');
+            mostrarNotificacao('Vídeos salvos com sucesso!', 'success');
         }
 
+        /**
+         * Atualiza um item da lista
+         */
         function atualizarItem(index, chave, valor, tipo) {
             if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
             if (dadosUnidade.unidade[chave][index]) {
                 dadosUnidade.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
-                salvarDados(true, chave);
+                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
             }
         }
 
+        /**
+         * Atualiza um item geral (matriz)
+         */
         function atualizarItemGeral(index, chave, valor, tipo) {
             if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
             if (dadosGerais.unidade[chave][index]) {
                 dadosGerais.unidade[chave][index][tipo] = tipo === 'nome' ? valor : parseInt(valor) || 0;
-                salvarDados(true, chave);
+                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
             }
         }
 
+        /**
+         * Remove um item da lista
+         */
         function removerItem(index, chave) {
             if (dadosUnidade.unidade[chave] && dadosUnidade.unidade[chave][index]) {
                 dadosUnidade.unidade[chave].splice(index, 1);
                 mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-                salvarDados(true, chave);
+                salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
             }
         }
 
+        /**
+         * Remove um item geral (matriz)
+         */
         function removerItemGeral(index, chave) {
             if (dadosGerais.unidade[chave] && dadosGerais.unidade[chave][index]) {
                 dadosGerais.unidade[chave].splice(index, 1);
                 mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-                salvarDados(true, chave);
+                salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
             }
         }
 
+        /**
+         * Adiciona um novo item à lista
+         */
         function adicionarItem(chave, subChave) {
             if (!dadosUnidade.unidade[chave]) dadosUnidade.unidade[chave] = [];
             dadosUnidade.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
             mostrarSecao(chave === 'especialidades' ? 'faltometro' : 'atendimentos');
-            salvarDados(true, chave);
+            salvarDados(true, chave === 'especialidades' ? 'faltometro' : 'atendimentos');
         }
 
+        /**
+         * Adiciona um novo item geral (matriz)
+         */
         function adicionarItemGeral(chave, subChave) {
             if (!dadosGerais.unidade[chave]) dadosGerais.unidade[chave] = [];
             dadosGerais.unidade[chave].push({ nome: "Novo Item", [subChave]: 0 });
             mostrarSecao(chave === 'smsMunicipal' ? 'sms' : 'video');
-            salvarDados(true, chave);
+            salvarDados(true, chave === 'smsMunicipal' ? 'sms' : 'video');
         }
 
+        /**
+         * Salva os dados no Firebase
+         */
         function salvarDados(isLocalUpdate = false, tipoAlteracao = null) { 
             if (permissoesUsuario && permissoesUsuario.nivel === 'visualizador') {
-                mostrarNotificacao('Sem permissão para editar.', 'error');
+                mostrarNotificacao('Você não tem permissão para editar dados. Apenas visualização.', 'error');
                 return;
             }
             
@@ -3175,15 +2799,18 @@ https://exemplo.com/flayer-unidade2.png"
             }
             
             if (isLocalUpdate) {
-                mostrarNotificacao('Dados salvos!', 'success');
-                console.log(`💾 Salvos (${tipoAlteracao})`);
+                mostrarNotificacao('Dados salvos com sucesso!', 'success');
+                console.log(`💾 Dados salvos (${tipoAlteracao})`);
             }
         }
 
         // =================================================================
-        // NOTIFICAÇÕES
+        // FUNÇÕES DE NOTIFICAÇÃO
         // =================================================================
 
+        /**
+         * Mostra uma notificação
+         */
         function mostrarNotificacao(mensagem, tipo = 'info') {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -3208,12 +2835,30 @@ https://exemplo.com/flayer-unidade2.png"
             } else if (tipo === 'error') {
                 notification.style.background = 'linear-gradient(135deg, #d32f2f, #f44336)';
                 notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> <span>${mensagem}</span>`;
+            } else if (tipo === 'warning') {
+                notification.style.background = 'linear-gradient(135deg, #ff9800, #ffb74d)';
+                notification.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${mensagem}</span>`;
             } else {
                 notification.style.background = 'linear-gradient(135deg, #1976d2, #2196f3)';
                 notification.innerHTML = `<i class="fas fa-info-circle"></i> <span>${mensagem}</span>`;
             }
             
             document.body.appendChild(notification);
+            
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                `;
+                document.head.appendChild(style);
+            }
             
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease-out forwards';
@@ -3222,13 +2867,16 @@ https://exemplo.com/flayer-unidade2.png"
                         notification.parentNode.removeChild(notification);
                     }
                 }, 300);
-            }, 3000);
+            }, 5000);
         }
 
         // =================================================================
-        // GERENCIAMENTO DE USUÁRIOS (RESUMIDO)
+        // GERENCIAMENTO DE USUÁRIOS - TOTALMENTE FUNCIONAL
         // =================================================================
 
+        /**
+         * Cria o usuário admin principal
+         */
         function criarUsuarioAdminPrincipal() {
             const adminLogin = 'gti';
             
@@ -3244,7 +2892,7 @@ https://exemplo.com/flayer-unidade2.png"
                 
                 if (!adminExiste) {
                     const adminUsuario = {
-                        nome: 'Administrador GTI',
+                        nome: 'Administrador Principal GTI',
                         login: adminLogin,
                         senha: 'Itatilac2009',
                         nivel: 'super_admin',
@@ -3254,26 +2902,48 @@ https://exemplo.com/flayer-unidade2.png"
                         criado_por: 'sistema'
                     };
                     
-                    db.ref('usuarios/admin_gti').set(adminUsuario)
-                        .then(() => console.log('✅ Admin criado'));
+                    const adminKey = 'admin_gti';
+                    
+                    db.ref('usuarios/' + adminKey).set(adminUsuario)
+                        .then(() => {
+                            console.log('Usuário admin principal criado:', adminLogin);
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao criar usuário admin:', error);
+                        });
                 }
             });
         }
 
+        /**
+         * Carrega todos os usuários
+         */
         function carregarTodosUsuarios() {
             db.ref('usuarios').once('value').then((snapshot) => {
                 listaUsuarios = [];
                 const usuarios = snapshot.val() || {};
+                
                 Object.entries(usuarios).forEach(([key, dados]) => {
-                    listaUsuarios.push({ id: key, ...dados });
+                    listaUsuarios.push({
+                        id: key,
+                        ...dados
+                    });
                 });
+                
+                console.log(`📋 ${listaUsuarios.length} usuários carregados`);
+            }).catch(error => {
+                console.error('Erro ao carregar usuários:', error);
             });
         }
 
+        /**
+         * Carrega todas as unidades
+         */
         function carregarTodasUnidades() {
             db.ref('paineis').once('value').then((snapshot) => {
                 listaTodasUnidades = [];
                 const unidades = snapshot.val() || {};
+                
                 Object.entries(unidades).forEach(([key, dados]) => {
                     if (key !== 'geral') {
                         listaTodasUnidades.push({
@@ -3282,75 +2952,1510 @@ https://exemplo.com/flayer-unidade2.png"
                             especialidades: dados.unidade?.especialidades?.length || 0,
                             atendimentos: dados.unidade?.atendimentos?.length || 0,
                             avisos: dados.avisos?.length || 0,
-                            ultima_atualizacao: dados.ultima_atualizacao || 0
+                            ultima_atualizacao: dados.ultima_atualizacao || 0,
+                            ultima_sincronizacao: dados.ultima_sincronizacao || 0
                         });
                     }
                 });
+                
+                console.log(`🏥 ${listaTodasUnidades.length} unidades carregadas`);
+            }).catch(error => {
+                console.error('Erro ao carregar unidades:', error);
             });
         }
 
+        /**
+         * Mostra o gerenciamento de usuários
+         */
         function mostrarGerenciamentoUsuarios() {
-            let html = `<div class="admin-section"><h2><i class="fas fa-users-cog"></i> Usuários</h2>`;
-            html += `<div style="text-align: center; padding: 40px; color: #999;">
-                        <i class="fas fa-users" style="font-size: 48px;"></i>
-                        <p style="margin-top: 20px;">Gerenciamento de usuários disponível apenas na matriz.</p>
-                     </div>`;
-            html += `</div>`;
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Gerencie os usuários que têm acesso ao sistema administrativo.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Usuários</h3>
+                        <button class="admin-btn" onclick="adicionarNovoUsuario()">
+                            <i class="fas fa-user-plus"></i> Novo Usuário
+                        </button>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Login</th>
+                                <th>Nível</th>
+                                <th>Unidades</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (listaUsuarios.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                            Nenhum usuário cadastrado
+                        </td>
+                    </tr>
+                `;
+            } else {
+                listaUsuarios.forEach(usuario => {
+                    let nivelBadge = '';
+                    switch(usuario.nivel) {
+                        case 'super_admin':
+                            nivelBadge = '<span class="badge badge-danger">Super Admin</span>';
+                            break;
+                        case 'admin_unidade':
+                            nivelBadge = '<span class="badge badge-info">Admin Unidade</span>';
+                            break;
+                        case 'visualizador':
+                            nivelBadge = '<span class="badge badge-warning">Visualizador</span>';
+                            break;
+                        default:
+                            nivelBadge = '<span class="badge">Usuário</span>';
+                    }
+                    
+                    let statusBadge = usuario.status === 'ativo' 
+                        ? '<span class="badge badge-success">Ativo</span>' 
+                        : '<span class="badge badge-danger">Inativo</span>';
+                    
+                    let unidadesTexto = '';
+                    if (usuario.unidades_permitidas) {
+                        if (usuario.unidades_permitidas.includes('todas')) {
+                            unidadesTexto = 'Todas';
+                        } else {
+                            unidadesTexto = usuario.unidades_permitidas.join(', ');
+                        }
+                    } else {
+                        unidadesTexto = 'Nenhuma';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${usuario.nome || 'Sem nome'}</strong></td>
+                            <td><code>${usuario.login}</code></td>
+                            <td>${nivelBadge}</td>
+                            <td>${unidadesTexto}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="editarUsuario('${usuario.id}')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="admin-btn admin-btn-danger" style="padding: 8px 12px; font-size: 12px;" onclick="excluirUsuario('${usuario.id}', '${usuario.nome}')">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
             document.getElementById('adminContent').innerHTML = html;
         }
 
-        function mostrarTodasUnidades() {
-            let html = `<div class="admin-section"><h2><i class="fas fa-building"></i> Unidades</h2>`;
-            html += `<div class="unidades-grid">`;
+        /**
+         * Adiciona um novo usuário
+         */
+        function adicionarNovoUsuario() {
+            const content = document.getElementById('adminContent');
             
-            listaTodasUnidades.forEach(unidade => {
-                html += `
-                    <div class="unidade-card">
-                        <div class="unidade-header">
-                            <h3 class="unidade-nome">${unidade.nome}</h3>
-                            <div class="unidade-id">${unidade.id}</div>
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-plus"></i> Adicionar Novo Usuário</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Preencha os dados do novo usuário.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="novoUsuarioNome" class="admin-input" placeholder="Digite o nome completo">
                         </div>
-                        <div class="unidade-stats">
-                            <div class="stat-item"><span class="stat-value">${unidade.especialidades}</span><span class="stat-label">Esp.</span></div>
-                            <div class="stat-item"><span class="stat-value">${unidade.atendimentos}</span><span class="stat-label">Atend.</span></div>
-                            <div class="stat-item"><span class="stat-value">${unidade.avisos}</span><span class="stat-label">Avisos</span></div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login:</label>
+                            <input id="novoUsuarioLogin" class="admin-input" placeholder="Digite o login">
                         </div>
-                        <div class="unidade-actions">
-                            <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')">
-                                <i class="fas fa-tv"></i> Acessar
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Senha:</label>
+                            <input id="novoUsuarioSenha" type="password" class="admin-input" placeholder="Digite a senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="novoUsuarioNivel" class="admin-input">
+                                <option value="super_admin">Super Administrador</option>
+                                <option value="admin_unidade">Administrador de Unidade</option>
+                                <option value="visualizador">Visualizador</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;" id="unidadesPermitidasContainer">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <label style="display: block; margin-bottom: 10px;">
+                                    <input type="checkbox" id="todasUnidades" onchange="toggleTodasUnidades()"> 
+                                    <strong>Todas as unidades</strong>
+                                </label>
+                                <div id="listaUnidadesCheckboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    ${listaTodasUnidades.map(unidade => `
+                                        <label>
+                                            <input type="checkbox" class="checkUnidade" value="${unidade.id}"> 
+                                            ${unidade.nome}
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="novoUsuarioStatus" class="admin-input">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarNovoUsuario()">
+                                <i class="fas fa-save"></i> Salvar Usuário
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('usuarios')">
+                                <i class="fas fa-times"></i> Cancelar
                             </button>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
+        }
+
+        /**
+         * Toggle para selecionar todas as unidades
+         */
+        function toggleTodasUnidades() {
+            const todasCheckbox = document.getElementById('todasUnidades');
+            const checkboxes = document.querySelectorAll('.checkUnidade');
             
-            html += `</div></div>`;
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+            });
+        }
+
+        /**
+         * Salva o novo usuário
+         */
+        function salvarNovoUsuario() {
+            const nome = document.getElementById('novoUsuarioNome').value.trim();
+            const login = document.getElementById('novoUsuarioLogin').value.trim();
+            const senha = document.getElementById('novoUsuarioSenha').value;
+            const nivel = document.getElementById('novoUsuarioNivel').value;
+            const status = document.getElementById('novoUsuarioStatus').value;
+            
+            if (!nome || !login || !senha) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            const loginExistente = listaUsuarios.find(u => u.login === login);
+            if (loginExistente) {
+                mostrarNotificacao('Este login já está em uso!', 'error');
+                return;
+            }
+            
+            let unidades_permitidas = [];
+            
+            if (document.getElementById('todasUnidades').checked) {
+                unidades_permitidas = ['todas'];
+            } else {
+                const checkboxes = document.querySelectorAll('.checkUnidade:checked');
+                checkboxes.forEach(checkbox => {
+                    unidades_permitidas.push(checkbox.value);
+                });
+            }
+            
+            const novoUsuario = {
+                nome: nome,
+                login: login,
+                senha: senha,
+                nivel: nivel,
+                unidades_permitidas: unidades_permitidas,
+                status: status,
+                data_criacao: new Date().toISOString(),
+                criado_por: usuarioAtual.nome || 'admin'
+            };
+            
+            const usuarioKey = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            db.ref('usuarios/' + usuarioKey).set(novoUsuario)
+                .then(() => {
+                    mostrarNotificacao('Usuário criado com sucesso!', 'success');
+                    carregarTodosUsuarios();
+                    setTimeout(() => mostrarSecao('usuarios'), 1000);
+                })
+                .catch(error => {
+                    console.error('Erro ao criar usuário:', error);
+                    mostrarNotificacao('Erro ao criar usuário!', 'error');
+                });
+        }
+
+        /**
+         * Edita um usuário
+         */
+        function editarUsuario(usuarioId) {
+            const usuario = listaUsuarios.find(u => u.id === usuarioId);
+            
+            if (!usuario) {
+                mostrarNotificacao('Usuário não encontrado!', 'error');
+                return;
+            }
+            
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-user-edit"></i> Editar Usuário: ${usuario.nome}</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Edite os dados do usuário.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome Completo:</label>
+                            <input id="editarUsuarioNome" class="admin-input" value="${usuario.nome}">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Login:</label>
+                            <input id="editarUsuarioLogin" class="admin-input" value="${usuario.login}">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nova Senha (deixe em branco para não alterar):</label>
+                            <input id="editarUsuarioSenha" type="password" class="admin-input" placeholder="Digite nova senha">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nível de Acesso:</label>
+                            <select id="editarUsuarioNivel" class="admin-input">
+                                <option value="super_admin" ${usuario.nivel === 'super_admin' ? 'selected' : ''}>Super Administrador</option>
+                                <option value="admin_unidade" ${usuario.nivel === 'admin_unidade' ? 'selected' : ''}>Administrador de Unidade</option>
+                                <option value="visualizador" ${usuario.nivel === 'visualizador' ? 'selected' : ''}>Visualizador</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;" id="editarUnidadesPermitidasContainer">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Unidades Permitidas:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                <label style="display: block; margin-bottom: 10px;">
+                                    <input type="checkbox" id="editarTodasUnidades" onchange="toggleTodasUnidadesEditar()" 
+                                           ${usuario.unidades_permitidas && usuario.unidades_permitidas.includes('todas') ? 'checked' : ''}> 
+                                    <strong>Todas as unidades</strong>
+                                </label>
+                                <div id="editarListaUnidadesCheckboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    ${listaTodasUnidades.map(unidade => {
+                                        const isChecked = usuario.unidades_permitidas && 
+                                            (usuario.unidades_permitidas.includes('todas') || 
+                                             usuario.unidades_permitidas.includes(unidade.id));
+                                        return `
+                                            <label>
+                                                <input type="checkbox" class="checkUnidadeEditar" value="${unidade.id}" 
+                                                       ${isChecked ? 'checked' : ''}> 
+                                                ${unidade.nome}
+                                            </label>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Status:</label>
+                            <select id="editarUsuarioStatus" class="admin-input">
+                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="salvarEdicaoUsuario('${usuarioId}')">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('usuarios')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Toggle para selecionar todas as unidades (edição)
+         */
+        function toggleTodasUnidadesEditar() {
+            const todasCheckbox = document.getElementById('editarTodasUnidades');
+            const checkboxes = document.querySelectorAll('.checkUnidadeEditar');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = todasCheckbox.checked;
+                checkbox.disabled = todasCheckbox.checked;
+            });
+        }
+
+        /**
+         * Salva a edição do usuário
+         */
+        function salvarEdicaoUsuario(usuarioId) {
+            const nome = document.getElementById('editarUsuarioNome').value.trim();
+            const login = document.getElementById('editarUsuarioLogin').value.trim();
+            const novaSenha = document.getElementById('editarUsuarioSenha').value;
+            const nivel = document.getElementById('editarUsuarioNivel').value;
+            const status = document.getElementById('editarUsuarioStatus').value;
+            
+            if (!nome || !login) {
+                mostrarNotificacao('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            const usuarioExistente = listaUsuarios.find(u => u.login === login && u.id !== usuarioId);
+            if (usuarioExistente) {
+                mostrarNotificacao('Este login já está em uso!', 'error');
+                return;
+            }
+            
+            let unidades_permitidas = [];
+            
+            if (document.getElementById('editarTodasUnidades').checked) {
+                unidades_permitidas = ['todas'];
+            } else {
+                const checkboxes = document.querySelectorAll('.checkUnidadeEditar:checked');
+                checkboxes.forEach(checkbox => {
+                    unidades_permitidas.push(checkbox.value);
+                });
+            }
+            
+            db.ref('usuarios/' + usuarioId).once('value').then((snapshot) => {
+                const usuarioAtualData = snapshot.val();
+                
+                const dadosAtualizados = {
+                    nome: nome,
+                    login: login,
+                    nivel: nivel,
+                    unidades_permitidas: unidades_permitidas,
+                    status: status,
+                    data_atualizacao: new Date().toISOString(),
+                    atualizado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                if (novaSenha) {
+                    dadosAtualizados.senha = novaSenha;
+                } else {
+                    dadosAtualizados.senha = usuarioAtualData.senha;
+                }
+                
+                if (usuarioAtualData.data_criacao) {
+                    dadosAtualizados.data_criacao = usuarioAtualData.data_criacao;
+                    dadosAtualizados.criado_por = usuarioAtualData.criado_por;
+                }
+                
+                db.ref('usuarios/' + usuarioId).set(dadosAtualizados)
+                    .then(() => {
+                        mostrarNotificacao('Usuário atualizado com sucesso!', 'success');
+                        carregarTodosUsuarios();
+                        setTimeout(() => mostrarSecao('usuarios'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar usuário:', error);
+                        mostrarNotificacao('Erro ao atualizar usuário!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Exclui um usuário
+         */
+        function excluirUsuario(usuarioId, usuarioNome) {
+            if (usuarioId === 'admin_gti') {
+                mostrarNotificacao('Não é possível excluir o administrador principal!', 'error');
+                return;
+            }
+            
+            if (confirm(`Excluir usuário "${usuarioNome}"?`)) {
+                db.ref('usuarios/' + usuarioId).remove()
+                    .then(() => {
+                        mostrarNotificacao(`Usuário excluído com sucesso!`, 'success');
+                        carregarTodosUsuarios();
+                        setTimeout(() => mostrarSecao('usuarios'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir usuário:', error);
+                        mostrarNotificacao('Erro ao excluir usuário!', 'error');
+                    });
+            }
+        }
+
+        // =================================================================
+        // GERENCIAMENTO DE UNIDADES - TOTALMENTE FUNCIONAL
+        // =================================================================
+
+        /**
+         * Mostra o gerenciamento de todas as unidades
+         */
+        function mostrarTodasUnidades() {
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-building"></i> Gerenciar Todas as Unidades</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Visualize e gerencie todas as unidades cadastradas no sistema.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Lista de Unidades</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="admin-btn" onclick="adicionarNovaUnidade()">
+                                <i class="fas fa-plus-circle"></i> Nova Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="atualizarListaUnidades()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="unidades-grid">
+            `;
+            
+            if (listaTodasUnidades.length === 0) {
+                html += `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-hospital" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+                        <h3 style="color: #666; margin-bottom: 10px;">Nenhuma unidade cadastrada</h3>
+                        <p style="color: #888;">Clique em "Nova Unidade" para adicionar a primeira unidade.</p>
+                    </div>
+                `;
+            } else {
+                listaTodasUnidades.forEach(unidade => {
+                    const ultimaAtualizacao = unidade.ultima_atualizacao 
+                        ? new Date(unidade.ultima_atualizacao).toLocaleString('pt-BR')
+                        : 'Nunca';
+                    
+                    html += `
+                        <div class="unidade-card">
+                            <div class="unidade-header">
+                                <div>
+                                    <h3 class="unidade-nome">${unidade.nome}</h3>
+                                    <div class="unidade-id">ID: ${unidade.id}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" title="Acessar Unidade">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')" title="Editar Unidade">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn action-btn-danger" onclick="excluirUnidadeCard('${unidade.id}', '${unidade.nome}')" title="Excluir Unidade">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="unidade-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.especialidades}</span>
+                                    <span class="stat-label">Especialidades</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.atendimentos}</span>
+                                    <span class="stat-label">Atendimentos</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${unidade.avisos}</span>
+                                    <span class="stat-label">Avisos</span>
+                                </div>
+                            </div>
+                            
+                            <div style="font-size: 11px; color: #666; margin-top: 10px;">
+                                <i class="fas fa-clock"></i> Última atualização: ${ultimaAtualizacao}
+                            </div>
+                            
+                            <div class="unidade-actions">
+                                <button class="action-btn action-btn-primary" onclick="acessarUnidade('${unidade.id}')" style="flex: 2;">
+                                    <i class="fas fa-tv"></i> Acessar Painel
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <button class="action-btn action-btn-danger" onclick="excluirUnidadeCard('${unidade.id}', '${unidade.nome}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
             document.getElementById('adminContent').innerHTML = html;
         }
 
+        /**
+         * Atualiza a lista de unidades
+         */
+        function atualizarListaUnidades() {
+            carregarTodasUnidades();
+            setTimeout(() => mostrarTodasUnidades(), 500);
+            mostrarNotificacao('Lista de unidades atualizada!', 'success');
+        }
+
+        /**
+         * Acessa uma unidade específica
+         */
         function acessarUnidade(unidadeId) {
             const url = window.location.origin + window.location.pathname + '?id=' + unidadeId;
             window.open(url, '_blank');
         }
 
+        /**
+         * Adiciona uma nova unidade
+         */
+        function adicionarNovaUnidade() {
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-plus-circle"></i> Adicionar Nova Unidade</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Crie uma nova unidade de saúde.
+                    </div>
+                    
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
+                            <input id="novaUnidadeNome" class="admin-input" placeholder="Digite o nome da unidade">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ID da Unidade (único):</label>
+                            <input id="novaUnidadeId" class="admin-input" placeholder="Digite um ID único">
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                Use apenas letras, números e underscores.
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Configuração Inicial:</label>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <input type="checkbox" id="addEspecialidades" checked style="margin-right: 10px;">
+                                    Adicionar exemplo de especialidades
+                                </label>
+                                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <input type="checkbox" id="addAtendimentos" checked style="margin-right: 10px;">
+                                    Adicionar exemplo de atendimentos
+                                </label>
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="addAvisos" checked style="margin-right: 10px;">
+                                    Adicionar aviso de boas-vindas
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="admin-btn" onclick="criarNovaUnidade()">
+                                <i class="fas fa-save"></i> Criar Unidade
+                            </button>
+                            <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidades')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Cria uma nova unidade
+         */
+        function criarNovaUnidade() {
+            const nome = document.getElementById('novaUnidadeNome').value.trim();
+            const unidadeId = document.getElementById('novaUnidadeId').value.trim().toLowerCase();
+            
+            if (!nome || !unidadeId) {
+                mostrarNotificacao('Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            if (!/^[a-z0-9_]+$/.test(unidadeId)) {
+                mostrarNotificacao('Use apenas letras minúsculas, números e underscore!', 'error');
+                return;
+            }
+            
+            const idExistente = listaTodasUnidades.find(u => u.id === unidadeId);
+            if (idExistente) {
+                mostrarNotificacao('Este ID já está em uso!', 'error');
+                return;
+            }
+            
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    mostrarNotificacao('Esta unidade já existe!', 'error');
+                    return;
+                }
+                
+                const novaUnidade = {
+                    unidade: {
+                        nome: nome,
+                        especialidades: [],
+                        atendimentos: []
+                    },
+                    avisos: [],
+                    flayers: [], // Adicionar array de flayers vazio
+                    ultima_atualizacao: Date.now(),
+                    ultima_sincronizacao: Date.now(),
+                    data_criacao: new Date().toISOString(),
+                    criado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                if (document.getElementById('addEspecialidades').checked) {
+                    novaUnidade.unidade.especialidades = [
+                        { nome: "Clínica Médica", faltas: 0 },
+                        { nome: "Pediatria", faltas: 0 },
+                        { nome: "Enfermagem", faltas: 0 }
+                    ];
+                }
+                
+                if (document.getElementById('addAtendimentos').checked) {
+                    novaUnidade.unidade.atendimentos = [
+                        { nome: "Consultas", valor: 0 },
+                        { nome: "Exames", valor: 0 },
+                        { nome: "Vacinas", valor: 0 }
+                    ];
+                }
+                
+                if (document.getElementById('addAvisos').checked) {
+                    novaUnidade.avisos = ["Bem-vindo à " + nome + "!"];
+                }
+                
+                db.ref('paineis/' + unidadeId).set(novaUnidade)
+                    .then(() => {
+                        mostrarNotificacao(`Unidade "${nome}" criada com sucesso!`, 'success');
+                        carregarTodasUnidades();
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao criar unidade:', error);
+                        mostrarNotificacao('Erro ao criar unidade!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Edita uma unidade
+         */
+        function editarUnidade(unidadeId) {
+            const unidade = listaTodasUnidades.find(u => u.id === unidadeId);
+            
+            if (!unidade) {
+                mostrarNotificacao('Unidade não encontrada!', 'error');
+                return;
+            }
+            
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                const dadosUnidade = snapshot.val();
+                
+                const content = document.getElementById('adminContent');
+                
+                content.innerHTML = `
+                    <div class="admin-section">
+                        <h2><i class="fas fa-edit"></i> Editar Unidade: ${dadosUnidade.unidade.nome}</h2>
+                        <div class="section-info">
+                            <i class="fas fa-info-circle"></i> Edite os dados da unidade.
+                        </div>
+                        
+                        <div style="max-width: 600px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Nome da Unidade:</label>
+                                <input id="editarUnidadeNome" class="admin-input" value="${dadosUnidade.unidade.nome}">
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ID da Unidade:</label>
+                                <input id="editarUnidadeId" class="admin-input" value="${unidadeId}" disabled>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    O ID não pode ser alterado.
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                <button class="admin-btn" onclick="salvarEdicaoUnidade('${unidadeId}')">
+                                    <i class="fas fa-save"></i> Salvar Alterações
+                                </button>
+                                <button class="admin-btn admin-btn-secondary" onclick="mostrarSecao('unidades')">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 40px; padding: 20px; background: #ffebee; border-radius: 10px; border-left: 4px solid #d32f2f;">
+                                <h3 style="color: #d32f2f; margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Área de Perigo</h3>
+                                <p style="color: #666; margin-bottom: 15px;">
+                                    <strong>Atenção:</strong> A exclusão da unidade removerá todos os dados permanentemente.
+                                </p>
+                                <button class="admin-btn admin-btn-danger" onclick="excluirUnidade('${unidadeId}', '${dadosUnidade.unidade.nome}')">
+                                    <i class="fas fa-trash"></i> Excluir Esta Unidade
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        /**
+         * Salva a edição da unidade
+         */
+        function salvarEdicaoUnidade(unidadeId) {
+            const novoNome = document.getElementById('editarUnidadeNome').value.trim();
+            
+            if (!novoNome) {
+                mostrarNotificacao('Digite um nome para a unidade!', 'error');
+                return;
+            }
+            
+            db.ref('paineis/' + unidadeId).once('value').then((snapshot) => {
+                const dadosAtuais = snapshot.val();
+                
+                const dadosAtualizados = {
+                    ...dadosAtuais,
+                    unidade: {
+                        ...dadosAtuais.unidade,
+                        nome: novoNome
+                    },
+                    ultima_atualizacao: Date.now(),
+                    data_atualizacao: new Date().toISOString(),
+                    atualizado_por: usuarioAtual.nome || 'admin'
+                };
+                
+                db.ref('paineis/' + unidadeId).set(dadosAtualizados)
+                    .then(() => {
+                        mostrarNotificacao('Unidade atualizada com sucesso!', 'success');
+                        carregarTodasUnidades();
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar unidade:', error);
+                        mostrarNotificacao('Erro ao atualizar unidade!', 'error');
+                    });
+            });
+        }
+
+        /**
+         * Exclui uma unidade do painel de edição
+         */
+        function excluirUnidade(unidadeId, unidadeNome) {
+            if (unidadeId === 'geral') {
+                mostrarNotificacao('Não é possível excluir a matriz!', 'error');
+                return;
+            }
+            
+            if (confirm(`Excluir unidade "${unidadeNome}"?`)) {
+                db.ref('paineis/' + unidadeId).remove()
+                    .then(() => {
+                        mostrarNotificacao(`Unidade excluída com sucesso!`, 'success');
+                        carregarTodasUnidades();
+                        setTimeout(() => mostrarSecao('unidades'), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir unidade:', error);
+                        mostrarNotificacao('Erro ao excluir unidade!', 'error');
+                    });
+            }
+        }
+
+        /**
+         * Exclui uma unidade diretamente do card
+         */
+        function excluirUnidadeCard(unidadeId, unidadeNome) {
+            if (unidadeId === 'geral') {
+                mostrarNotificacao('Não é possível excluir a matriz!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja EXCLUIR a unidade "${unidadeNome}"?\n\nEsta ação é PERMANENTE e irá remover:\n• Todos os dados da unidade\n• Histórico de atendimentos\n• Configurações\n\nID: ${unidadeId}`)) {
+                db.ref('paineis/' + unidadeId).remove()
+                    .then(() => {
+                        // Atualizar lista local
+                        listaTodasUnidades = listaTodasUnidades.filter(u => u.id !== unidadeId);
+                        
+                        mostrarNotificacao(`Unidade "${unidadeNome}" excluída com sucesso!`, 'success');
+                        
+                        // Recarregar a lista
+                        setTimeout(() => mostrarTodasUnidades(), 500);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir unidade:', error);
+                        mostrarNotificacao('Erro ao excluir unidade!', 'error');
+                    });
+            }
+        }
+
+        // =================================================================
+        // MONITOR DE INATIVIDADE - TOTALMENTE FUNCIONAL
+        // =================================================================
+
+        /**
+         * Mostra o monitor de inatividade
+         */
         function mostrarMonitorInatividade() {
-            let html = `<div class="admin-section"><h2><i class="fas fa-exclamation-triangle"></i> Monitor</h2>`;
-            html += `<div style="text-align: center; padding: 40px; color: #999;">
-                        <i class="fas fa-chart-line" style="font-size: 48px;"></i>
-                        <p style="margin-top: 20px;">Monitor de inatividade disponível na matriz.</p>
-                     </div>`;
-            html += `</div>`;
+            // Verificar se há unidades carregadas
+            if (listaTodasUnidades.length === 0) {
+                carregarTodasUnidades();
+                setTimeout(() => mostrarMonitorInatividade(), 1000);
+                return;
+            }
+            
+            // Calcular inatividade
+            const agora = Date.now();
+            const unidadesComInatividade = listaTodasUnidades.map(unidade => {
+                const ultimaSincronizacao = unidade.ultima_sincronizacao || unidade.ultima_atualizacao || 0;
+                const horasInatividade = ultimaSincronizacao ? Math.floor((agora - ultimaSincronizacao) / (1000 * 60 * 60)) : 999;
+                
+                let status = 'ativo';
+                let statusCor = '#2e7d32';
+                let statusTexto = 'Ativo';
+                
+                if (horasInatividade > 168) {
+                    status = 'critico';
+                    statusCor = '#d32f2f';
+                    statusTexto = 'Crítico';
+                } else if (horasInatividade > 72) {
+                    status = 'alerta';
+                    statusCor = '#f57c00';
+                    statusTexto = 'Alerta';
+                } else if (horasInatividade > 24) {
+                    status = 'atencao';
+                    statusCor = '#ffb74d';
+                    statusTexto = 'Atenção';
+                }
+                
+                return {
+                    ...unidade,
+                    horasInatividade: horasInatividade,
+                    status: status,
+                    statusCor: statusCor,
+                    statusTexto: statusTexto,
+                    ultimaSincronizacaoFormatada: ultimaSincronizacao 
+                        ? new Date(ultimaSincronizacao).toLocaleString('pt-BR')
+                        : 'Nunca'
+                };
+            }).sort((a, b) => b.horasInatividade - a.horasInatividade);
+            
+            const criticas = unidadesComInatividade.filter(u => u.status === 'critico').length;
+            const alertas = unidadesComInatividade.filter(u => u.status === 'alerta').length;
+            const atencao = unidadesComInatividade.filter(u => u.status === 'atencao').length;
+            const ativas = unidadesComInatividade.filter(u => u.status === 'ativo').length;
+            
+            let html = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Monitor de Inatividade</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> Monitoramento das unidades que não atualizaram dados recentemente.
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: #2e7d32; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${ativas}</div>
+                            <div style="font-size: 14px;">Ativas (< 24h)</div>
+                        </div>
+                        <div style="background: #ffb74d; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${atencao}</div>
+                            <div style="font-size: 14px;">Atenção (1-3 dias)</div>
+                        </div>
+                        <div style="background: #f57c00; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${alertas}</div>
+                            <div style="font-size: 14px;">Alerta (3-7 dias)</div>
+                        </div>
+                        <div style="background: #d32f2f; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800;">${criticas}</div>
+                            <div style="font-size: 14px;">Críticas (> 7 dias)</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Detalhamento por Unidade (${unidadesComInatividade.length} unidades)</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="admin-btn" onclick="atualizarMonitor()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="admin-btn admin-btn-primary" onclick="forcarSincronizacaoTodas()">
+                                <i class="fas fa-bolt"></i> Sincronizar Todas
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>Status</th>
+                                <th>Tempo Inativo</th>
+                                <th>Última Sincronização</th>
+                                <th>Dados</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            if (unidadesComInatividade.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-database" style="font-size: 32px; margin-bottom: 10px; display: block; color: #1565c0;"></i>
+                            Nenhuma unidade encontrada.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                unidadesComInatividade.forEach(unidade => {
+                    let tempoInatividade = '';
+                    if (unidade.horasInatividade === 0) {
+                        tempoInatividade = '< 1 hora';
+                    } else if (unidade.horasInatividade < 24) {
+                        tempoInatividade = `${unidade.horasInatividade} horas`;
+                    } else {
+                        const dias = Math.floor(unidade.horasInatividade / 24);
+                        const horas = unidade.horasInatividade % 24;
+                        tempoInatividade = `${dias}d ${horas}h`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${unidade.nome}</strong>
+                                <div style="font-size: 11px; color: #666;">ID: ${unidade.id}</div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: ${unidade.statusCor}; color: white;">
+                                    ${unidade.statusTexto}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: ${unidade.statusCor};">${tempoInatividade}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">${unidade.ultimaSincronizacaoFormatada}</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 16px; font-weight: 700; color: #d32f2f;">${unidade.especialidades}</div>
+                                        <div style="font-size: 10px; color: #666;">Esp.</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 16px; font-weight: 700; color: #2196f3;">${unidade.atendimentos}</div>
+                                        <div style="font-size: 10px; color: #666;">Atend.</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 16px; font-weight: 700; color: #7b1fa2;">${unidade.avisos}</div>
+                                        <div style="font-size: 10px; color: #666;">Avisos</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="admin-btn" style="padding: 8px 12px; font-size: 12px;" onclick="forcarSincronizacaoUnidade('${unidade.id}')" title="Forçar Sincronização">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <button class="admin-btn" style="padding: 8px 12px; font-size: 12px; background: #1565c0;" onclick="acessarUnidade('${unidade.id}')" title="Acessar Unidade">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
             document.getElementById('adminContent').innerHTML = html;
         }
 
-        function forcarSincronizacaoTodas() {
-            mostrarNotificacao('Sincronização forçada enviada!', 'success');
+        /**
+         * Atualiza o monitor
+         */
+        function atualizarMonitor() {
+            carregarTodasUnidades();
+            setTimeout(() => {
+                mostrarMonitorInatividade();
+                mostrarNotificacao('Monitor atualizado!', 'success');
+            }, 1000);
         }
 
         // =================================================================
-        // INICIALIZAÇÃO
+        // FUNÇÕES DE SINCRONIZAÇÃO FORÇADA
+        // =================================================================
+
+        /**
+         * Força sincronização de uma unidade
+         */
+        function forcarSincronizacaoUnidade(unidadeId) {
+            const agora = Date.now();
+            
+            db.ref('paineis/' + unidadeId + '/ultima_atualizacao').set(agora)
+                .then(() => {
+                    mostrarNotificacao(`Sincronização forçada enviada para ${unidadeId}!`, 'success');
+                })
+                .catch(error => {
+                    console.error('Erro ao forçar sincronização:', error);
+                    mostrarNotificacao('Erro ao forçar sincronização!', 'error');
+                });
+        }
+
+        /**
+         * Força sincronização de todas as unidades
+         */
+        function forcarSincronizacaoTodas() {
+            if (confirm('Forçar sincronização em TODAS as unidades?')) {
+                const agora = Date.now();
+                const promises = [];
+                
+                listaTodasUnidades.forEach(unidade => {
+                    const promise = db.ref('paineis/' + unidade.id + '/ultima_atualizacao').set(agora);
+                    promises.push(promise);
+                });
+                
+                promises.push(db.ref('paineis/geral/ultima_atualizacao').set(agora));
+                
+                Promise.all(promises)
+                    .then(() => {
+                        mostrarNotificacao(`Sincronização forçada enviada para ${listaTodasUnidades.length + 1} unidades!`, 'success');
+                    })
+                    .catch(error => {
+                        console.error('Erro ao forçar sincronização:', error);
+                        mostrarNotificacao('Erro ao forçar sincronização!', 'error');
+                    });
+            }
+        }
+
+        // =================================================================
+        // SISTEMA DE FLAYERS - EXIBIÇÃO PÓS-VIDEO (SEM ALTERAR ESTRUTURA)
         // =================================================================
         
+        // Configuração dos flayers
+        const flayerSystem = {
+            enabled: true,
+            duration: 30000,           // 30 segundos por flayer
+            currentIndex: 0,
+            isPlaying: false,
+            timer: null,
+            videoCheckInterval: null,
+            flayers: [],
+            
+            // Inicializar
+            init() {
+                this.carregarDoFirebase();
+                this.setupRealtimeListener();
+                this.monitorarVideo();
+                console.log('🖼️ Sistema de flayers inicializado (modo pós-vídeo)');
+            },
+            
+            // Carregar flayers do Firebase
+            carregarDoFirebase() {
+                db.ref('paineis/' + unidadeID + '/flayers').once('value')
+                    .then(snapshot => {
+                        this.flayers = snapshot.val() || [];
+                        console.log('🖼️ Flayers carregados:', this.flayers.length);
+                    });
+            },
+            
+            // Listener em tempo real
+            setupRealtimeListener() {
+                db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
+                    this.flayers = snapshot.val() || [];
+                    console.log('🖼️ Flayers atualizados:', this.flayers.length);
+                });
+            },
+            
+            // Monitorar quando o vídeo termina
+            monitorarVideo() {
+                // Verificar a cada 30 segundos se o vídeo terminou
+                this.videoCheckInterval = setInterval(() => {
+                    // Só verificar se não estiver tocando flayer
+                    if (this.isPlaying) return;
+                    
+                    // Verificar se tem flayers configurados
+                    if (this.flayers.length === 0) return;
+                    
+                    // Verificar se o vídeo está rodando
+                    this.verificarFimDoVideo();
+                }, 30000);
+            },
+            
+            // Verificar se o vídeo terminou
+            verificarFimDoVideo() {
+                const iframe = document.querySelector('.video-iframe');
+                if (!iframe) return;
+                
+                // Verificar se o vídeo existe e se está tocando há muito tempo
+                const ultimaTroca = localStorage.getItem('ultimaTrocaVideo_' + unidadeID);
+                const agora = Date.now();
+                
+                if (ultimaTroca) {
+                    const tempoDesdeTroca = agora - parseInt(ultimaTroca);
+                    
+                    // Se passou mais de 5 minutos desde a última troca de vídeo
+                    // e tem flayers configurados, inicia os flayers
+                    if (tempoDesdeTroca > 300000) { // 5 minutos
+                        this.iniciarCicloFlayers();
+                    }
+                }
+            },
+            
+            // Iniciar ciclo de flayers (chamado quando vídeo termina)
+            iniciarCicloFlayers() {
+                // Verificar se já está tocando ou não tem flayers
+                if (this.isPlaying) return;
+                if (this.flayers.length === 0) return;
+                
+                console.log('🎬 Fim do vídeo detectado - iniciando flayers');
+                this.isPlaying = true;
+                this.currentIndex = 0;
+                this.proximoFlayer();
+            },
+            
+            // Mostrar próximo flayer
+            proximoFlayer() {
+                if (!this.isPlaying) return;
+                
+                if (this.currentIndex >= this.flayers.length) {
+                    // Terminou todos os flayers - voltar para vídeo
+                    this.voltarParaVideo();
+                    return;
+                }
+                
+                this.mostrarFlayer(this.flayers[this.currentIndex]);
+                this.currentIndex++;
+                
+                // Agendar próximo flayer
+                if (this.timer) clearTimeout(this.timer);
+                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
+            },
+            
+            // Mostrar flayer em tela cheia
+            mostrarFlayer(url) {
+                const videoSection = document.querySelector('.video-section');
+                const videoContainer = document.getElementById('videoContainer');
+                const btnSom = document.getElementById('btnSom');
+                
+                if (!videoSection || !videoContainer) return;
+                
+                // Esconder botão de som
+                if (btnSom) btnSom.style.display = 'none';
+                
+                // Criar ou obter container do flayer
+                let flayerDiv = document.getElementById('flayerContainer');
+                if (!flayerDiv) {
+                    flayerDiv = document.createElement('div');
+                    flayerDiv.id = 'flayerContainer';
+                    videoSection.style.position = 'relative';
+                    videoSection.appendChild(flayerDiv);
+                }
+                
+                // Configurar imagem
+                flayerDiv.innerHTML = `
+                    <img src="${url}" 
+                         alt="Flayer"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem<br><span style=\'font-size: 16px;\'>URL inválida</span></div>';">
+                `;
+                
+                // Mostrar flayer, esconder vídeo
+                flayerDiv.style.display = 'flex';
+                videoContainer.style.display = 'none';
+                
+                console.log('🖼️ Exibindo flayer:', this.currentIndex + 1, 'de', this.flayers.length);
+            },
+            
+            // Voltar para o vídeo após todos os flayers
+            voltarParaVideo() {
+                this.isPlaying = false;
+                
+                const flayerDiv = document.getElementById('flayerContainer');
+                if (flayerDiv) {
+                    flayerDiv.style.display = 'none';
+                }
+                
+                const videoContainer = document.getElementById('videoContainer');
+                if (videoContainer) {
+                    videoContainer.style.display = 'block';
+                }
+                
+                const btnSom = document.getElementById('btnSom');
+                if (btnSom && isMuted === false) {
+                    btnSom.style.display = 'none';
+                } else if (btnSom) {
+                    btnSom.style.display = 'block';
+                }
+                
+                // Recarregar vídeo para garantir que está tocando
+                setTimeout(() => {
+                    carregarVideo();
+                }, 100);
+                
+                console.log('🎬 Todos os flayers exibidos - voltando para vídeo');
+            },
+            
+            // Salvar flayers no Firebase
+            salvar(urls) {
+                this.flayers = urls.filter(url => url.trim() !== '');
+                return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayers);
+            },
+            
+            // Parar flayers manualmente
+            parar() {
+                this.isPlaying = false;
+                if (this.timer) {
+                    clearTimeout(this.timer);
+                    this.timer = null;
+                }
+                this.voltarParaVideo();
+            }
+        };
+
+        // =================================================================
+        // INTERFACE ADMINISTRATIVA PARA FLAYERS
+        // =================================================================
+
+        /**
+         * Mostrar configuração de flayers no admin
+         */
+        function mostrarSecaoFlayers() {
+            if (!verificarAcessoSecao('flayers')) {
+                mostrarNotificacao('Você não tem permissão para acessar esta seção.', 'error');
+                return;
+            }
+            
+            const content = document.getElementById('adminContent');
+            const urls = flayerSystem.flayers || [];
+            
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h2><i class="fas fa-images"></i> Encartes/Flayers - Pós-Vídeo</h2>
+                    <div class="section-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Funcionamento automático:</strong><br>
+                        1. Os vídeos rodam normalmente em sequência<br>
+                        2. Quando a sequência de vídeos termina, os flayers começam automaticamente<br>
+                        3. Cada flayer fica 30 segundos em tela cheia<br>
+                        4. Após todos os flayers, a sequência de vídeos recomeça<br>
+                        5. O ciclo se repete indefinidamente
+                    </div>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
+                            <i class="fas fa-link"></i> URLs das Imagens (uma por linha):
+                        </label>
+                        <textarea id="flayerUrls" class="admin-input" 
+                            placeholder="https://exemplo.com/imagem1.jpg
+https://exemplo.com/imagem2.png
+https://exemplo.com/imagem3.jpg" 
+                            style="min-height: 180px; font-family: monospace;">${urls.join('\n')}</textarea>
+                        <div style="font-size: 13px; color: #666; margin-top: 8px;">
+                            <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;">
+                        <button class="admin-btn" onclick="salvarFlayers()">
+                            <i class="fas fa-save"></i> Salvar Flayers
+                        </button>
+                        <button class="admin-btn admin-btn-primary" onclick="testarFlayersAgora()">
+                            <i class="fas fa-play"></i> Testar Agora (Forçar Início)
+                        </button>
+                        <button class="admin-btn admin-btn-secondary" onclick="pararFlayersAgora()">
+                            <i class="fas fa-stop"></i> Voltar para Vídeo
+                        </button>
+                        <button class="admin-btn admin-btn-danger" onclick="limparTodosFlayers()">
+                            <i class="fas fa-trash"></i> Limpar Todos
+                        </button>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <h3 style="color: #1565c0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-image"></i> Pré-visualização (${urls.length} flayer${urls.length !== 1 ? 'es' : ''})
+                        </h3>
+                        
+                        <div id="flayerPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;">
+                            ${urls.map((url, index) => `
+                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                    <div style="height: 120px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 10px;">
+                                        <img src="${url}" 
+                                             style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iMTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiPkVycm88L3RleHQ+PC9zdmc+';">
+                                    </div>
+                                    <div style="padding: 10px; border-top: 1px solid #f0f0f0;">
+                                        <div style="font-size: 11px; color: #666; word-break: break-all; margin-bottom: 8px;">
+                                            ${url.length > 30 ? url.substring(0, 30) + '...' : url}
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 11px; background: #1565c0; color: white; padding: 2px 8px; border-radius: 12px;">
+                                                ${index + 1}
+                                            </span>
+                                            <button onclick="removerFlayerEspecifico(${index})" 
+                                                    style="background: none; border: none; color: #d32f2f; cursor: pointer; padding: 5px;">
+                                                <i class="fas fa-times-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            ${urls.length === 0 ? `
+                                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #999;">
+                                    <i class="fas fa-images" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
+                                    <h4 style="color: #666; margin-bottom: 5px;">Nenhum flayer configurado</h4>
+                                    <p style="font-size: 13px;">Adicione URLs de imagens acima para começar</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px; border-left: 5px solid #2e7d32;">
+                        <h4 style="color: #2e7d32; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-info-circle"></i> Como funciona:
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: #555;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">1</span>
+                                <span>Vídeos rodam em sequência</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">2</span>
+                                <span>Ao terminar, inicia flayers</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">3</span>
+                                <span>30 segundos por flayer</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">4</span>
+                                <span>Após todos, vídeos recomeçam</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Salvar flayers no Firebase
+         */
+        function salvarFlayers() {
+            const textarea = document.getElementById('flayerUrls');
+            if (!textarea) return;
+            
+            const urls = textarea.value.split('\n')
+                .map(url => url.trim())
+                .filter(url => url !== '');
+            
+            flayerSystem.salvar(urls).then(() => {
+                mostrarNotificacao(`${urls.length} flayer(s) salvos com sucesso!`, 'success');
+                mostrarSecaoFlayers();
+            }).catch(error => {
+                mostrarNotificacao('Erro ao salvar flayers!', 'error');
+                console.error(error);
+            });
+        }
+
+        /**
+         * Remover flayer específico
+         */
+        function removerFlayerEspecifico(index) {
+            const urls = [...flayerSystem.flayers];
+            urls.splice(index, 1);
+            
+            flayerSystem.salvar(urls).then(() => {
+                mostrarNotificacao('Flayer removido!', 'success');
+                mostrarSecaoFlayers();
+            });
+        }
+
+        /**
+         * Limpar todos os flayers
+         */
+        function limparTodosFlayers() {
+            if (confirm('Remover TODOS os flayers configurados?')) {
+                flayerSystem.salvar([]).then(() => {
+                    mostrarNotificacao('Todos os flayers foram removidos!', 'success');
+                    flayerSystem.parar();
+                    mostrarSecaoFlayers();
+                });
+            }
+        }
+
+        /**
+         * Testar flayers imediatamente (forçar início)
+         */
+        function testarFlayersAgora() {
+            if (flayerSystem.flayers.length === 0) {
+                mostrarNotificacao('Não há flayers configurados para testar!', 'warning');
+                return;
+            }
+            
+            mostrarNotificacao('Iniciando flayers (teste)...', 'success');
+            
+            // Fechar admin se estiver aberto
+            if (document.getElementById('adminPanel').style.display === 'flex') {
+                setTimeout(() => {
+                    document.getElementById('adminPanel').style.display = 'none';
+                }, 300);
+            }
+            
+            // Forçar início dos flayers
+            flayerSystem.parar(); // Para qualquer reprodução atual
+            setTimeout(() => {
+                flayerSystem.isPlaying = true;
+                flayerSystem.currentIndex = 0;
+                flayerSystem.proximoFlayer();
+            }, 500);
+        }
+
+        /**
+         * Parar flayers e voltar para vídeo
+         */
+        function pararFlayersAgora() {
+            flayerSystem.parar();
+            mostrarNotificacao('Voltando para reprodução de vídeos...', 'info');
+        }
+
+        // =================================================================
+        // INICIALIZAÇÃO DO SISTEMA
+        // =================================================================
+        
+        /**
+         * Inicializa o sistema quando a página carrega
+         */
         window.onload = iniciarSistema;
     </script>
 </body>
