@@ -163,7 +163,7 @@
             gap: 8px; 
         }
         
-        /* SEÇÃO DE VÍDEO */
+        /* SEÇÃO DE VÍDEO (AGORA PLAYLIST) */
         .video-section { 
             background: #000; 
             border-radius: 16px; 
@@ -1093,7 +1093,7 @@
         }
         
         /* ================================
-           ESTILOS PARA FLAYERS
+           CONTAINER PARA FLAYERS (IMAGENS)
            ================================ */
         #flayerContainer {
             position: absolute;
@@ -1170,7 +1170,7 @@
                     <i class="fas fa-volume-up"></i> ATIVAR SOM
                 </button>
                 <div class="video-container" id="videoContainer"></div>
-                <!-- Container para flayers será inserido aqui via JavaScript -->
+                <!-- Container para flayers (imagens) -->
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
         </div>
@@ -1269,7 +1269,10 @@
                 <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">
                     <i class="fas fa-video"></i> Vídeos
                 </div>
-                <!-- Item Flayers será inserido aqui via JavaScript -->
+                <!-- Item Flayers -->
+                <div class="sidebar-item" id="menuFlayers" onclick="mostrarSecao('flayers')">
+                    <i class="fas fa-images"></i> Encartes/Flayers
+                </div>
                 <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
@@ -1292,7 +1295,7 @@
 
         <!-- Informações de versão -->
         <div class="version-info">
-            Sistema de Saúde PMPF v3.2 | Sistema Automático com Flayers
+            Sistema de Saúde PMPF v3.2 | Playlist Unificada (Vídeos + Flayers)
         </div>
     </div>
 
@@ -1314,7 +1317,7 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const storage = firebase.storage(); // Adicionado para upload de imagens
+        const storage = firebase.storage();
         
         // =================================================================
         // VARIÁVEIS GLOBAIS
@@ -1329,7 +1332,8 @@
                 especialidades: [], 
                 atendimentos: [] 
             }, 
-            avisos: [] 
+            avisos: [],
+            flayers: [] 
         };
         
         let dadosGerais = { 
@@ -1352,6 +1356,14 @@
         let isMuted = true;
         let carouselIndex = 0;
         let tickerInterval = null;
+
+        // =================================================================
+        // PLAYLIST UNIFICADA (VÍDEOS + FLAYERS)
+        // =================================================================
+        let unifiedPlaylist = [];          // Array de objetos { type: 'youtube', url } ou { type: 'image', url }
+        let currentPlaylistIndex = 0;
+        let playlistTimer = null;
+        let isPlayingPlaylist = false;
 
         // =================================================================
         // SISTEMA DE SINCRONIZAÇÃO AUTOMÁTICA
@@ -1547,7 +1559,7 @@
                     hash = hash & hash;
                 }
                 this.unitSyncOffset = Math.abs(hash % syncConfig.currentInterval);
-                console.log(`⏱️  Offset para ${unidadeID}: ${this.unitSyncOffset} minutos`);
+                console.log(`⏱️ Offset para ${unidadeID}: ${this.unitSyncOffset} minutos`);
             },
             
             async loadFromCache() {
@@ -1862,8 +1874,9 @@
                 const videoUrls = snapshot.val() || [];
                 if (JSON.stringify(videoUrls) !== JSON.stringify(dadosGerais.unidade.videoUrls)) {
                     dadosGerais.unidade.videoUrls = videoUrls;
-                    carregarVideo();
-                    console.log('🎬 Vídeos atualizados em tempo real');
+                    // Reinicia a playlist com a nova ordem
+                    startPlaylist();
+                    console.log('🎬 Vídeos atualizados, playlist reiniciada');
                 }
             });
             
@@ -1880,9 +1893,12 @@
                 loadingDetails.textContent = 'Iniciando sincronização automática...';
                 syncManager.init();
                 
-                // Inicializar sistema de flayers após carregar tudo
+                // Inicializar sistema de flayers (apenas para carregar dados)
+                flayerSystem.init();
+                
+                // Iniciar playlist após carregar tudo
                 setTimeout(() => {
-                    flayerSystem.init();
+                    startPlaylist();
                 }, 2000);
                 
                 setTimeout(() => {
@@ -1916,7 +1932,7 @@
             }
             
             atualizarInterface();
-            carregarVideo();
+            // Não chama mais carregarVideo() diretamente, a playlist cuida disso
             iniciarAvisos();
         }
 
@@ -1935,44 +1951,6 @@
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
-        }
-
-        /**
-         * Carrega o vídeo do YouTube
-         */
-        function carregarVideo() {
-            // Verificar se está tocando flayer - não recarregar vídeo
-            if (flayerSystem && flayerSystem.isPlaying) {
-                return;
-            }
-            
-            const container = document.getElementById('videoContainer');
-            const videoUrls = dadosGerais.unidade.videoUrls || [];
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const ids = videoUrls.map(url => { 
-                const m = url.match(regExp); 
-                return (m && m[7].length === 11) ? m[7] : null; 
-            }).filter(id => id !== null);
-            
-            if(ids.length > 0) {
-                const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
-                if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
-                    container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
-                    
-                    // Registrar que o vídeo foi carregado
-                    localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
-                    console.log('🎬 Vídeo carregado/recarregado');
-                }
-            }
-        }
-
-        /**
-         * Ativa o som do vídeo
-         */
-        function ativarSom() { 
-            isMuted = false; 
-            carregarVideo(); 
-            document.getElementById('btnSom').style.display = 'none'; 
         }
 
         /**
@@ -2060,6 +2038,157 @@
             
             mostrarProximo();
             if (items.length > 1) tickerInterval = setInterval(mostrarProximo, 30000);
+        }
+
+        // =================================================================
+        // PLAYLIST UNIFICADA
+        // =================================================================
+
+        /**
+         * Constrói a playlist combinando vídeos (YouTube) e flayers (imagens)
+         * A ordem é: primeiro todos os vídeos na ordem da lista, depois todas as imagens na ordem da lista.
+         */
+        function buildUnifiedPlaylist() {
+            unifiedPlaylist = [];
+            
+            // Adiciona vídeos do YouTube (globais) na ordem cadastrada
+            if (dadosGerais.unidade.videoUrls && Array.isArray(dadosGerais.unidade.videoUrls)) {
+                dadosGerais.unidade.videoUrls.forEach(url => {
+                    if (url && url.trim() !== '') {
+                        unifiedPlaylist.push({ type: 'youtube', url: url.trim() });
+                    }
+                });
+            }
+            
+            // Adiciona flayers/imagens (específicos da unidade) na ordem cadastrada
+            if (dadosUnidade.flayers && Array.isArray(dadosUnidade.flayers)) {
+                dadosUnidade.flayers.forEach(url => {
+                    if (url && url.trim() !== '') {
+                        unifiedPlaylist.push({ type: 'image', url: url.trim() });
+                    }
+                });
+            }
+            
+            console.log(`📋 Playlist unificada: ${unifiedPlaylist.length} itens (${unifiedPlaylist.filter(i => i.type === 'youtube').length} vídeos, ${unifiedPlaylist.filter(i => i.type === 'image').length} imagens)`);
+            return unifiedPlaylist;
+        }
+
+        /**
+         * Inicia/reinicia a reprodução da playlist
+         */
+        function startPlaylist() {
+            // Para qualquer reprodução em andamento
+            stopPlaylist();
+            
+            buildUnifiedPlaylist();
+            
+            if (unifiedPlaylist.length === 0) {
+                console.log('⚠️ Playlist vazia, nada a reproduzir');
+                return;
+            }
+            
+            isPlayingPlaylist = true;
+            currentPlaylistIndex = 0;
+            playCurrentPlaylistItem();
+        }
+
+        /**
+         * Para a reprodução da playlist
+         */
+        function stopPlaylist() {
+            if (playlistTimer) {
+                clearTimeout(playlistTimer);
+                playlistTimer = null;
+            }
+            isPlayingPlaylist = false;
+            
+            // Esconde flayer e mostra vídeo (se necessário)
+            const flayerDiv = document.getElementById('flayerContainer');
+            if (flayerDiv) flayerDiv.style.display = 'none';
+            document.getElementById('videoContainer').style.display = 'block';
+        }
+
+        /**
+         * Reproduz o item atual da playlist
+         */
+        function playCurrentPlaylistItem() {
+            if (!isPlayingPlaylist || unifiedPlaylist.length === 0) return;
+            
+            const item = unifiedPlaylist[currentPlaylistIndex];
+            const videoContainer = document.getElementById('videoContainer');
+            const btnSom = document.getElementById('btnSom');
+            
+            // Garantir que o container de flayer existe
+            let flayerDiv = document.getElementById('flayerContainer');
+            if (!flayerDiv) {
+                flayerDiv = document.createElement('div');
+                flayerDiv.id = 'flayerContainer';
+                document.querySelector('.video-section').appendChild(flayerDiv);
+            }
+            
+            if (item.type === 'youtube') {
+                // Reproduz vídeo do YouTube
+                videoContainer.style.display = 'block';
+                flayerDiv.style.display = 'none';
+                if (btnSom && !isMuted) btnSom.style.display = 'none';
+                else if (btnSom) btnSom.style.display = 'block';
+                
+                // Extrai ID do YouTube
+                const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+                const match = item.url.match(regExp);
+                const videoId = (match && match[7].length === 11) ? match[7] : null;
+                
+                if (videoId) {
+                    const mutedParam = isMuted ? 1 : 0;
+                    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${mutedParam}&enablejsapi=1`;
+                    videoContainer.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
+                    
+                    // O próximo item será acionado pelo evento de fim do vídeo (YouTube API)
+                } else {
+                    console.warn('URL de vídeo inválida, pulando...');
+                    nextPlaylistItem();
+                }
+            } else if (item.type === 'image') {
+                // Exibe imagem por 30 segundos
+                videoContainer.style.display = 'none';
+                flayerDiv.style.display = 'flex';
+                if (btnSom) btnSom.style.display = 'none'; // esconde botão de som durante imagem
+                
+                flayerDiv.innerHTML = `<img src="${item.url}" alt="flayer" style="width:100%; height:100%; object-fit:contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color:white;font-size:24px;text-align:center;background:#000;width:100%;height:100%;display:flex;align-items:center;justify-content:center;\'>Erro ao carregar imagem</div>';">`;
+                
+                // Agenda próximo item após 30 segundos
+                playlistTimer = setTimeout(() => {
+                    nextPlaylistItem();
+                }, 30000); // 30 segundos
+            }
+        }
+
+        /**
+         * Avança para o próximo item da playlist (loop infinito)
+         */
+        function nextPlaylistItem() {
+            if (!isPlayingPlaylist || unifiedPlaylist.length === 0) return;
+            
+            // Se for o último, volta ao primeiro
+            if (currentPlaylistIndex >= unifiedPlaylist.length - 1) {
+                currentPlaylistIndex = 0;
+            } else {
+                currentPlaylistIndex++;
+            }
+            
+            playCurrentPlaylistItem();
+        }
+
+        /**
+         * Ativa o som do vídeo atual (se for vídeo)
+         */
+        function ativarSom() { 
+            isMuted = false; 
+            // Se o item atual for vídeo, recarrega com som
+            if (isPlayingPlaylist && unifiedPlaylist[currentPlaylistIndex]?.type === 'youtube') {
+                playCurrentPlaylistItem(); // recarrega o mesmo vídeo com som ativo
+            }
+            document.getElementById('btnSom').style.display = 'none'; 
         }
 
         // =================================================================
@@ -2249,54 +2378,15 @@
             
             document.getElementById('menuFalto').style.display = (nivel === 'admin_unidade' || nivel === 'super_admin') ? 'block' : 'none';
             document.getElementById('menuAtend').style.display = (nivel === 'admin_unidade' || nivel === 'super_admin') ? 'block' : 'none';
+            document.getElementById('menuFlayers').style.display = (nivel === 'admin_unidade' || nivel === 'super_admin') ? 'block' : 'none';
             
             if (nivel === 'visualizador') {
                 document.getElementById('menuFalto').style.display = 'none';
                 document.getElementById('menuAtend').style.display = 'none';
                 document.getElementById('menuSMS').style.display = 'none';
                 document.getElementById('menuVideo').style.display = 'none';
+                document.getElementById('menuFlayers').style.display = 'none';
                 document.getElementById('menuSincronizacao').style.display = 'none';
-            }
-            
-            // Adicionar item Flayers ao menu
-            adicionarMenuItemFlayers();
-        }
-
-        /**
-         * Adiciona o item Flayers no menu lateral
-         */
-        function adicionarMenuItemFlayers() {
-            const sidebar = document.querySelector('.admin-sidebar');
-            if (!sidebar) return;
-            
-            // Verificar se já existe
-            if (document.querySelector('.sidebar-item[onclick*="Flayers"]') || 
-                document.querySelector('.sidebar-item[onclick*="flayers"]')) {
-                return;
-            }
-            
-            const flayerMenuItem = document.createElement('div');
-            flayerMenuItem.className = 'sidebar-item';
-            flayerMenuItem.id = 'menuFlayers';
-            flayerMenuItem.setAttribute('onclick', 'mostrarSecaoFlayers()');
-            flayerMenuItem.innerHTML = '<i class="fas fa-images"></i> Encartes/Flayers';
-            
-            // Inserir após o menu de vídeo
-            const videoMenu = document.getElementById('menuVideo');
-            const syncMenu = document.getElementById('menuSincronizacao');
-            
-            if (videoMenu && videoMenu.parentNode) {
-                videoMenu.parentNode.insertBefore(flayerMenuItem, videoMenu.nextSibling);
-            } else if (syncMenu && syncMenu.parentNode) {
-                syncMenu.parentNode.insertBefore(flayerMenuItem, syncMenu);
-            } else {
-                sidebar.appendChild(flayerMenuItem);
-            }
-            
-            // Mostrar/esconder baseado nas permissões
-            if (permissoesUsuario) {
-                const nivel = permissoesUsuario.nivel;
-                flayerMenuItem.style.display = (nivel === 'super_admin' || nivel === 'admin_unidade') ? 'block' : 'none';
             }
         }
 
@@ -2707,6 +2797,7 @@
             const videosText = document.getElementById('vUrls').value;
             dadosGerais.unidade.videoUrls = videosText.split('\n').filter(u => u.trim() !== '');
             salvarDados(true, 'video');
+            // A playlist será reiniciada pelo listener de vídeos
             mostrarNotificacao('Vídeos salvos com sucesso!', 'success');
         }
 
@@ -3629,7 +3720,7 @@
                         atendimentos: []
                     },
                     avisos: [],
-                    flayers: [], // Adicionar array de flayers vazio
+                    flayers: [],
                     ultima_atualizacao: Date.now(),
                     ultima_sincronizacao: Date.now(),
                     data_criacao: new Date().toISOString(),
@@ -4063,28 +4154,17 @@
         }
 
         // =================================================================
-        // SISTEMA DE FLAYERS - EXIBIÇÃO PÓS-VIDEO (COM UPLOAD PARA STORAGE)
+        // SISTEMA DE FLAYERS (APENAS GERENCIAMENTO, REPRODUÇÃO AGORA NA PLAYLIST)
         // =================================================================
-        
-        // Configuração dos flayers
         const flayerSystem = {
-            enabled: true,
-            duration: 30000,           // 30 segundos por flayer
-            currentIndex: 0,
-            isPlaying: false,
-            timer: null,
-            videoCheckInterval: null,
             flayers: [],
             
-            // Inicializar
             init() {
                 this.carregarDoFirebase();
                 this.setupRealtimeListener();
-                this.monitorarVideo();
-                console.log('🖼️ Sistema de flayers inicializado (modo pós-vídeo)');
+                console.log('🖼️ Sistema de flayers inicializado (modo playlist)');
             },
             
-            // Carregar flayers do Firebase
             carregarDoFirebase() {
                 db.ref('paineis/' + unidadeID + '/flayers').once('value')
                     .then(snapshot => {
@@ -4093,169 +4173,23 @@
                     });
             },
             
-            // Listener em tempo real
             setupRealtimeListener() {
                 db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
                     this.flayers = snapshot.val() || [];
-                    console.log('🖼️ Flayers atualizados:', this.flayers.length);
+                    // Reinicia a playlist com a nova ordem
+                    startPlaylist();
+                    console.log('🖼️ Flayers atualizados, playlist reiniciada');
                 });
             },
             
-            // Monitorar quando o vídeo termina
-            monitorarVideo() {
-                // Verificar a cada 30 segundos se o vídeo terminou
-                this.videoCheckInterval = setInterval(() => {
-                    // Só verificar se não estiver tocando flayer
-                    if (this.isPlaying) return;
-                    
-                    // Verificar se tem flayers configurados
-                    if (this.flayers.length === 0) return;
-                    
-                    // Verificar se o vídeo está rodando
-                    this.verificarFimDoVideo();
-                }, 30000);
-                
-                // Adicionar listener para mensagens do iframe (YouTube API)
-                window.addEventListener('message', (event) => {
-                    if (event.origin !== 'https://www.youtube.com') return;
-                    try {
-                        const data = JSON.parse(event.data);
-                        if (data.event === 'onStateChange' && data.info === 0) {
-                            // Vídeo terminou (estado 0 = ended)
-                            console.log('🎬 Vídeo terminou (evento YouTube)');
-                            this.iniciarCicloFlayers();
-                        }
-                    } catch (e) {}
-                });
-            },
-            
-            // Verificar se o vídeo terminou (fallback)
-            verificarFimDoVideo() {
-                const iframe = document.querySelector('.video-iframe');
-                if (!iframe) return;
-                
-                // Verificar se o vídeo existe e se está tocando há muito tempo
-                const ultimaTroca = localStorage.getItem('ultimaTrocaVideo_' + unidadeID);
-                const agora = Date.now();
-                
-                if (ultimaTroca) {
-                    const tempoDesdeTroca = agora - parseInt(ultimaTroca);
-                    
-                    // Se passou mais de 5 minutos desde a última troca de vídeo
-                    // e tem flayers configurados, inicia os flayers
-                    if (tempoDesdeTroca > 300000) { // 5 minutos
-                        this.iniciarCicloFlayers();
-                    }
-                }
-            },
-            
-            // Iniciar ciclo de flayers (chamado quando vídeo termina)
-            iniciarCicloFlayers() {
-                // Verificar se já está tocando ou não tem flayers
-                if (this.isPlaying) return;
-                if (this.flayers.length === 0) return;
-                
-                console.log('🎬 Fim do vídeo detectado - iniciando flayers');
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.proximoFlayer();
-            },
-            
-            // Mostrar próximo flayer
-            proximoFlayer() {
-                if (!this.isPlaying) return;
-                
-                if (this.currentIndex >= this.flayers.length) {
-                    // Terminou todos os flayers - voltar para vídeo
-                    this.voltarParaVideo();
-                    return;
-                }
-                
-                this.mostrarFlayer(this.flayers[this.currentIndex]);
-                this.currentIndex++;
-                
-                // Agendar próximo flayer
-                if (this.timer) clearTimeout(this.timer);
-                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
-            },
-            
-            // Mostrar flayer em tela cheia
-            mostrarFlayer(url) {
-                const videoSection = document.querySelector('.video-section');
-                const videoContainer = document.getElementById('videoContainer');
-                const btnSom = document.getElementById('btnSom');
-                
-                if (!videoSection || !videoContainer) return;
-                
-                // Esconder botão de som
-                if (btnSom) btnSom.style.display = 'none';
-                
-                // Criar ou obter container do flayer
-                let flayerDiv = document.getElementById('flayerContainer');
-                if (!flayerDiv) {
-                    flayerDiv = document.createElement('div');
-                    flayerDiv.id = 'flayerContainer';
-                    videoSection.style.position = 'relative';
-                    videoSection.appendChild(flayerDiv);
-                }
-                
-                // Configurar imagem
-                flayerDiv.innerHTML = `
-                    <img src="${url}" 
-                         alt="Flayer"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem<br><span style=\'font-size: 16px;\'>URL inválida</span></div>';">
-                `;
-                
-                // Mostrar flayer, esconder vídeo
-                flayerDiv.style.display = 'flex';
-                videoContainer.style.display = 'none';
-                
-                console.log('🖼️ Exibindo flayer:', this.currentIndex + 1, 'de', this.flayers.length);
-            },
-            
-            // Voltar para o vídeo após todos os flayers
-            voltarParaVideo() {
-                this.isPlaying = false;
-                
-                const flayerDiv = document.getElementById('flayerContainer');
-                if (flayerDiv) {
-                    flayerDiv.style.display = 'none';
-                }
-                
-                const videoContainer = document.getElementById('videoContainer');
-                if (videoContainer) {
-                    videoContainer.style.display = 'block';
-                }
-                
-                const btnSom = document.getElementById('btnSom');
-                if (btnSom && isMuted === false) {
-                    btnSom.style.display = 'none';
-                } else if (btnSom) {
-                    btnSom.style.display = 'block';
-                }
-                
-                // Recarregar vídeo para garantir que está tocando
-                setTimeout(() => {
-                    carregarVideo();
-                }, 100);
-                
-                console.log('🎬 Todos os flayers exibidos - voltando para vídeo');
-            },
-            
-            // Salvar flayers no Firebase
             salvar(urls) {
                 this.flayers = urls.filter(url => url.trim() !== '');
                 return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayers);
             },
             
-            // Parar flayers manualmente
             parar() {
-                this.isPlaying = false;
-                if (this.timer) {
-                    clearTimeout(this.timer);
-                    this.timer = null;
-                }
-                this.voltarParaVideo();
+                // Não é mais necessário, mas mantido para compatibilidade
+                stopPlaylist();
             }
         };
 
@@ -4277,15 +4211,13 @@
             
             content.innerHTML = `
                 <div class="admin-section">
-                    <h2><i class="fas fa-images"></i> Encartes/Flayers - Pós-Vídeo</h2>
+                    <h2><i class="fas fa-images"></i> Encartes/Flayers</h2>
                     <div class="section-info">
                         <i class="fas fa-info-circle"></i> 
-                        <strong>Funcionamento automático:</strong><br>
-                        1. Os vídeos rodam normalmente em sequência<br>
-                        2. Quando a sequência de vídeos termina, os flayers começam automaticamente<br>
-                        3. Cada flayer fica 30 segundos em tela cheia<br>
-                        4. Após todos os flayers, a sequência de vídeos recomeça<br>
-                        5. O ciclo se repete indefinidamente
+                        <strong>Funcionamento automático (playlist unificada):</strong><br>
+                        1. Os vídeos do YouTube (cadastrados na seção "Vídeos") são reproduzidos primeiro, na ordem cadastrada.<br>
+                        2. Em seguida, os flayers (imagens) são reproduzidos, cada um por 30 segundos, na ordem cadastrada.<br>
+                        3. Ao final, a playlist reinicia automaticamente (loop infinito).
                     </div>
                     
                     <!-- Área de upload -->
@@ -4317,13 +4249,7 @@ https://exemplo.com/imagem2.png"
                         <button class="admin-btn" onclick="salvarFlayers()">
                             <i class="fas fa-save"></i> Salvar Flayers
                         </button>
-                        <button class="admin-btn admin-btn-primary" onclick="testarFlayersAgora()">
-                            <i class="fas fa-play"></i> Testar Agora (Forçar Início)
-                        </button>
-                        <button class="admin-btn admin-btn-secondary" onclick="pararFlayersAgora()">
-                            <i class="fas fa-stop"></i> Voltar para Vídeo
-                        </button>
-                        <button class="admin-btn admin-btn-danger" onclick="limparTodosFlayers()">
+                        <button class="admin-btn admin-btn-secondary" onclick="limparTodosFlayers()">
                             <i class="fas fa-trash"></i> Limpar Todos
                         </button>
                     </div>
@@ -4371,25 +4297,12 @@ https://exemplo.com/imagem2.png"
                     
                     <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px; border-left: 5px solid #2e7d32;">
                         <h4 style="color: #2e7d32; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-info-circle"></i> Como funciona:
+                            <i class="fas fa-info-circle"></i> Ordem de reprodução:
                         </h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: #555;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">1</span>
-                                <span>Vídeos rodam em sequência</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">2</span>
-                                <span>Ao terminar, inicia flayers</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">3</span>
-                                <span>30 segundos por flayer</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">4</span>
-                                <span>Após todos, vídeos recomeçam</span>
-                            </div>
+                        <div style="color: #555;">
+                            <strong>1. Vídeos do YouTube</strong> (na ordem da lista em "Vídeos")<br>
+                            <strong>2. Flayers/imagens</strong> (na ordem acima)<br>
+                            <em>Após o último, a playlist recomeça do primeiro vídeo.</em>
                         </div>
                     </div>
                 </div>
@@ -4525,41 +4438,6 @@ https://exemplo.com/imagem2.png"
                     mostrarSecaoFlayers();
                 });
             }
-        }
-
-        /**
-         * Testar flayers imediatamente (forçar início)
-         */
-        function testarFlayersAgora() {
-            if (flayerSystem.flayers.length === 0) {
-                mostrarNotificacao('Não há flayers configurados para testar!', 'warning');
-                return;
-            }
-            
-            mostrarNotificacao('Iniciando flayers (teste)...', 'success');
-            
-            // Fechar admin se estiver aberto
-            if (document.getElementById('adminPanel').style.display === 'flex') {
-                setTimeout(() => {
-                    document.getElementById('adminPanel').style.display = 'none';
-                }, 300);
-            }
-            
-            // Forçar início dos flayers
-            flayerSystem.parar(); // Para qualquer reprodução atual
-            setTimeout(() => {
-                flayerSystem.isPlaying = true;
-                flayerSystem.currentIndex = 0;
-                flayerSystem.proximoFlayer();
-            }, 500);
-        }
-
-        /**
-         * Parar flayers e voltar para vídeo
-         */
-        function pararFlayersAgora() {
-            flayerSystem.parar();
-            mostrarNotificacao('Voltando para reprodução de vídeos...', 'info');
         }
 
         // =================================================================
