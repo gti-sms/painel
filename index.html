@@ -1092,41 +1092,6 @@
         }
         
         /* ================================
-           ESTILOS PARA FLAYERS
-           ================================ */
-        #flayerContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            z-index: 2000;
-            animation: fadeInFlayer 0.5s ease-in-out;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-        }
-        
-        #flayerContainer img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            animation: zoomInFlayer 1s ease-out;
-        }
-        
-        @keyframes fadeInFlayer {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes zoomInFlayer {
-            from { transform: scale(1.1); opacity: 0.8; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        /* ================================
            RESPONSIVIDADE (DEBUG)
            ================================ */
         @media (max-width: 1920px) {
@@ -1164,12 +1129,11 @@
     <!-- Conteúdo principal -->
     <main class="main-container">
         <div class="left-column">
-            <section class="video-section" id="videoSection">
+            <section class="video-section">
                 <button id="btnSom" class="btn-som" onclick="ativarSom()">
                     <i class="fas fa-volume-up"></i> ATIVAR SOM
                 </button>
                 <div class="video-container" id="videoContainer"></div>
-                <!-- Container para flayers será inserido aqui via JavaScript -->
             </section>
             <section class="announcements-section" id="tickerContainer"></section>
         </div>
@@ -1268,7 +1232,6 @@
                 <div class="sidebar-item" id="menuVideo" onclick="mostrarSecao('video')">
                     <i class="fas fa-video"></i> Vídeos
                 </div>
-                <!-- Item Flayers será inserido aqui via JavaScript -->
                 <div class="sidebar-item" id="menuSincronizacao" onclick="mostrarSecao('sincronizacao')">
                     <i class="fas fa-sync-alt"></i> Sincronização
                 </div>
@@ -1291,7 +1254,7 @@
 
         <!-- Informações de versão -->
         <div class="version-info">
-            Sistema de Saúde PMPF v3.2 | Sistema Automático com Flayers
+            Sistema de Saúde PMPF v3.2 | Sistema Automático
         </div>
     </div>
 
@@ -1877,11 +1840,6 @@
                 loadingDetails.textContent = 'Iniciando sincronização automática...';
                 syncManager.init();
                 
-                // Inicializar sistema de flayers após carregar tudo
-                setTimeout(() => {
-                    flayerSystem.init();
-                }, 2000);
-                
                 setTimeout(() => {
                     if (loadingOverlay.style.display !== 'none') {
                         loadingOverlay.style.opacity = '0';
@@ -1938,11 +1896,6 @@
          * Carrega o vídeo do YouTube
          */
         function carregarVideo() {
-            // Verificar se está tocando flayer - não recarregar vídeo
-            if (flayerSystem && flayerSystem.isPlaying) {
-                return;
-            }
-            
             const container = document.getElementById('videoContainer');
             const videoUrls = dadosGerais.unidade.videoUrls || [];
             const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -1955,10 +1908,6 @@
                 const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ids.join(',')}&controls=0`;
                 if (!container.innerHTML.includes(ids[0]) || (isMuted === false && container.innerHTML.includes('mute=1'))) {
                     container.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
-                    
-                    // Registrar que o vídeo foi carregado
-                    localStorage.setItem('ultimaTrocaVideo_' + unidadeID, Date.now().toString());
-                    console.log('🎬 Vídeo carregado/recarregado');
                 }
             }
         }
@@ -2234,6 +2183,7 @@
             document.getElementById('menuUsuarios').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             document.getElementById('menuUnidades').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             document.getElementById('menuMonitor').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
+            
             document.getElementById('menuSincronizacao').style.display = (isMatriz && nivel === 'super_admin') ? 'block' : 'none';
             
             if (isMatriz) {
@@ -2253,47 +2203,6 @@
                 document.getElementById('menuSMS').style.display = 'none';
                 document.getElementById('menuVideo').style.display = 'none';
                 document.getElementById('menuSincronizacao').style.display = 'none';
-            }
-            
-            // Adicionar item Flayers ao menu
-            adicionarMenuItemFlayers();
-        }
-
-        /**
-         * Adiciona o item Flayers no menu lateral
-         */
-        function adicionarMenuItemFlayers() {
-            const sidebar = document.querySelector('.admin-sidebar');
-            if (!sidebar) return;
-            
-            // Verificar se já existe
-            if (document.querySelector('.sidebar-item[onclick*="Flayers"]') || 
-                document.querySelector('.sidebar-item[onclick*="flayers"]')) {
-                return;
-            }
-            
-            const flayerMenuItem = document.createElement('div');
-            flayerMenuItem.className = 'sidebar-item';
-            flayerMenuItem.id = 'menuFlayers';
-            flayerMenuItem.setAttribute('onclick', 'mostrarSecaoFlayers()');
-            flayerMenuItem.innerHTML = '<i class="fas fa-images"></i> Encartes/Flayers';
-            
-            // Inserir após o menu de vídeo
-            const videoMenu = document.getElementById('menuVideo');
-            const syncMenu = document.getElementById('menuSincronizacao');
-            
-            if (videoMenu && videoMenu.parentNode) {
-                videoMenu.parentNode.insertBefore(flayerMenuItem, videoMenu.nextSibling);
-            } else if (syncMenu && syncMenu.parentNode) {
-                syncMenu.parentNode.insertBefore(flayerMenuItem, syncMenu);
-            } else {
-                sidebar.appendChild(flayerMenuItem);
-            }
-            
-            // Mostrar/esconder baseado nas permissões
-            if (permissoesUsuario) {
-                const nivel = permissoesUsuario.nivel;
-                flayerMenuItem.style.display = (nivel === 'super_admin' || nivel === 'admin_unidade') ? 'block' : 'none';
             }
         }
 
@@ -2328,16 +2237,12 @@
             
             if (permissoesUsuario.nivel === 'super_admin') return true;
             
-            if (secao === 'flayers') {
-                return (permissoesUsuario.nivel === 'admin_unidade' || permissoesUsuario.nivel === 'super_admin');
-            }
-            
             if (permissoesUsuario.nivel === 'visualizador') {
                 const secoesVisualizacao = ['unidade', 'avisos'];
                 return secoesVisualizacao.includes(secao);
             }
             
-            const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos', 'flayers'];
+            const secoesUnidade = ['unidade', 'faltometro', 'atendimentos', 'avisos'];
             if (!isMatriz && secoesUnidade.includes(secao)) return true;
             
             const secoesMatriz = ['sms', 'video', 'unidades', 'monitor', 'usuarios', 'sincronizacao'];
@@ -2371,8 +2276,6 @@
                 mostrarTodasUnidades();
             } else if(secao === 'monitor') {
                 mostrarMonitorInatividade();
-            } else if(secao === 'flayers') {
-                mostrarSecaoFlayers();
             } else {
                 mostrarSecaoPadrao(secao, content);
             }
@@ -3466,6 +3369,7 @@
                                     <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')" title="Editar Unidade">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <!-- BOTÃO EXCLUIR ADICIONADO -->
                                     <button class="action-btn action-btn-danger" onclick="excluirUnidadeCard('${unidade.id}', '${unidade.nome}')" title="Excluir Unidade">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -3498,6 +3402,7 @@
                                 <button class="action-btn action-btn-secondary" onclick="editarUnidade('${unidade.id}')">
                                     <i class="fas fa-cog"></i>
                                 </button>
+                                <!-- BOTÃO EXCLUIR NO RODAPÉ -->
                                 <button class="action-btn action-btn-danger" onclick="excluirUnidadeCard('${unidade.id}', '${unidade.nome}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -3626,7 +3531,6 @@
                         atendimentos: []
                     },
                     avisos: [],
-                    flayers: [], // Adicionar array de flayers vazio
                     ultima_atualizacao: Date.now(),
                     ultima_sincronizacao: Date.now(),
                     data_criacao: new Date().toISOString(),
@@ -4057,396 +3961,6 @@
                         mostrarNotificacao('Erro ao forçar sincronização!', 'error');
                     });
             }
-        }
-
-        // =================================================================
-        // SISTEMA DE FLAYERS - EXIBIÇÃO PÓS-VIDEO (SEM ALTERAR ESTRUTURA)
-        // =================================================================
-        
-        // Configuração dos flayers
-        const flayerSystem = {
-            enabled: true,
-            duration: 30000,           // 30 segundos por flayer
-            currentIndex: 0,
-            isPlaying: false,
-            timer: null,
-            videoCheckInterval: null,
-            flayers: [],
-            
-            // Inicializar
-            init() {
-                this.carregarDoFirebase();
-                this.setupRealtimeListener();
-                this.monitorarVideo();
-                console.log('🖼️ Sistema de flayers inicializado (modo pós-vídeo)');
-            },
-            
-            // Carregar flayers do Firebase
-            carregarDoFirebase() {
-                db.ref('paineis/' + unidadeID + '/flayers').once('value')
-                    .then(snapshot => {
-                        this.flayers = snapshot.val() || [];
-                        console.log('🖼️ Flayers carregados:', this.flayers.length);
-                    });
-            },
-            
-            // Listener em tempo real
-            setupRealtimeListener() {
-                db.ref('paineis/' + unidadeID + '/flayers').on('value', (snapshot) => {
-                    this.flayers = snapshot.val() || [];
-                    console.log('🖼️ Flayers atualizados:', this.flayers.length);
-                });
-            },
-            
-            // Monitorar quando o vídeo termina
-            monitorarVideo() {
-                // Verificar a cada 30 segundos se o vídeo terminou
-                this.videoCheckInterval = setInterval(() => {
-                    // Só verificar se não estiver tocando flayer
-                    if (this.isPlaying) return;
-                    
-                    // Verificar se tem flayers configurados
-                    if (this.flayers.length === 0) return;
-                    
-                    // Verificar se o vídeo está rodando
-                    this.verificarFimDoVideo();
-                }, 30000);
-            },
-            
-            // Verificar se o vídeo terminou
-            verificarFimDoVideo() {
-                const iframe = document.querySelector('.video-iframe');
-                if (!iframe) return;
-                
-                // Verificar se o vídeo existe e se está tocando há muito tempo
-                const ultimaTroca = localStorage.getItem('ultimaTrocaVideo_' + unidadeID);
-                const agora = Date.now();
-                
-                if (ultimaTroca) {
-                    const tempoDesdeTroca = agora - parseInt(ultimaTroca);
-                    
-                    // Se passou mais de 5 minutos desde a última troca de vídeo
-                    // e tem flayers configurados, inicia os flayers
-                    if (tempoDesdeTroca > 300000) { // 5 minutos
-                        this.iniciarCicloFlayers();
-                    }
-                }
-            },
-            
-            // Iniciar ciclo de flayers (chamado quando vídeo termina)
-            iniciarCicloFlayers() {
-                // Verificar se já está tocando ou não tem flayers
-                if (this.isPlaying) return;
-                if (this.flayers.length === 0) return;
-                
-                console.log('🎬 Fim do vídeo detectado - iniciando flayers');
-                this.isPlaying = true;
-                this.currentIndex = 0;
-                this.proximoFlayer();
-            },
-            
-            // Mostrar próximo flayer
-            proximoFlayer() {
-                if (!this.isPlaying) return;
-                
-                if (this.currentIndex >= this.flayers.length) {
-                    // Terminou todos os flayers - voltar para vídeo
-                    this.voltarParaVideo();
-                    return;
-                }
-                
-                this.mostrarFlayer(this.flayers[this.currentIndex]);
-                this.currentIndex++;
-                
-                // Agendar próximo flayer
-                if (this.timer) clearTimeout(this.timer);
-                this.timer = setTimeout(() => this.proximoFlayer(), this.duration);
-            },
-            
-            // Mostrar flayer em tela cheia
-            mostrarFlayer(url) {
-                const videoSection = document.querySelector('.video-section');
-                const videoContainer = document.getElementById('videoContainer');
-                const btnSom = document.getElementById('btnSom');
-                
-                if (!videoSection || !videoContainer) return;
-                
-                // Esconder botão de som
-                if (btnSom) btnSom.style.display = 'none';
-                
-                // Criar ou obter container do flayer
-                let flayerDiv = document.getElementById('flayerContainer');
-                if (!flayerDiv) {
-                    flayerDiv = document.createElement('div');
-                    flayerDiv.id = 'flayerContainer';
-                    videoSection.style.position = 'relative';
-                    videoSection.appendChild(flayerDiv);
-                }
-                
-                // Configurar imagem
-                flayerDiv.innerHTML = `
-                    <img src="${url}" 
-                         alt="Flayer"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color: white; font-size: 24px; text-align: center; background: #000; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;\'>Erro ao carregar imagem<br><span style=\'font-size: 16px;\'>URL inválida</span></div>';">
-                `;
-                
-                // Mostrar flayer, esconder vídeo
-                flayerDiv.style.display = 'flex';
-                videoContainer.style.display = 'none';
-                
-                console.log('🖼️ Exibindo flayer:', this.currentIndex + 1, 'de', this.flayers.length);
-            },
-            
-            // Voltar para o vídeo após todos os flayers
-            voltarParaVideo() {
-                this.isPlaying = false;
-                
-                const flayerDiv = document.getElementById('flayerContainer');
-                if (flayerDiv) {
-                    flayerDiv.style.display = 'none';
-                }
-                
-                const videoContainer = document.getElementById('videoContainer');
-                if (videoContainer) {
-                    videoContainer.style.display = 'block';
-                }
-                
-                const btnSom = document.getElementById('btnSom');
-                if (btnSom && isMuted === false) {
-                    btnSom.style.display = 'none';
-                } else if (btnSom) {
-                    btnSom.style.display = 'block';
-                }
-                
-                // Recarregar vídeo para garantir que está tocando
-                setTimeout(() => {
-                    carregarVideo();
-                }, 100);
-                
-                console.log('🎬 Todos os flayers exibidos - voltando para vídeo');
-            },
-            
-            // Salvar flayers no Firebase
-            salvar(urls) {
-                this.flayers = urls.filter(url => url.trim() !== '');
-                return db.ref('paineis/' + unidadeID + '/flayers').set(this.flayers);
-            },
-            
-            // Parar flayers manualmente
-            parar() {
-                this.isPlaying = false;
-                if (this.timer) {
-                    clearTimeout(this.timer);
-                    this.timer = null;
-                }
-                this.voltarParaVideo();
-            }
-        };
-
-        // =================================================================
-        // INTERFACE ADMINISTRATIVA PARA FLAYERS
-        // =================================================================
-
-        /**
-         * Mostrar configuração de flayers no admin
-         */
-        function mostrarSecaoFlayers() {
-            if (!verificarAcessoSecao('flayers')) {
-                mostrarNotificacao('Você não tem permissão para acessar esta seção.', 'error');
-                return;
-            }
-            
-            const content = document.getElementById('adminContent');
-            const urls = flayerSystem.flayers || [];
-            
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h2><i class="fas fa-images"></i> Encartes/Flayers - Pós-Vídeo</h2>
-                    <div class="section-info">
-                        <i class="fas fa-info-circle"></i> 
-                        <strong>Funcionamento automático:</strong><br>
-                        1. Os vídeos rodam normalmente em sequência<br>
-                        2. Quando a sequência de vídeos termina, os flayers começam automaticamente<br>
-                        3. Cada flayer fica 30 segundos em tela cheia<br>
-                        4. Após todos os flayers, a sequência de vídeos recomeça<br>
-                        5. O ciclo se repete indefinidamente
-                    </div>
-                    
-                    <div style="margin-bottom: 25px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                            <i class="fas fa-link"></i> URLs das Imagens (uma por linha):
-                        </label>
-                        <textarea id="flayerUrls" class="admin-input" 
-                            placeholder="https://exemplo.com/imagem1.jpg
-https://exemplo.com/imagem2.png
-https://exemplo.com/imagem3.jpg" 
-                            style="min-height: 180px; font-family: monospace;">${urls.join('\n')}</textarea>
-                        <div style="font-size: 13px; color: #666; margin-top: 8px;">
-                            <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;">
-                        <button class="admin-btn" onclick="salvarFlayers()">
-                            <i class="fas fa-save"></i> Salvar Flayers
-                        </button>
-                        <button class="admin-btn admin-btn-primary" onclick="testarFlayersAgora()">
-                            <i class="fas fa-play"></i> Testar Agora (Forçar Início)
-                        </button>
-                        <button class="admin-btn admin-btn-secondary" onclick="pararFlayersAgora()">
-                            <i class="fas fa-stop"></i> Voltar para Vídeo
-                        </button>
-                        <button class="admin-btn admin-btn-danger" onclick="limparTodosFlayers()">
-                            <i class="fas fa-trash"></i> Limpar Todos
-                        </button>
-                    </div>
-                    
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
-                        <h3 style="color: #1565c0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-image"></i> Pré-visualização (${urls.length} flayer${urls.length !== 1 ? 'es' : ''})
-                        </h3>
-                        
-                        <div id="flayerPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;">
-                            ${urls.map((url, index) => `
-                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                                    <div style="height: 120px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 10px;">
-                                        <img src="${url}" 
-                                             style="max-width: 100%; max-height: 100%; object-fit: contain;"
-                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iMTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiPkVycm88L3RleHQ+PC9zdmc+';">
-                                    </div>
-                                    <div style="padding: 10px; border-top: 1px solid #f0f0f0;">
-                                        <div style="font-size: 11px; color: #666; word-break: break-all; margin-bottom: 8px;">
-                                            ${url.length > 30 ? url.substring(0, 30) + '...' : url}
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-size: 11px; background: #1565c0; color: white; padding: 2px 8px; border-radius: 12px;">
-                                                ${index + 1}
-                                            </span>
-                                            <button onclick="removerFlayerEspecifico(${index})" 
-                                                    style="background: none; border: none; color: #d32f2f; cursor: pointer; padding: 5px;">
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            
-                            ${urls.length === 0 ? `
-                                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #999;">
-                                    <i class="fas fa-images" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
-                                    <h4 style="color: #666; margin-bottom: 5px;">Nenhum flayer configurado</h4>
-                                    <p style="font-size: 13px;">Adicione URLs de imagens acima para começar</p>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px; border-left: 5px solid #2e7d32;">
-                        <h4 style="color: #2e7d32; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-info-circle"></i> Como funciona:
-                        </h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: #555;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">1</span>
-                                <span>Vídeos rodam em sequência</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">2</span>
-                                <span>Ao terminar, inicia flayers</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">3</span>
-                                <span>30 segundos por flayer</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="background: #2e7d32; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">4</span>
-                                <span>Após todos, vídeos recomeçam</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        /**
-         * Salvar flayers no Firebase
-         */
-        function salvarFlayers() {
-            const textarea = document.getElementById('flayerUrls');
-            if (!textarea) return;
-            
-            const urls = textarea.value.split('\n')
-                .map(url => url.trim())
-                .filter(url => url !== '');
-            
-            flayerSystem.salvar(urls).then(() => {
-                mostrarNotificacao(`${urls.length} flayer(s) salvos com sucesso!`, 'success');
-                mostrarSecaoFlayers();
-            }).catch(error => {
-                mostrarNotificacao('Erro ao salvar flayers!', 'error');
-                console.error(error);
-            });
-        }
-
-        /**
-         * Remover flayer específico
-         */
-        function removerFlayerEspecifico(index) {
-            const urls = [...flayerSystem.flayers];
-            urls.splice(index, 1);
-            
-            flayerSystem.salvar(urls).then(() => {
-                mostrarNotificacao('Flayer removido!', 'success');
-                mostrarSecaoFlayers();
-            });
-        }
-
-        /**
-         * Limpar todos os flayers
-         */
-        function limparTodosFlayers() {
-            if (confirm('Remover TODOS os flayers configurados?')) {
-                flayerSystem.salvar([]).then(() => {
-                    mostrarNotificacao('Todos os flayers foram removidos!', 'success');
-                    flayerSystem.parar();
-                    mostrarSecaoFlayers();
-                });
-            }
-        }
-
-        /**
-         * Testar flayers imediatamente (forçar início)
-         */
-        function testarFlayersAgora() {
-            if (flayerSystem.flayers.length === 0) {
-                mostrarNotificacao('Não há flayers configurados para testar!', 'warning');
-                return;
-            }
-            
-            mostrarNotificacao('Iniciando flayers (teste)...', 'success');
-            
-            // Fechar admin se estiver aberto
-            if (document.getElementById('adminPanel').style.display === 'flex') {
-                setTimeout(() => {
-                    document.getElementById('adminPanel').style.display = 'none';
-                }, 300);
-            }
-            
-            // Forçar início dos flayers
-            flayerSystem.parar(); // Para qualquer reprodução atual
-            setTimeout(() => {
-                flayerSystem.isPlaying = true;
-                flayerSystem.currentIndex = 0;
-                flayerSystem.proximoFlayer();
-            }, 500);
-        }
-
-        /**
-         * Parar flayers e voltar para vídeo
-         */
-        function pararFlayersAgora() {
-            flayerSystem.parar();
-            mostrarNotificacao('Voltando para reprodução de vídeos...', 'info');
         }
 
         // =================================================================
