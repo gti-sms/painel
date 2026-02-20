@@ -694,9 +694,10 @@
     // ═══════════════════════════════════════════════
     // PLAYLIST CORRIGIDA - VÍDEOS PRIMEIRO, DEPOIS FLAYERS
     // ═══════════════════════════════════════════════
-    
+
     // 1. Função que inicia a playlist unindo Vídeos + Flyers
     function startPlaylist() {
+        console.log("🎬 Iniciando playlist...");
         if (!dadosGerais.unidade) return;
 
         const vUrls = dadosGerais.unidade.videoUrls || [];
@@ -708,8 +709,10 @@
             ...fUrls.map(url => ({ type: 'flayer', url: url }))
         ];
 
+        console.log(`📋 Playlist criada: ${playlist.length} itens (${vUrls.length} vídeos, ${fUrls.length} flyers)`);
+
         if (playlist.length === 0) {
-            console.log("Playlist vazia");
+            console.log("⚠️ Playlist vazia");
             return;
         }
 
@@ -720,76 +723,134 @@
 
     // 2. Função de execução para tratar os dois tipos de mídia
     function playItem() {
-        if (!playlistActive || !playlist.length) return;
+        if (!playlistActive || !playlist.length) {
+            console.log("⚠️ Playlist inativa ou vazia");
+            return;
+        }
         
-        clearTimers(); // Limpa timers de segurança e de imagens anteriores
-        removeYTListener(); // Remove ouvintes de mensagens do YouTube anteriores
+        console.log(`▶️ Reproduzindo item ${playIndex + 1} de ${playlist.length}`);
+        
+        clearTimers();
+        removeYTListener();
 
         const item = playlist[playIndex];
         const vc = document.getElementById('videoContainer');
         const fc = document.getElementById('flayerContainer');
+        const btn = document.getElementById('btnSom');
         const countdown = document.getElementById('countdownBar');
+
+        console.log(`Tipo: ${item.type}, URL: ${item.url}`);
 
         if (item.type === 'youtube') {
             const ytId = extractYTId(item.url);
-            if (!ytId) { nextItem(); return; }
+            if (!ytId) { 
+                console.log("❌ ID do YouTube inválido, pulando para próximo");
+                nextItem(); 
+                return; 
+            }
 
+            // Esconde flyer e mostra vídeo
             if (fc) fc.style.display = 'none';
             if (vc) {
                 vc.style.display = 'block';
-                // Adicionado 'origin' e 'enablejsapi=1' para permitir a comunicação de fim de vídeo
+                vc.innerHTML = ''; // Limpa conteúdo anterior
+                
+                const muted = isMuted ? 1 : 0;
                 const origin = window.location.origin;
+                
+                // Cria o iframe do YouTube
                 vc.innerHTML = `<iframe id="ytPlayer" class="video-iframe" 
-                    src="https://www.youtube.com/embed/${ytId}?enablejsapi=1&autoplay=1&mute=${isMuted?1:0}&controls=0&rel=0&origin=${origin}" 
-                    allow="autoplay; encrypted-media"></iframe>`;
+                    src="https://www.youtube.com/embed/${ytId}?enablejsapi=1&autoplay=1&mute=${muted}&controls=0&rel=0&origin=${origin}" 
+                    allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             }
+            if (btn) btn.style.display = isMuted ? 'block' : 'none';
+            hideCountdown();
 
-            // Listener para detectar o fim do vídeo (State 0 = Ended)
-            youtubeMessageHandler = (event) => {
+            // Listener para detectar o fim do vídeo
+            youtubeMessageHandler = function(event) {
                 try {
-                    const data = JSON.parse(event.data);
-                    if (data.event === 'onStateChange' && data.info === 0) {
-                        nextItem();
+                    // Tenta parsear como JSON
+                    if (typeof event.data === 'string') {
+                        if (event.data.includes('"info":0') || event.data.includes('"event":"onStateChange"')) {
+                            const data = JSON.parse(event.data);
+                            if (data.event === 'onStateChange' && data.info === 0) {
+                                console.log("✅ Vídeo terminou, avançando...");
+                                nextItem();
+                            }
+                        }
                     }
-                } catch(e) {}
+                } catch(e) {
+                    // Ignora erros de parse
+                }
             };
+            
             window.addEventListener('message', youtubeMessageHandler);
 
-            // Timer de segurança (5 minutos) caso o vídeo trave
-            safetyTimer = setTimeout(nextItem, 300000);
+            // Timer de segurança baseado no tamanho do vídeo (10 minutos)
+            safetyTimer = setTimeout(() => {
+                console.log("⏰ Timeout de segurança do vídeo");
+                nextItem();
+            }, 600000);
 
         } else if (item.type === 'flayer') {
+            // Esconde vídeo e mostra flyer
             if (vc) {
                 vc.style.display = 'none';
-                vc.innerHTML = ''; // Para o áudio do vídeo anterior se houver
+                vc.innerHTML = ''; // Para o áudio
             }
+            if (btn) btn.style.display = 'none';
+            
             if (fc) {
                 fc.style.display = 'flex';
-                fc.innerHTML = `<img src="${item.url}" style="width:100%; height:100%; object-fit:contain;">`;
-                
-                // Inicia a barra de progresso (se existir no seu layout)
-                if(countdown) startCountdown(30000);
-                
-                // Define 30 segundos para o flyer e pula para o próximo
-                imageTimer = setTimeout(nextItem, 30000);
+                fc.innerHTML = `<img src="${item.url}" style="width:100%; height:100%; object-fit:contain;" onload="onFlayerLoaded()" onerror="onFlayerError()">`;
             }
+            
+            hideCountdown();
         }
     }
 
-    // 3. Função de próximo item para criar o loop infinito
+    // 3. Função chamada quando o flyer carrega
+    function onFlayerLoaded() {
+        console.log("✅ Flyer carregado, 30 segundos");
+        clearTimers();
+        startCountdown(30000);
+        imageTimer = setTimeout(() => {
+            console.log("⏰ Tempo do flyer terminou");
+            nextItem();
+        }, 30000);
+    }
+
+    // 4. Função chamada quando o flyer dá erro
+    function onFlayerError() {
+        console.log("❌ Erro ao carregar flyer, pulando...");
+        clearTimers();
+        imageTimer = setTimeout(nextItem, 5000);
+    }
+
+    // 5. Função de próximo item para criar o loop infinito
     function nextItem() {
-        if (!playlistActive || playlist.length === 0) return;
+        if (!playlistActive || playlist.length === 0) {
+            console.log("⚠️ nextItem: playlist inativa ou vazia");
+            return;
+        }
         
+        // Avança para o próximo índice
         playIndex++;
+        console.log(`➡️ Avançando para índice ${playIndex}`);
         
-        // Se chegou ao fim da lista total, volta para o primeiro item (0)
+        // Se chegou ao fim, volta para o início
         if (playIndex >= playlist.length) {
             playIndex = 0;
+            console.log("🔄 Fim da playlist, reiniciando do início");
         }
         
-        playItem();
+        // Aguarda um pequeno momento antes de tocar o próximo
+        setTimeout(() => {
+            playItem();
+        }, 500);
     }
 
+    // 6. Função para parar a playlist
     function stopPlaylist() {
         console.log('⏹️ Parando playlist');
         playlistActive = false;
@@ -799,7 +860,10 @@
         const vc = document.getElementById('videoContainer');
         const fc = document.getElementById('flayerContainer');
         
-        if (vc) vc.innerHTML = '';
+        if (vc) {
+            vc.style.display = 'block';
+            vc.innerHTML = '';
+        }
         if (fc) {
             fc.style.display = 'none';
             fc.innerHTML = '';
@@ -807,12 +871,23 @@
         hideCountdown();
     }
 
+    // 7. Função para limpar timers
     function clearTimers() {
-        if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
-        if (imageTimer)  { clearTimeout(imageTimer);  imageTimer  = null; }
-        if (countdownRaf){ cancelAnimationFrame(countdownRaf); countdownRaf = null; }
+        if (safetyTimer) { 
+            clearTimeout(safetyTimer); 
+            safetyTimer = null; 
+        }
+        if (imageTimer) {  
+            clearTimeout(imageTimer);  
+            imageTimer  = null; 
+        }
+        if (countdownRaf) {
+            cancelAnimationFrame(countdownRaf); 
+            countdownRaf = null; 
+        }
     }
 
+    // 8. Função para remover listener do YouTube
     function removeYTListener() {
         if (youtubeMessageHandler) {
             window.removeEventListener('message', youtubeMessageHandler);
@@ -820,14 +895,39 @@
         }
     }
 
-    // Barra de progresso verde
+    // 9. Função para extrair ID do YouTube
+    function extractYTId(url) {
+        if (!url) return null;
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?#]+)/,
+            /youtube\.com\/watch\?.*v=([^&]+)/
+        ];
+        for (let pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) return match[1];
+        }
+        return null;
+    }
+
+    // 10. Função para ativar som
+    function ativarSom() {
+        isMuted = false;
+        const btn = document.getElementById('btnSom');
+        if (btn) btn.style.display = 'none';
+        // Recarrega o item atual com som
+        if (playlistActive && playlist[playIndex]?.type === 'youtube') {
+            playItem();
+        }
+    }
+
+    // 11. Barra de progresso
     function startCountdown(duration) {
         const bar = document.getElementById('countdownBar');
         if (!bar) return;
         bar.style.display = 'block';
         bar.style.transition = 'none';
         bar.style.width = '100%';
-        // Pequeno delay para o CSS "enxergar" o reset
+        
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 bar.style.transition = `width ${duration}ms linear`;
@@ -838,26 +938,14 @@
 
     function hideCountdown() {
         const bar = document.getElementById('countdownBar');
-        if (bar) { bar.style.display = 'none'; bar.style.width = '0'; }
-    }
-
-    function extractYTId(url) {
-        if (!url) return null;
-        const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?#]{11})/);
-        return m ? m[1] : null;
-    }
-
-    function ativarSom() {
-        isMuted = false;
-        const btn = document.getElementById('btnSom');
-        if (btn) btn.style.display = 'none';
-        // Recarrega o item atual com som
-        if (playlistActive && playlist[playIndex]?.type === 'youtube') playItem();
+        if (bar) { 
+            bar.style.display = 'none'; 
+            bar.style.width = '0'; 
+        }
     }
 
     // ═══════════════════════════════════════════════
     // SISTEMA PRINCIPAL
-    // ═══════════════════════════════════════════════
     // ═══════════════════════════════════════════════
     // POLLING CONFIGURÁVEL — poupa Firebase (sem listeners em tempo real)
     // ═══════════════════════════════════════════════
