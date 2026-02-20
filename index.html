@@ -646,6 +646,7 @@
                 <div class="sidebar-item" id="menuUnidades" style="display:none;" onclick="mostrarSecao('unidades')"><i class="fas fa-building"></i> Unidades</div>
                 <div class="sidebar-item" id="menuMonitor" style="display:none;" onclick="mostrarSecao('monitor')"><i class="fas fa-satellite-dish"></i> Monitor</div>
                 <div class="sidebar-item" id="menuSincronizacao" style="display:none;" onclick="mostrarSecao('sincronizacao')"><i class="fas fa-sync-alt"></i> Sincronização</div>
+                <div class="sidebar-item" id="menuBackup" style="display:none;" onclick="mostrarSecao('backup')"><i class="fas fa-cloud-upload-alt"></i> Backup / Restore</div>
             </nav>
             <div class="admin-content" id="adminContent"></div>
         </div>
@@ -1211,6 +1212,7 @@
         show('menuUnidades',       isSA && isMatriz);
         show('menuMonitor',        isSA && isMatriz);
         show('menuSincronizacao',  isSA && isMatriz);
+        show('menuBackup',         isSA && isMatriz);
     }
 
     function trocarUsuario() { usuarioAtual=null; permissoesUsuario=null; openLogin(); }
@@ -1265,6 +1267,7 @@
             'avisos_central':  mostrarSecaoAvisosCentral,
             'video':           mostrarSecaoVideo,
             'sms':             mostrarSecaoSMS,
+            'backup':          mostrarSecaoBackup,
         };
         if (SECOES[secao]) SECOES[secao]();
     }
@@ -1640,6 +1643,364 @@ https://www.youtube.com/watch?v=...">${(dadosGerais.unidade.videoUrls||[]).join(
         mostrarNotificacao('Dados atualizados!', 'success');
         mostrarSincronizacao(); // re-renderiza com horário atualizado
     }
+
+    // ═══════════════════════════════════════════════
+    // BACKUP / RESTORE — GitHub via API
+    // Token salvo criptografado em Firebase: configuracoes/github
+    // ═══════════════════════════════════════════════
+
+    const _e = s => btoa(unescape(encodeURIComponent(s)));
+    const _d = s => { try { return decodeURIComponent(escape(atob(s))); } catch(e) { return s; } };
+
+    let ghConfig = { token:'', owner:'', repo:'', path:'painel/backup/backup_completo.json' };
+    let backupStatus = { ultimoBackup: null, sha: null };
+
+    async function carregarConfigGitHub() {
+        try {
+            const snap = await db.ref('configuracoes/github').once('value');
+            const cfg  = snap.val();
+            if (cfg) {
+                ghConfig.token = cfg.token ? _d(cfg.token) : '';
+                ghConfig.owner = cfg.owner || '';
+                ghConfig.repo  = cfg.repo  || '';
+                ghConfig.path  = cfg.path  || 'painel/backup/backup_completo.json';
+                backupStatus.ultimoBackup = cfg.ultimo_backup || null;
+                backupStatus.sha          = cfg.sha           || null;
+            }
+        } catch(e) { console.warn('Erro ao carregar config GitHub:', e.message); }
+    }
+
+    async function salvarConfigGitHub(token, owner, repo, path) {
+        const cfg = {
+            token: _e(token), owner, repo,
+            path: path || 'painel/backup/backup_completo.json',
+            ultimo_backup: backupStatus.ultimoBackup || null,
+            sha: backupStatus.sha || null,
+        };
+        await db.ref('configuracoes/github').set(cfg);
+        ghConfig = { token, owner, repo, path: cfg.path };
+        mostrarNotificacao('Configuração GitHub salva com segurança no Firebase!', 'success');
+    }
+
+    async function coletarDadosCompletos() {
+        const [snapPaineis, snapUsuarios] = await Promise.all([
+            db.ref('paineis').once('value'),
+            db.ref('usuarios').once('value'),
+        ]);
+        return {
+            meta: {
+                versao:         '3.4',
+                gerado_em:      new Date().toISOString(),
+                gerado_por:     usuarioAtual?.nome || 'admin',
+                total_unidades: Object.keys(snapPaineis.val() || {}).length,
+                total_usuarios: Object.keys(snapUsuarios.val() || {}).length,
+            },
+            paineis:  snapPaineis.val()  || {},
+            usuarios: snapUsuarios.val() || {},
+        };
+    }
+
+    async function buscarSHAGitHub() {
+        if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return null;
+        try {
+            const res = await fetch(
+                `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`,
+                { headers: { Authorization: `token ${ghConfig.token}`, Accept: 'application/vnd.github.v3+json' } }
+            );
+            if (!res.ok) return null;
+            const data = await res.json();
+            return data.sha || null;
+        } catch(e) { return null; }
+    }
+
+    async function enviarParaGitHub(jsonStr) {
+        if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo)
+            throw new Error('Configure o token, owner e repositório antes de fazer backup.');
+        const sha = backupStatus.sha || await buscarSHAGitHub();
+        const body = {
+            message: `backup: ${new Date().toLocaleString('pt-BR')} — via PMPF Saúde`,
+            content: btoa(unescape(encodeURIComponent(jsonStr))),
+            branch:  'main',
+        };
+        if (sha) body.sha = sha;
+        const res = await fetch(
+            `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`,
+            {
+                method:  'PUT',
+                headers: { Authorization: `token ${ghConfig.token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+                body:    JSON.stringify(body),
+            }
+        );
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || `Erro GitHub: ${res.status}`);
+        }
+        const data = await res.json();
+        return data.content?.sha || null;
+    }
+
+    async function lerBackupGitHub() {
+        if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo)
+            throw new Error('Configure o token, owner e repositório primeiro.');
+        const res = await fetch(
+            `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`,
+            { headers: { Authorization: `token ${ghConfig.token}`, Accept: 'application/vnd.github.v3+json' } }
+        );
+        if (!res.ok) throw new Error('Arquivo de backup não encontrado no repositório.');
+        const data = await res.json();
+        return JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+    }
+
+    async function executarBackup() {
+        atualizarBtnBackup(true);
+        try {
+            mostrarNotificacao('Coletando dados do Firebase...', 'info');
+            const dados   = await coletarDadosCompletos();
+            const jsonStr = JSON.stringify(dados, null, 2);
+            mostrarNotificacao('Enviando para o GitHub...', 'info');
+            const novoSha = await enviarParaGitHub(jsonStr);
+            backupStatus.sha          = novoSha;
+            backupStatus.ultimoBackup = new Date().toISOString();
+            await db.ref('configuracoes/github').update({ sha: novoSha, ultimo_backup: backupStatus.ultimoBackup });
+            mostrarNotificacao('✅ Backup enviado com sucesso para o GitHub!', 'success');
+            mostrarSecaoBackup();
+        } catch(e) {
+            mostrarNotificacao('Erro no backup: ' + e.message, 'error');
+        } finally { atualizarBtnBackup(false); }
+    }
+
+    async function executarRestore() {
+        if (!confirm(
+            'ATENÇÃO: O RESTORE irá SUBSTITUIR todos os dados atuais do Firebase pelos dados do backup.\n\n' +
+            'Isso afeta:\n• Todas as unidades\n• Usuários do sistema\n• Vídeos, flyers e SMS Municipal\n\n' +
+            'Tem certeza que deseja continuar?'
+        )) return;
+        atualizarBtnRestore(true);
+        try {
+            mostrarNotificacao('Lendo backup do GitHub...', 'info');
+            const backup = await lerBackupGitHub();
+            if (!backup.paineis || !backup.usuarios)
+                throw new Error('Arquivo de backup inválido ou corrompido.');
+            mostrarNotificacao('Restaurando dados no Firebase...', 'info');
+            await Promise.all([
+                db.ref('paineis').set(backup.paineis),
+                db.ref('usuarios').set(backup.usuarios),
+            ]);
+            dadosGerais  = backup.paineis?.geral        || dadosGerais;
+            dadosUnidade = backup.paineis?.[unidadeID]  || dadosUnidade;
+            mostrarNotificacao('✅ Restore concluído! Dados restaurados com sucesso.', 'success');
+            mostrarSecaoBackup();
+        } catch(e) {
+            mostrarNotificacao('Erro no restore: ' + e.message, 'error');
+        } finally { atualizarBtnRestore(false); }
+    }
+
+    function atualizarBtnBackup(loading) {
+        const btn = document.getElementById('btnExecutarBackup');
+        if (!btn) return;
+        btn.disabled  = loading;
+        btn.innerHTML = loading
+            ? '<i class="fas fa-spinner fa-spin"></i> Enviando...'
+            : '<i class="fas fa-cloud-upload-alt"></i> Fazer Backup Agora';
+    }
+
+    function atualizarBtnRestore(loading) {
+        const btn = document.getElementById('btnExecutarRestore');
+        if (!btn) return;
+        btn.disabled  = loading;
+        btn.innerHTML = loading
+            ? '<i class="fas fa-spinner fa-spin"></i> Restaurando...'
+            : '<i class="fas fa-cloud-download-alt"></i> Restaurar do GitHub';
+    }
+
+    async function mostrarSecaoBackup() {
+        document.getElementById('adminContent').innerHTML = `
+            <div class="page-header">
+                <h2>Backup / Restore</h2>
+                <p>Carregando configuração...</p>
+            </div>
+            <div class="card" style="text-align:center;padding:60px;">
+                <div class="loading-ring" style="margin:0 auto 16px;border-top-color:#0f62fe;"></div>
+            </div>`;
+
+        await carregarConfigGitHub();
+
+        const temConfig    = !!(ghConfig.token && ghConfig.owner && ghConfig.repo);
+        const ultimoBackup = backupStatus.ultimoBackup
+            ? new Date(backupStatus.ultimoBackup).toLocaleString('pt-BR') : '—';
+        const disabledAttr = temConfig ? '' : 'disabled';
+
+        document.getElementById('adminContent').innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-cloud-upload-alt" style="color:#0f62fe;margin-right:10px;"></i>Backup / Restore</h2>
+                <p>Salve e restaure todos os dados no GitHub. Token armazenado com segurança no Firebase.</p>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon"><i class="fas fa-info-circle"></i></span> Status</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:18px;text-align:center;">
+                        <div style="font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><i class="fas fa-clock"></i> Último Backup</div>
+                        <div style="font-size:14px;font-weight:700;color:#15803d;">${ultimoBackup}</div>
+                    </div>
+                    <div style="background:${temConfig?'#eff6ff':'#fef2f2'};border:1px solid ${temConfig?'#bfdbfe':'#fecaca'};border-radius:12px;padding:18px;text-align:center;">
+                        <div style="font-size:11px;font-weight:700;color:${temConfig?'#1d4ed8':'#dc2626'};text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><i class="fas fa-plug"></i> Conexão GitHub</div>
+                        <div style="font-size:14px;font-weight:700;color:${temConfig?'#1d4ed8':'#dc2626'};">${temConfig?'✅ Configurado':'⚠️ Não configurado'}</div>
+                    </div>
+                    <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:18px;text-align:center;">
+                        <div style="font-size:11px;font-weight:700;color:#7e22ce;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><i class="fab fa-github"></i> Repositório</div>
+                        <div style="font-size:13px;font-weight:700;color:#7e22ce;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${temConfig?ghConfig.owner+'/'+ghConfig.repo:'—'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon" style="background:#fff7ed;color:#c2410c;"><i class="fab fa-github"></i></span> Configuração GitHub</h3>
+                <div class="info-banner" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534;">
+                    <i class="fas fa-shield-alt"></i>
+                    O token é <strong>criptografado e salvo no Firebase</strong> — nunca fica exposto no código ou navegador.
+                    Crie um <strong>Personal Access Token (PAT)</strong> com permissão <code>contents:write</code>.
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+                    <div>
+                        <label class="form-label"><i class="fas fa-user"></i> Owner (usuário ou organização)</label>
+                        <input id="ghOwner" class="form-input" placeholder="ex: prefeitura-passo-fundo" value="${ghConfig.owner}">
+                    </div>
+                    <div>
+                        <label class="form-label"><i class="fab fa-github"></i> Repositório</label>
+                        <input id="ghRepo" class="form-input" placeholder="ex: painel-saude" value="${ghConfig.repo}">
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <label class="form-label"><i class="fas fa-key"></i> Personal Access Token (PAT)</label>
+                    <div style="display:flex;gap:10px;">
+                        <input id="ghToken" class="form-input" type="password"
+                            placeholder="${temConfig?'••••••••••••••• (token salvo — deixe em branco para manter)':'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'}"
+                            style="flex:1;font-family:var(--mono);font-size:13px;">
+                        <button class="btn btn-ghost" style="flex-shrink:0;" onclick="
+                            const i=document.getElementById('ghToken');
+                            i.type=i.type==='password'?'text':'password';
+                            this.innerHTML=i.type==='password'?'<i class=\'fas fa-eye\'></i>':'<i class=\'fas fa-eye-slash\'></i>';
+                        "><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <label class="form-label"><i class="fas fa-folder"></i> Caminho no repositório</label>
+                    <input id="ghPath" class="form-input" value="${ghConfig.path}" style="font-family:var(--mono);font-size:13px;">
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="salvarConfigGH()"><i class="fas fa-save"></i> Salvar Configuração</button>
+                    <button class="btn btn-ghost" onclick="testarConexaoGH()"><i class="fas fa-plug"></i> Testar Conexão</button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div class="card" style="border-top:4px solid #22c55e;">
+                    <h3><span class="card-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-cloud-upload-alt"></i></span> Fazer Backup</h3>
+                    <p style="font-size:14px;color:#64748b;margin-bottom:16px;line-height:1.6;">Exporta <strong>todos os dados</strong> do Firebase em um único JSON para o GitHub.</p>
+                    <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#475569;">
+                        ${['Todas as unidades (faltômetro, atendimentos)','Avisos (central + unidades)','Flyers / URLs de mídia','Usuários do sistema','Vídeos YouTube e SMS Municipal']
+                            .map(t=>`<div style="margin-bottom:5px;"><i class="fas fa-check" style="color:#22c55e;margin-right:8px;"></i>${t}</div>`).join('')}
+                    </div>
+                    <button id="btnExecutarBackup" class="btn btn-primary" style="width:100%;justify-content:center;background:#16a34a;border-color:#16a34a;" onclick="executarBackup()" ${disabledAttr}>
+                        <i class="fas fa-cloud-upload-alt"></i> Fazer Backup Agora
+                    </button>
+                    ${!temConfig?'<p style="font-size:12px;color:#ef4444;margin-top:8px;text-align:center;">Configure o GitHub primeiro</p>':''}
+                </div>
+                <div class="card" style="border-top:4px solid #f59e0b;">
+                    <h3><span class="card-icon" style="background:#fffbeb;color:#d97706;"><i class="fas fa-cloud-download-alt"></i></span> Restaurar Backup</h3>
+                    <p style="font-size:14px;color:#64748b;margin-bottom:16px;line-height:1.6;">Lê o arquivo JSON do GitHub e <strong>restaura todos os dados</strong> no Firebase.</p>
+                    <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#78350f;line-height:1.5;">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Atenção:</strong>
+                        O restore <strong>substitui permanentemente</strong> todos os dados atuais. Faça um backup antes. A operação não pode ser desfeita.
+                    </div>
+                    <button id="btnExecutarRestore" class="btn btn-danger" style="width:100%;justify-content:center;" onclick="executarRestore()" ${disabledAttr}>
+                        <i class="fas fa-cloud-download-alt"></i> Restaurar do GitHub
+                    </button>
+                    ${!temConfig?'<p style="font-size:12px;color:#ef4444;margin-top:8px;text-align:center;">Configure o GitHub primeiro</p>':''}
+                </div>
+            </div>
+
+            ${temConfig ? `
+            <div class="card">
+                <h3><span class="card-icon"><i class="fas fa-history"></i></span> Histórico de Backups</h3>
+                <div id="historicoBackups" style="text-align:center;padding:30px;color:#94a3b8;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:10px;"></i>Carregando...
+                </div>
+            </div>` : ''}`;
+
+        if (temConfig) carregarHistoricoGitHub();
+    }
+
+    async function salvarConfigGH() {
+        const token = document.getElementById('ghToken').value.trim();
+        const owner = document.getElementById('ghOwner').value.trim();
+        const repo  = document.getElementById('ghRepo').value.trim();
+        const path  = document.getElementById('ghPath').value.trim() || 'painel/backup/backup_completo.json';
+        if (!owner || !repo) { mostrarNotificacao('Preencha owner e repositório.', 'error'); return; }
+        if (!token && !ghConfig.token) { mostrarNotificacao('Informe o token do GitHub.', 'error'); return; }
+        await salvarConfigGitHub(token || ghConfig.token, owner, repo, path);
+        mostrarSecaoBackup();
+    }
+
+    async function testarConexaoGH() {
+        const token = document.getElementById('ghToken').value.trim() || ghConfig.token;
+        const owner = document.getElementById('ghOwner').value.trim() || ghConfig.owner;
+        const repo  = document.getElementById('ghRepo').value.trim()  || ghConfig.repo;
+        if (!token || !owner || !repo) { mostrarNotificacao('Preencha todos os campos antes de testar.', 'error'); return; }
+        mostrarNotificacao('Testando conexão...', 'info');
+        try {
+            const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`,
+                { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } });
+            if (res.ok) {
+                const d = await res.json();
+                mostrarNotificacao(`✅ Conectado! Repositório: ${d.full_name} (${d.private?'privado':'público'})`, 'success');
+            } else {
+                mostrarNotificacao('❌ Token inválido ou repositório não encontrado.', 'error');
+            }
+        } catch(e) { mostrarNotificacao('Erro de rede: ' + e.message, 'error'); }
+    }
+
+    async function carregarHistoricoGitHub() {
+        const el = document.getElementById('historicoBackups');
+        if (!el) return;
+        try {
+            const res = await fetch(
+                `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/commits?path=${encodeURIComponent(ghConfig.path)}&per_page=10`,
+                { headers: { Authorization: `token ${ghConfig.token}`, Accept: 'application/vnd.github.v3+json' } }
+            );
+            if (!res.ok) { el.innerHTML = '<p style="color:#94a3b8;text-align:center;">Nenhum backup encontrado ainda.</p>'; return; }
+            const commits = await res.json();
+            if (!Array.isArray(commits) || !commits.length) {
+                el.innerHTML = '<p style="color:#94a3b8;text-align:center;">Nenhum backup encontrado ainda.</p>'; return;
+            }
+            el.innerHTML = `
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <thead>
+                        <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+                            <th style="padding:10px 16px;text-align:left;color:#475569;font-weight:600;">Data / Hora</th>
+                            <th style="padding:10px 16px;text-align:left;color:#475569;font-weight:600;">Mensagem</th>
+                            <th style="padding:10px 16px;text-align:center;color:#475569;font-weight:600;">Commit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${commits.map(c => {
+                            const dt  = new Date(c.commit.author.date).toLocaleString('pt-BR');
+                            const sha = c.sha.substring(0, 7);
+                            const msg = (c.commit.message || '').replace(/^backup:\s*/i,'');
+                            return `<tr style="border-bottom:1px solid #f1f5f9;">
+                                <td style="padding:10px 16px;color:#1e293b;font-weight:600;">${dt}</td>
+                                <td style="padding:10px 16px;color:#475569;">${msg}</td>
+                                <td style="padding:10px 16px;text-align:center;"><code style="background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:12px;">${sha}</code></td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+        } catch(e) {
+            el.innerHTML = `<p style="color:#ef4444;text-align:center;">Erro ao carregar histórico: ${e.message}</p>`;
+        }
+    }
+
 
     // ═══════════════════════════════════════════════
     // FLAYERS — somente Central posta, aparece em todas as unidades
