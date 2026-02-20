@@ -692,47 +692,101 @@
     const storage = firebase.storage();
 
     // ═══════════════════════════════════════════════
-    // PLAYLIST CORRIGIDA: VÍDEOS PRIMEIRO, DEPOIS FLAYERS
+    // PLAYLIST CORRIGIDA - VÍDEOS PRIMEIRO, DEPOIS FLAYERS
     // ═══════════════════════════════════════════════
-    function buildPlaylist() {
-        playlist = [];
-        
-        // Primeiro: todos os vídeos da Central
-        const videos = dadosGerais.unidade.videoUrls || [];
-        for (let i = 0; i < videos.length; i++) {
-            const url = videos[i];
-            if (url && url.trim()) {
-                playlist.push({ type: 'youtube', url: url.trim() });
-            }
-        }
-        
-        // Depois: todos os flyers da Central
-        const flyers = dadosGerais.flayers || [];
-        for (let i = 0; i < flyers.length; i++) {
-            const url = flyers[i];
-            if (url && url.trim()) {
-                playlist.push({ type: 'image', url: url.trim() });
-            }
-        }
-        
-        console.log('📋 Playlist construída:', playlist.length, 'itens');
-        console.log('   - Vídeos:', videos.length);
-        console.log('   - Flyers:', flyers.length);
-    }
-
+    
+    // 1. Função que inicia a playlist unindo Vídeos + Flyers
     function startPlaylist() {
-        console.log('🎬 Iniciando playlist...');
-        stopPlaylist();
-        buildPlaylist();
-        
+        if (!dadosGerais.unidade) return;
+
+        const vUrls = dadosGerais.unidade.videoUrls || [];
+        const fUrls = dadosGerais.flayers || [];
+
+        // Cria uma única lista: primeiro os vídeos, depois os flyers
+        playlist = [
+            ...vUrls.map(url => ({ type: 'youtube', url: url })),
+            ...fUrls.map(url => ({ type: 'flayer', url: url }))
+        ];
+
         if (playlist.length === 0) {
-            console.log('⚠️ Nenhum item na playlist');
+            console.log("Playlist vazia");
             return;
         }
-        
+
         playlistActive = true;
         playIndex = 0;
-        console.log(`▶️ Playlist iniciada com ${playlist.length} itens`);
+        playItem();
+    }
+
+    // 2. Função de execução para tratar os dois tipos de mídia
+    function playItem() {
+        if (!playlistActive || !playlist.length) return;
+        
+        clearTimers(); // Limpa timers de segurança e de imagens anteriores
+        removeYTListener(); // Remove ouvintes de mensagens do YouTube anteriores
+
+        const item = playlist[playIndex];
+        const vc = document.getElementById('videoContainer');
+        const fc = document.getElementById('flayerContainer');
+        const countdown = document.getElementById('countdownBar');
+
+        if (item.type === 'youtube') {
+            const ytId = extractYTId(item.url);
+            if (!ytId) { nextItem(); return; }
+
+            if (fc) fc.style.display = 'none';
+            if (vc) {
+                vc.style.display = 'block';
+                // Adicionado 'origin' e 'enablejsapi=1' para permitir a comunicação de fim de vídeo
+                const origin = window.location.origin;
+                vc.innerHTML = `<iframe id="ytPlayer" class="video-iframe" 
+                    src="https://www.youtube.com/embed/${ytId}?enablejsapi=1&autoplay=1&mute=${isMuted?1:0}&controls=0&rel=0&origin=${origin}" 
+                    allow="autoplay; encrypted-media"></iframe>`;
+            }
+
+            // Listener para detectar o fim do vídeo (State 0 = Ended)
+            youtubeMessageHandler = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.event === 'onStateChange' && data.info === 0) {
+                        nextItem();
+                    }
+                } catch(e) {}
+            };
+            window.addEventListener('message', youtubeMessageHandler);
+
+            // Timer de segurança (5 minutos) caso o vídeo trave
+            safetyTimer = setTimeout(nextItem, 300000);
+
+        } else if (item.type === 'flayer') {
+            if (vc) {
+                vc.style.display = 'none';
+                vc.innerHTML = ''; // Para o áudio do vídeo anterior se houver
+            }
+            if (fc) {
+                fc.style.display = 'flex';
+                fc.innerHTML = `<img src="${item.url}" style="width:100%; height:100%; object-fit:contain;">`;
+                
+                // Inicia a barra de progresso (se existir no seu layout)
+                if(countdown) startCountdown(30000);
+                
+                // Define 30 segundos para o flyer e pula para o próximo
+                imageTimer = setTimeout(nextItem, 30000);
+            }
+        }
+    }
+
+    // 3. Função de próximo item para criar o loop infinito
+    function nextItem() {
+        if (!playlistActive || playlist.length === 0) return;
+        
+        playIndex++;
+        
+        // Se chegou ao fim da lista total, volta para o primeiro item (0)
+        if (playIndex >= playlist.length) {
+            playIndex = 0;
+        }
+        
         playItem();
     }
 
@@ -764,115 +818,6 @@
             window.removeEventListener('message', youtubeMessageHandler);
             youtubeMessageHandler = null;
         }
-    }
-
-    function nextItem() {
-        if (!playlistActive || playlist.length === 0) return;
-        
-        // Avança para o próximo item
-        playIndex++;
-        
-        // Se chegou ao final, volta para o primeiro
-        if (playIndex >= playlist.length) {
-            playIndex = 0;
-            console.log('↻ Fim da playlist, reiniciando do início');
-        }
-        
-        console.log(`⏭ Reproduzindo item ${playIndex + 1} de ${playlist.length}`);
-        playItem();
-    }
-
-    function playItem() {
-        if (!playlistActive || !playlist.length) {
-            console.log('⚠️ Playlist vazia ou inativa');
-            return;
-        }
-
-        clearTimers();
-        removeYTListener();
-
-        const item = playlist[playIndex];
-        const vc = document.getElementById('videoContainer');
-        const fc = document.getElementById('flayerContainer');
-        const btn = document.getElementById('btnSom');
-
-        console.log(`▶️ Reproduzindo [${playIndex + 1}/${playlist.length}] ${item.type}:`, item.url);
-
-        if (item.type === 'youtube') {
-            // Mostrar vídeo
-            if (vc) {
-                vc.style.display = 'block';
-                vc.innerHTML = '';
-            }
-            if (fc) {
-                fc.style.display = 'none';
-                fc.innerHTML = '';
-            }
-            if (btn) btn.style.display = isMuted ? 'block' : 'none';
-            hideCountdown();
-
-            const vid = extractYTId(item.url);
-            if (!vid) {
-                console.error('❌ ID do YouTube inválido');
-                nextItem();
-                return;
-            }
-
-            const muted = isMuted ? 1 : 0;
-            vc.innerHTML = `<iframe class="video-iframe" 
-                src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=${muted}&enablejsapi=1"
-                allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-
-            // Detectar fim do vídeo
-            youtubeMessageHandler = function(event) {
-                try {
-                    if (typeof event.data === 'string' && event.data.includes('"info":0')) {
-                        console.log('✅ Vídeo terminou');
-                        nextItem();
-                    }
-                } catch(e) {}
-            };
-            window.addEventListener('message', youtubeMessageHandler);
-
-            // Timer de segurança: 10 minutos
-            safetyTimer = setTimeout(() => {
-                console.log('⏰ Timeout do vídeo');
-                nextItem();
-            }, 600000);
-
-        } else if (item.type === 'image') {
-            // Mostrar flyer
-            console.log('🖼️ Exibindo flyer:', item.url);
-            
-            if (vc) vc.style.display = 'none';
-            if (btn) btn.style.display = 'none';
-            
-            if (fc) {
-                fc.style.display = 'flex';
-                fc.innerHTML = `<img src="${item.url}" 
-                    style="width:100%; height:100%; object-fit:contain;" 
-                    onload="onImageLoaded()" 
-                    onerror="onImageError()">`;
-            }
-        }
-    }
-
-    // Chamada quando a imagem carrega com sucesso
-    function onImageLoaded() {
-        console.log('✅ Flyer carregado, 30 segundos');
-        clearTimers();
-        startCountdown(30000);
-        imageTimer = setTimeout(() => {
-            console.log('⏰ Tempo do flyer terminou');
-            nextItem();
-        }, 30000);
-    }
-
-    // Chamada quando a imagem falha
-    function onImageError() {
-        console.error('❌ Erro ao carregar flyer');
-        clearTimers();
-        imageTimer = setTimeout(nextItem, 5000);
     }
 
     // Barra de progresso verde
