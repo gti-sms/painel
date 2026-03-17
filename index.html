@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://www.gstatic.com https://www.youtube.com https://gti-painel-default-rtdb.firebaseio.com https://gti-painel.firebaseapp.com; img-src * data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src https: wss: blob:; img-src * data: blob:; media-src * blob:; frame-src https:;">
 <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sistema de Saúde — Passo Fundo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1014,6 +1014,8 @@ async function iniciar() {
   }, 800);
 
   if (IS_MATRIZ) carregarTodosUsuarios();
+  // Garantir que o usuário admin existe no banco (primeira execução)
+  garantirAdminInicial();
 }
 
 function processarInterface() {
@@ -2120,6 +2122,26 @@ function notif(msg, tipo='info') {
 // ─────────────────────────────────────────────
 // START
 // ─────────────────────────────────────────────
+// Cria o admin padrão apenas se não existir NENHUM usuário no banco
+function garantirAdminInicial() {
+  db.ref('usuarios').once('value').then(snap => {
+    const us = snap.val() || {};
+    const temUsuario = Object.keys(us).length > 0;
+    if (!temUsuario) {
+      // Cria usuário padrão apenas na primeira execução
+      db.ref('usuarios/admin_gti').set({
+        nome: 'Administrador GTI',
+        login: 'gti',
+        senha: 'Itatilac2009',
+        nivel: 'super_admin',
+        unidades_permitidas: ['todas'],
+        status: 'ativo',
+        criado_em: new Date().toISOString()
+      });
+    }
+  }).catch(() => {});
+}
+
 document.addEventListener('DOMContentLoaded', iniciar);
 
 })(); // fim do IIFE
