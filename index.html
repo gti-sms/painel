@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <style>
 /* === RESET === */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit','Segoe UI',sans-serif}
@@ -535,39 +536,27 @@ const cache = {
 };
 
 // ─────────────────────────────────────────────
-// ROTAÇÃO: vídeos → flayers → apresentação → vídeos
+// ROTAÇÃO: YouTube IFrame API detecta fim da
+// playlist → flayers → apresentação → reinicia
 // ─────────────────────────────────────────────
-const CICLO_VIDEO_MS = 10 * 60 * 1000; // 10 minutos
+let ytPlayer = null;
+let ytApiPronto = false;
+let ytPendente = false;
+
+// Callback global exigido pela YouTube IFrame API
+window.onYouTubeIframeAPIReady = function() {
+  ytApiPronto = true;
+  if (ytPendente) { ytPendente = false; criarPlayer(); }
+};
 
 const rotacao = {
-  checkTimer: null,
-  iniciado: false,
+  emCiclo: false,
 
-  init() {
-    // Marcar início dos vídeos
-    if (!localStorage.getItem('videoStart_'+UNIDADE_ID)) {
-      localStorage.setItem('videoStart_'+UNIDADE_ID, Date.now().toString());
-    }
-    // Verificar a cada 30 segundos se deve iniciar rotação
-    this.checkTimer = setInterval(() => this.verificar(), 30000);
-  },
-
-  resetar() {
-    localStorage.setItem('videoStart_'+UNIDADE_ID, Date.now().toString());
-    this.iniciado = false;
-    flayerSys.parar(false);
-    apresentSys.parar(false);
-    carregarVideo();
-  },
-
-  verificar() {
-    if (this.iniciado) return;
+  playlistTerminou() {
+    if (this.emCiclo) return;
     if (flayerSys.isPlaying || apresentSys.isPlaying) return;
-    const start = parseInt(localStorage.getItem('videoStart_'+UNIDADE_ID) || '0');
-    if (Date.now() - start >= CICLO_VIDEO_MS) {
-      this.iniciado = true;
-      this.iniciarCiclo();
-    }
+    this.emCiclo = true;
+    this.iniciarCiclo();
   },
 
   iniciarCiclo() {
@@ -577,6 +566,13 @@ const rotacao = {
     } else {
       apresentSys.iniciar(() => this.resetar());
     }
+  },
+
+  resetar() {
+    this.emCiclo = false;
+    flayerSys.parar(false);
+    apresentSys.parar(false);
+    carregarVideo();
   }
 };
 
@@ -1012,7 +1008,7 @@ async function iniciar() {
     setTimeout(() => {
       apresentSys.init();
       flayerSys.init();
-      rotacao.init();
+      // rotação agora é event-driven (YouTube IFrame API)
     }, 1500);
     setTimeout(ocultarLoading, 25000);
   }, 800);
@@ -1039,18 +1035,76 @@ function atualizarRelogio() {
   document.getElementById('currentTime').textContent = n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 
+// Extrai ID do YouTube de qualquer formato de URL
+function extrairYtId(url) {
+  const m = url.match(/^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
+  return (m && m[1].length === 11) ? m[1] : null;
+}
+
+// carregarVideo: cria/recria o player YT via IFrame API
 function carregarVideo() {
   if (flayerSys.isPlaying || apresentSys.isPlaying) return;
-  const c = document.getElementById('videoContainer');
-  const urls = dadosGerais.unidade.videoUrls || [];
-  const reg = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const ids = urls.map(u => { const m=u.match(reg); return(m&&m[1].length===11)?m[1]:null; }).filter(Boolean);
-  if (ids.length > 0) {
-    const src = `https://www.youtube.com/embed/${ids[0]}?autoplay=1&mute=${isMuted?1:0}&loop=1&playlist=${ids.join(',')}&controls=0`;
-    if (!c.innerHTML.includes(ids[0]) || (isMuted===false && c.innerHTML.includes('mute=1'))) {
-      c.innerHTML = `<iframe class="video-iframe" src="${src}" allow="autoplay; encrypted-media"></iframe>`;
-    }
+  const ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
+  if (ids.length === 0) return;
+
+  if (!ytApiPronto) { ytPendente = true; return; }
+  criarPlayer(ids);
+}
+
+function criarPlayer(ids) {
+  // Usar IDs atuais se não fornecidos
+  if (!ids) {
+    ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
   }
+  if (ids.length === 0) return;
+
+  const container = document.getElementById('videoContainer');
+  container.innerHTML = '<div id="ytPlayerEl"></div>';
+
+  // Destruir player anterior se existir
+  if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+    try { ytPlayer.destroy(); } catch(e) {}
+    ytPlayer = null;
+  }
+
+  ytPlayer = new YT.Player('ytPlayerEl', {
+    width: '100%',
+    height: '100%',
+    videoId: ids[0],
+    playerVars: {
+      autoplay: 1,
+      mute: isMuted ? 1 : 0,
+      controls: 0,
+      rel: 0,
+      loop: 0,          // SEM loop — queremos detectar o fim da fila
+      playlist: ids.join(','),
+      playsinline: 1,
+      modestbranding: 1,
+      iv_load_policy: 3
+    },
+    events: {
+      onReady(e) { e.target.playVideo(); },
+      onStateChange(e) {
+        // YT.PlayerState.ENDED = 0
+        // Quando um vídeo termina, verificar se é o último da fila
+        if (e.data === 0) {
+          const lista = ytPlayer.getPlaylist();
+          const idx   = ytPlayer.getPlaylistIndex();
+          const ultimo = !lista || idx >= lista.length - 1;
+          if (ultimo) {
+            rotacao.playlistTerminou();
+          }
+          // Se não é o último, o YouTube avança sozinho
+        }
+      },
+      onError() {
+        // Em caso de erro num vídeo, avançar para o próximo
+        if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
+          setTimeout(() => ytPlayer.nextVideo(), 2000);
+        }
+      }
+    }
+  });
 }
 
 function atualizarFaltometro() {
@@ -1702,7 +1756,13 @@ window.APP = {
   trocarUsuario() { auth.trocarUsuario(); },
   ativarSom() {
     isMuted = false;
-    carregarVideo();
+    // Recriar player sem mute
+    if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+      ytPlayer.unMute();
+      ytPlayer.setVolume(80);
+    } else {
+      criarPlayer();
+    }
     document.getElementById('btnSom').style.display = 'none';
   },
   logout() {
