@@ -2605,21 +2605,20 @@ function notif(msg, tipo='info') {
 // ─────────────────────────────────────────────
 // Cria o admin padrão apenas se não existir NENHUM usuário no banco
 function garantirAdminInicial() {
+  // Bootstrap: cria admin padrão APENAS se o banco estiver vazio (primeira execução).
+  // IMPORTANTE: troque a senha imediatamente após o primeiro login em Gerenciar Usuários.
   db.ref('usuarios').once('value').then(snap => {
     const us = snap.val() || {};
-    const temUsuario = Object.keys(us).length > 0;
-    if (!temUsuario) {
-      // Cria usuário padrão apenas na primeira execução
-      db.ref('usuarios/admin_gti').set({
-        nome: 'Administrador GTI',
-        login: 'gti',
-        senha: 'Itatilac2009',
-        nivel: 'super_admin',
-        unidades_permitidas: ['todas'],
-        status: 'ativo',
-        criado_em: new Date().toISOString()
-      });
-    }
+    if (Object.keys(us).length > 0) return; // já existe — não sobrescreve
+    db.ref('usuarios/admin_gti').set({
+      nome: 'Administrador GTI',
+      login: 'gti',
+      senha: 'Itatilac2009',  // Troque após o primeiro login!
+      nivel: 'super_admin',
+      unidades_permitidas: ['todas'],
+      status: 'ativo',
+      criado_em: new Date().toISOString()
+    });
   }).catch(() => {});
 }
 
