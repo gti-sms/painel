@@ -1438,71 +1438,87 @@ function criarPlayer(ids) {
   if (!ids) ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
   if (ids.length === 0) return;
 
+  // Registrar fila
+  ytIds         = [...ids];
+  ytTotalVideos = ids.length;
+  ytVideosVisto = 0;
+
   // Garantir container visível e limpo
   const container = document.getElementById('videoContainer');
   if (!container) return;
   container.style.display = 'block';
 
-  // Destruir player anterior sempre (evita estado inconsistente)
+  // Destruir player anterior
   try { if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy(); } catch(e) {}
   ytPlayer = null;
   container.innerHTML = '';
 
-  // Criar elemento alvo
   const el = document.createElement('div');
   el.id = 'ytPlayerEl';
   el.style.cssText = 'width:100%;height:100%';
   container.appendChild(el);
 
-  // Registrar quantos vídeos há na fila
-  ytIds = ids;
-  ytTotalVideos = ids.length;
-  ytVideosVisto = 0;
-
+  // IMPORTANTE: NÃO passar videoId nem playlist no construtor quando há
+  // múltiplos vídeos — usar loadPlaylist() no onReady para controle exato.
   ytPlayer = new YT.Player('ytPlayerEl', {
-    width: '100%',
+    width:  '100%',
     height: '100%',
-    videoId: ids[0],
     playerVars: {
-      autoplay:        1,
-      mute:            isMuted ? 1 : 0,
-      controls:        0,
-      rel:             0,
-      loop:            0,          // SEM loop — detectamos fim manualmente
-      playlist:        ids.join(','),
-      playsinline:     1,
-      modestbranding:  1,
-      iv_load_policy:  3,
-      disablekb:       1
+      autoplay:       1,
+      mute:           isMuted ? 1 : 0,
+      controls:       0,
+      rel:            0,
+      loop:           0,
+      playsinline:    1,
+      modestbranding: 1,
+      iv_load_policy: 3,
+      disablekb:      1,
+      origin:         window.location.origin
     },
     events: {
       onReady(e) {
+        // loadPlaylist é o método correto para múltiplos vídeos com sequência garantida
+        e.target.loadPlaylist({
+          playlist:    ytIds,       // array de IDs
+          index:       0,
+          startSeconds: 0,
+          suggestedQuality: 'hd720'
+        });
+        if (isMuted) e.target.mute(); else e.target.unMute();
         e.target.setVolume(80);
-        e.target.playVideo();
       },
+
       onStateChange(e) {
         if (rotacao.emCiclo) return;
-        if (e.data === YT.PlayerState.ENDED) {
+
+        const state = e.data;
+
+        // ENDED = 0: um vídeo terminou
+        if (state === YT.PlayerState.ENDED) {
           ytVideosVisto = Math.min(ytVideosVisto + 1, ytTotalVideos);
           if (ytVideosVisto >= ytTotalVideos) {
+            // Todos os vídeos foram exibidos — iniciar ciclo
             rotacao.playlistTerminou();
           }
-          // Vídeos restantes: YT avança automaticamente pela playlist
+          // Se ainda há vídeos, loadPlaylist avança automaticamente
         }
-        // Estado -1 após playlist toda (alguns browsers): tratar como fim
-        if (e.data === -1 && ytVideosVisto >= ytTotalVideos && ytTotalVideos > 0) {
+
+        // -1 (não iniciado) logo após ENDED com todos os vídeos vistos
+        // = YT chegou no fim da playlist e não tem próximo
+        if (state === -1 && ytVideosVisto > 0 && ytVideosVisto >= ytTotalVideos) {
           rotacao.playlistTerminou();
         }
       },
-      onError() {
-        // Vídeo bloqueado/inválido: contar como visto e avançar
-        ytVideosVisto++;
+
+      onError(e) {
+        // Vídeo bloqueado/removido: pular e contar
+        ytVideosVisto = Math.min(ytVideosVisto + 1, ytTotalVideos);
         if (ytVideosVisto >= ytTotalVideos) {
           rotacao.playlistTerminou();
         } else {
           setTimeout(() => {
-            try { if (ytPlayer) ytPlayer.nextVideo(); } catch(e) {}
-          }, 1500);
+            try { if (ytPlayer) ytPlayer.nextVideo(); } catch(err) {}
+          }, 1000);
         }
       }
     }
