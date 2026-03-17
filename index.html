@@ -116,16 +116,18 @@ body::after{
 .video-container{width:100%;height:100%}
 .video-iframe{width:100%;height:100%;border:none;display:block}
 .btn-som{
-  position:absolute;bottom:22px;left:22px;z-index:50;
-  background:rgba(0,230,118,.92);color:#011a0e;border:none;
-  padding:11px 22px;border-radius:30px;cursor:pointer;
-  font-weight:700;font-size:14px;letter-spacing:.5px;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 4px 20px rgba(0,230,118,.4);
-  backdrop-filter:blur(10px);
-  transition:all .2s;
+  position:absolute;bottom:18px;left:18px;z-index:50;
+  background:rgba(6,20,12,.72);color:rgba(0,230,118,.9);
+  border:1px solid rgba(0,230,118,.3);
+  padding:7px 15px 7px 12px;border-radius:20px;cursor:pointer;
+  font-weight:600;font-size:12px;letter-spacing:.6px;
+  display:flex;align-items:center;gap:7px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
+  transition:all .25s;opacity:.85;
 }
-.btn-som:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,230,118,.6)}
+.btn-som i{font-size:11px}
+.btn-som:hover{opacity:1;border-color:rgba(0,230,118,.65);background:rgba(6,20,12,.88);box-shadow:0 4px 18px rgba(0,230,118,.25)}
 
 /* — Flayer container — */
 #flayerContainer{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#000;z-index:40}
@@ -205,7 +207,16 @@ body::after{
   color:#fff;line-height:1;letter-spacing:3px;
   text-shadow:0 2px 16px rgba(0,0,0,.6),0 0 40px rgba(255,120,120,.3);
 }
-.total-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;letter-spacing:.5px}
+.total-sub{
+  font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,200,200,.75);margin-top:6px;
+  animation:subtlePulse 3s ease-in-out infinite;
+  text-shadow:0 0 10px rgba(255,100,100,.3);
+}
+@keyframes subtlePulse{
+  0%,100%{opacity:.7;text-shadow:0 0 8px rgba(255,100,100,.2)}
+  50%{opacity:1;text-shadow:0 0 16px rgba(255,120,120,.55)}
+}
 
 .lista-container{flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden}
 .item-lista{
@@ -268,9 +279,9 @@ body::after{
 .apres-timer-bar-outer{width:180px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
 .apres-timer-bar-inner{height:100%;width:100%;background:linear-gradient(90deg,var(--green),#69f0ae);border-radius:2px}
 .apres-timer-count{font-size:26px;font-weight:700;color:var(--green);font-family:'Bebas Neue',monospace;letter-spacing:2px}
-.apres-main{flex:1;display:grid;grid-template-columns:1.5fr 1fr;gap:0;position:relative;z-index:2;overflow:hidden}
-.apres-divider{position:absolute;top:30px;bottom:30px;left:60%;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08) 30%,rgba(255,255,255,.08) 70%,transparent)}
-.apres-left{padding:40px 55px;display:flex;flex-direction:column;justify-content:center}
+.apres-main{flex:1;display:grid;grid-template-columns:1fr 1.5fr;gap:0;position:relative;z-index:2;overflow:hidden}
+.apres-divider{position:absolute;top:30px;bottom:30px;left:40%;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08) 30%,rgba(255,255,255,.08) 70%,transparent)}
+.apres-left{padding:40px 45px 40px 55px;display:flex;flex-direction:column;justify-content:center}
 .apres-eyebrow{font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeSlideLeft .6s ease-out both}
 .apres-eyebrow::before{content:'';width:30px;height:2px;background:var(--green)}
 .apres-main-title{font-family:'Bebas Neue',sans-serif;font-size:82px;line-height:1;color:#fff;margin-bottom:20px;animation:fadeSlideLeft .7s ease-out .1s both;text-shadow:0 0 80px rgba(0,230,118,.2)}
@@ -282,7 +293,7 @@ body::after{
 .apres-texto-icon-wrap i{color:var(--green);font-size:17px}
 .apres-texto-item span{font-size:20px;color:rgba(255,255,255,.8);line-height:1.45}
 @keyframes fadeSlideLeft{from{transform:translateX(-40px);opacity:0}to{transform:translateX(0);opacity:1}}
-.apres-right{padding:40px 45px 40px 55px;display:flex;flex-direction:column;animation:fadeSlideRight .8s ease-out .2s both}
+.apres-right{padding:40px 55px;display:flex;flex-direction:column;justify-content:center;animation:fadeSlideRight .8s ease-out .2s both}
 @keyframes fadeSlideRight{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
 .apres-falto-label{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(239,83,80,.8);margin-bottom:8px;display:flex;align-items:center;gap:8px;line-height:1.4}
 .apres-falto-label::before{content:'';width:20px;height:2px;background:var(--red);flex-shrink:0}
@@ -996,12 +1007,6 @@ const apresentSys = {
       <div class="apres-main">
         <div class="apres-divider"></div>
         <div class="apres-left">
-          <div class="apres-eyebrow"><i class="fas fa-heartbeat"></i> Compromisso com a saúde</div>
-          <div class="apres-main-title">${tituloHtml}</div>
-          <div class="apres-main-msg">${sanitize(cfg.mensagemPrincipal)}</div>
-          <div class="apres-textos-lista">${textosHtml}</div>
-        </div>
-        <div class="apres-right">
           <div class="apres-falto-label"><i class="fas fa-chart-bar"></i> Dados do mês anterior desta unidade</div>
           <div class="apres-falto-title">FALTÔMETRO</div>
           <div class="apres-total-card">
@@ -1009,6 +1014,12 @@ const apresentSys = {
             <div class="apres-total-sublabel">consultas não realizadas no mês</div>
           </div>
           <div class="apres-esp-lista">${espHtml}</div>
+        </div>
+        <div class="apres-right">
+          <div class="apres-eyebrow"><i class="fas fa-heartbeat"></i> Compromisso com a saúde</div>
+          <div class="apres-main-title">${tituloHtml}</div>
+          <div class="apres-main-msg">${sanitize(cfg.mensagemPrincipal)}</div>
+          <div class="apres-textos-lista">${textosHtml}</div>
         </div>
       </div>
       <div class="apres-footer">
