@@ -85,10 +85,6 @@ body::after{
 .header-text{display:flex;flex-direction:column}
 .header-text h1{font-size:22px;font-weight:800;color:#fff;letter-spacing:.3px;line-height:1.1}
 #headerSubtitle{font-size:14px;color:rgba(255,255,255,.65);font-weight:500;letter-spacing:.5px}
-.header-center{display:flex;align-items:center;gap:0;background:rgba(0,0,0,.2);border-radius:30px;padding:4px 6px;border:1px solid rgba(255,255,255,.1)}
-.header-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px;margin-left:4px;animation:dotPulse 2s ease-in-out infinite;box-shadow:0 0 8px var(--green)}
-@keyframes dotPulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--green)}50%{opacity:.5;box-shadow:0 0 4px var(--green)}}
-.header-status-text{font-size:12px;color:var(--green);font-weight:600;letter-spacing:1px;margin-right:10px}
 .datetime-container{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px}
 #currentDate{font-size:12px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.5px;text-transform:capitalize}
 #currentTime{font-size:44px;font-weight:700;color:var(--green);font-family:'Bebas Neue',monospace;line-height:1;letter-spacing:3px;text-shadow:0 0 30px rgba(0,230,118,.5)}
@@ -571,10 +567,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div id="headerSubtitle">Carregando...</div>
     </div>
   </div>
-  <div class="header-center">
-    <div class="header-status-dot"></div>
-    <span class="header-status-text">SISTEMA ATIVO</span>
-  </div>
+
   <div class="datetime-container">
     <div id="currentDate"></div>
     <div id="currentTime"></div>
@@ -1518,7 +1511,7 @@ const auth = {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'flex';
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
-    APP.showSection('unidade');
+    APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
   },
 
@@ -1558,6 +1551,7 @@ function configurarMenus() {
     if (el) el.style.display = cond ? 'flex' : 'none';
   };
 
+  show('navUnidade', IS_MATRIZ && isAdm);
   show('navFalto', isAdm);
   show('navApresentacao', IS_MATRIZ && isAdm);
   show('navFlayers', IS_MATRIZ && isAdm);
@@ -2069,8 +2063,8 @@ window.APP = {
     // Verificar permissão
     const n = permissoesUsuario?.nivel;
     const bloqueado = {
-      visualizador: ['faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor'],
-      admin_unidade: IS_MATRIZ ? [] : ['apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor']
+      visualizador: ['unidade','faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor'],
+      admin_unidade: IS_MATRIZ ? [] : ['unidade','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor']
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
