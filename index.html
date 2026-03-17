@@ -1726,64 +1726,64 @@ const sections = {
   faltometro() {
     const itens = dadosUnidade.unidade.especialidades || [];
     if (permissoesUsuario?.nivel === 'visualizador') {
-      document.getElementById('admContent').innerHTML = `
-        <div class="adm-card">
-          <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div></div>
-          <div class="adm-info-box"><i class="fas fa-eye"></i> Visualização somente leitura.</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
-            ${itens.map(e=>`<div style="background:#f7f9fc;border:1px solid #e0e6ef;border-radius:10px;padding:16px"><div style="font-weight:700;color:#374151;font-size:16px;margin-bottom:8px">${sanitize(e.nome)}</div><div style="font-size:30px;font-weight:800;color:#d32f2f">${parseInt(e.faltas)||0}</div></div>`).join('')}
-          </div>
-        </div>`;
+      document.getElementById('admContent').innerHTML =
+        '<div class="adm-card">'
+        + '<div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div></div>'
+        + '<div class="adm-info-box"><i class="fas fa-eye"></i> Visualização somente leitura.</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">'
+        + itens.map(e=>'<div style="background:#f7f9fc;border:1px solid #e0e6ef;border-radius:10px;padding:16px"><div style="font-weight:700;color:#374151;font-size:16px;margin-bottom:8px">' + sanitize(e.nome) + '</div><div style="font-size:30px;font-weight:800;color:#d32f2f">' + (parseInt(e.faltas)||0) + '</div></div>').join('')
+        + '</div></div>';
       return;
     }
-    document.getElementById('admContent').innerHTML = `
-      <div class="adm-card">
-        <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div><div class="adm-card-desc">Dados exibidos no painel e na Apresentação Comunitária</div></div>
-          <button class="adm-btn-green" onclick="APP.adicionarEsp()"><i class="fas fa-plus"></i> Adicionar</button>
-        </div>
-        <div class="adm-info-box success"><i class="fas fa-check-circle"></i> Os valores são atualizados em tempo real em todas as telas. Informe os dados do mês anterior.</div>
-        <div id="listaEsp">
-          ${itens.map((e,i) => `
-            <div class="falto-row">
-              <input type="text" class="adm-input falto-row-nome" value="${sanitize(e.nome)}" placeholder="Nome da especialidade" onchange="APP.atualizarEsp(${i},'nome',this.value)">
-              <input type="number" class="adm-input falto-row-num" value="${parseInt(e.faltas)||0}" min="0" placeholder="0" onchange="APP.atualizarEsp(${i},'faltas',this.value)" style="font-size:22px;font-weight:700;color:#d32f2f;text-align:right">
-              <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerEsp(${i})" title="Remover"><i class="fas fa-trash"></i></button>
-            </div>`).join('')}
-        </div>
-        <div class="adm-action-bar">
-          <button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>
-        </div>
-      </div>
+    // Funções auxiliares para evitar template literals aninhados
+    const espRows = itens.map((e,i) => {
+      const row = document.createElement('div');
+      row.className = 'falto-row';
+      row.innerHTML = '<input type="text" class="adm-input falto-row-nome" value="' + sanitize(e.nome) + '" placeholder="Nome da especialidade" onchange="APP.atualizarEsp(' + i + ',\'nome\',this.value)">'
+        + '<input type="number" class="adm-input falto-row-num" value="' + (parseInt(e.faltas)||0) + '" min="0" placeholder="0" onchange="APP.atualizarEsp(' + i + ',\'faltas\',this.value)" style="font-size:22px;font-weight:700;color:#d32f2f;text-align:right">'
+        + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerEsp(' + i + ')" title="Remover"><i class="fas fa-trash"></i></button>';
+      return row.outerHTML;
+    }).join('');
 
-      <!-- Card: Mensagens de Conscientização -->
-      <div class="adm-card">
-        <div class="adm-card-header">
-          <div>
-            <div class="adm-card-title"><i class="fas fa-comment-dots"></i> Mensagens de Conscientização</div>
-            <div class="adm-card-desc">Textos rotativos exibidos no Faltômetro — trocam a cada 8 segundos</div>
-          </div>
-          <button class="adm-btn-green adm-btn-sm" onclick="APP.adicionarMsg()"><i class="fas fa-plus"></i> Adicionar</button>
-        </div>
-        <div class="adm-info-box">
-          <i class="fas fa-info-circle"></i>
-          Use <strong>*texto*</strong> para destacar em negrito. Exemplo: <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px">Sua vaga tem *valor*!</code>
-          → aparece como: Sua vaga tem <strong>valor</strong>!
-        </div>
-        <div id="listaMsgs">
-          ${FALTO_MSGS.map((m,i) => `
-            <div class="texto-row" id="msgRow${i}">
-              <input type="text" class="adm-input msg-input" data-idx="${i}"
-                value="${(m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*')}"
-                placeholder="Digite a mensagem...">
-              <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(${i})"><i class="fas fa-trash"></i></button>
-            </div>`).join('')}
-        </div>
-        <div class="adm-action-bar">
-          <button class="adm-btn-green" onclick="APP.salvarMsgs()"><i class="fas fa-save"></i> Salvar Mensagens</button>
-          <button class="adm-btn-muted" onclick="APP.resetarMsgs()"><i class="fas fa-undo"></i> Restaurar Padrão</button>
-        </div>
-      </div>`;
+    const msgRows = FALTO_MSGS.map((m, i) => {
+      const plain = (m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*');
+      return '<div class="texto-row" id="msgRow' + i + '">'
+        + '<input type="text" class="adm-input msg-input" data-idx="' + i + '" value="' + plain.replace(/"/g,'&quot;') + '" placeholder="Digite a mensagem...">'
+        + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(' + i + ')"><i class="fas fa-trash"></i></button>'
+        + '</div>';
+    }).join('');
+
+    const admC = document.getElementById('admContent');
+    admC.innerHTML = '';
+
+    admC.innerHTML =
+      '<div class="adm-card">'
+      + '<div class="adm-card-header">'
+        + '<div><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div>'
+        + '<div class="adm-card-desc">Dados exibidos no painel e na Apresentação Comunitária</div></div>'
+        + '<button class="adm-btn-green" onclick="APP.adicionarEsp()"><i class="fas fa-plus"></i> Adicionar</button>'
+      + '</div>'
+      + '<div class="adm-info-box success"><i class="fas fa-check-circle"></i> Os valores são atualizados em tempo real. Informe os dados do mês anterior.</div>'
+      + '<div id="listaEsp">' + espRows + '</div>'
+      + '<div class="adm-action-bar">'
+        + '<button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>'
+      + '</div>'
+    + '</div>'
+    + '<div class="adm-card">'
+      + '<div class="adm-card-header">'
+        + '<div>'
+          + '<div class="adm-card-title"><i class="fas fa-comment-dots"></i> Mensagens de Conscientização</div>'
+          + '<div class="adm-card-desc">Textos rotativos no Faltômetro — trocam a cada 8 segundos</div>'
+        + '</div>'
+        + '<button class="adm-btn-green adm-btn-sm" onclick="APP.adicionarMsg()"><i class="fas fa-plus"></i> Adicionar</button>'
+      + '</div>'
+      + '<div class="adm-info-box"><i class="fas fa-info-circle"></i> Use <strong>*texto*</strong> para negrito. Ex: <code>Sua vaga tem *valor*!</code></div>'
+      + '<div id="listaMsgs">' + msgRows + '</div>'
+      + '<div class="adm-action-bar">'
+        + '<button class="adm-btn-green" onclick="APP.salvarMsgs()"><i class="fas fa-save"></i> Salvar Mensagens</button>'
+        + '<button class="adm-btn-muted" onclick="APP.resetarMsgs()"><i class="fas fa-undo"></i> Restaurar Padrão</button>'
+      + '</div>'
+    + '</div>';
   },
 
   avisos() {
