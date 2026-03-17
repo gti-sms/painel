@@ -163,81 +163,132 @@ body::after{
   position:relative;z-index:1;
   border-radius:var(--radius-lg);overflow:hidden;
   display:flex;flex-direction:column;
-  background:linear-gradient(175deg,#0a1a30 0%,#070f1d 100%);
-  border:1px solid rgba(239,83,80,.3);
-  box-shadow:0 0 0 1px rgba(0,0,0,.9),var(--shadow-dark),inset 0 1px 0 rgba(255,255,255,.06);
+  background:linear-gradient(170deg,#0c0505 0%,#130a0a 40%,#0a0f1a 100%);
+  border:1px solid rgba(239,83,80,.22);
+  box-shadow:0 0 0 1px rgba(0,0,0,.95),0 16px 48px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.04);
 }
-/* faixa decorativa topo */
-.right-column::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,transparent,var(--red),#ff8a80,var(--red),transparent);
+/* Brilho lateral esquerdo */
+.right-column::after{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,transparent 0%,var(--red) 30%,rgba(239,83,80,.4) 70%,transparent 100%);
   z-index:2;
 }
-.falto-inner{display:flex;flex-direction:column;flex:1;padding:18px 18px 14px;overflow:hidden}
-.falto-context-badge{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-  color:rgba(239,83,80,.55);margin-bottom:6px;
+/* Brilho topo */
+.right-column::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(239,83,80,.8),#ff8a80,rgba(239,83,80,.8),transparent);
+  z-index:2;
 }
-.falto-context-badge i{font-size:10px}
 
-.section-title{
-  font-size:16px;font-weight:800;color:var(--text3);text-align:center;
-  margin-bottom:14px;text-transform:uppercase;letter-spacing:4px;
-  padding-bottom:0;position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
+/* Wrapper interno */
+.falto-inner{display:flex;flex-direction:column;flex:1;padding:16px 16px 12px;overflow:hidden;gap:0}
+
+/* ── Cabeçalho do painel ── */
+.falto-header{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding-bottom:12px;margin-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;
 }
-.section-title::before,.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+.falto-header-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.25);
+  display:flex;align-items:center;justify-content:center;
+  animation:iconGlow 3s ease-in-out infinite;
+}
+@keyframes iconGlow{0%,100%{box-shadow:0 0 0 0 rgba(239,83,80,0)}50%{box-shadow:0 0 12px rgba(239,83,80,.35)}}
+.falto-header-icon i{font-size:14px;color:var(--red)}
+.falto-header-text{display:flex;flex-direction:column;align-items:flex-start}
+.falto-header-title{
+  font-size:18px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);line-height:1;
+}
+.falto-header-period{
+  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(239,83,80,.5);margin-top:2px;
+  display:flex;align-items:center;gap:4px;
+}
+.falto-header-period::before{content:'';width:14px;height:1px;background:rgba(239,83,80,.4)}
 
+/* ── Card de total ── */
 .total-container{
-  border-radius:var(--radius);padding:16px 14px 14px;text-align:center;
-  margin-bottom:14px;position:relative;overflow:hidden;
-  background:linear-gradient(135deg,#7f0000 0%,#c62828 50%,#e53935 100%);
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 6px 24px rgba(183,28,28,.5),inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(0,0,0,.2);
+  border-radius:14px;padding:14px 12px 12px;text-align:center;
+  margin-bottom:12px;position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#5c0000 0%,#9e1010 40%,#c62828 80%,#d32f2f 100%);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 8px 28px rgba(183,28,28,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.25);
 }
+/* Brilho interno */
+.total-container::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);
+  pointer-events:none;
+}
+/* Partícula de brilho central */
 .total-container::after{
-  content:'';position:absolute;top:-40%;left:-20%;width:140%;height:80%;
-  background:radial-gradient(ellipse,rgba(255,255,255,.12) 0%,transparent 70%);
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:120%;height:120%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.06) 0%,transparent 65%);
   pointer-events:none;
 }
 .total-label{
-  font-size:22px;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,.92);
-  text-transform:none;margin-bottom:4px;line-height:1.2;
+  font-size:15px;font-weight:700;letter-spacing:.2px;
+  color:rgba(255,255,255,.9);
+  text-transform:none;margin-bottom:2px;line-height:1.2;
+  position:relative;z-index:1;
 }
 .total-value{
-  font-size:48px;font-weight:900;font-family:var(--font-mono);
+  font-size:60px;font-weight:900;font-family:var(--font-mono);
   color:#fff;line-height:1;letter-spacing:3px;
-  text-shadow:0 2px 16px rgba(0,0,0,.6),0 0 40px rgba(255,120,120,.3);
+  text-shadow:0 2px 16px rgba(0,0,0,.7),0 0 50px rgba(255,150,150,.4);
+  position:relative;z-index:1;
 }
 .total-sub{
-  font-size:24px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
-  color:rgba(255,180,180,.95);margin-top:8px;
+  font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(255,200,200,.95);margin-top:6px;
   animation:subtlePulse 3s ease-in-out infinite;
-  text-shadow:0 0 12px rgba(255,100,100,.4);
+  position:relative;z-index:1;
 }
 @keyframes subtlePulse{
-  0%,100%{opacity:.75;text-shadow:0 0 10px rgba(255,100,100,.3)}
-  50%{opacity:1;text-shadow:0 0 22px rgba(255,130,130,.7),0 0 40px rgba(255,80,80,.3)}
+  0%,100%{opacity:.75;text-shadow:0 0 8px rgba(255,100,100,.25)}
+  50%{opacity:1;text-shadow:0 0 20px rgba(255,140,140,.75),0 0 40px rgba(255,80,80,.3)}
 }
 
-.lista-container{flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+/* ── Mensagem de impacto ── */
+.falto-msg{
+  background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.14);
+  border-radius:10px;padding:10px 14px;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:10px;
+  animation:msgFade 6s ease-in-out infinite;
+}
+@keyframes msgFade{0%,100%{opacity:.8}50%{opacity:1}}
+.falto-msg-icon{color:var(--red);font-size:15px;margin-top:1px;flex-shrink:0;opacity:.7}
+.falto-msg-text{
+  font-size:13px;line-height:1.45;color:rgba(255,255,255,.65);font-weight:500;
+}
+.falto-msg-text strong{color:rgba(255,180,180,.9);font-weight:700}
+
+/* ── Lista de especialidades ── */
+.lista-container{flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden}
 .item-lista{
   display:flex;justify-content:space-between;align-items:center;
-  padding:10px 16px;border-radius:10px;flex:1 1 auto;min-height:0;max-height:76px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);
-  position:relative;overflow:hidden;transition:background .25s;
+  padding:9px 14px 9px 0;border-radius:10px;flex:1 1 auto;min-height:0;max-height:72px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.055);
+  position:relative;overflow:hidden;transition:all .25s;
 }
 .item-lista::before{
   content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(180deg,var(--red),rgba(239,83,80,.3));
+  background:linear-gradient(180deg,rgba(239,83,80,.8),rgba(239,83,80,.2));
   border-radius:3px 0 0 3px;
 }
 .item-nome{
-  font-size:22px;font-weight:700;flex:1;
+  font-size:19px;font-weight:700;flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  color:rgba(255,255,255,.95);padding-left:10px;
-  letter-spacing:.2px;
+  color:rgba(255,255,255,.88);padding-left:14px;
+  letter-spacing:.1px;
 }
 .item-valor{
   font-size:28px;font-weight:900;font-family:var(--font-mono);
@@ -1260,6 +1311,7 @@ async function iniciar() {
     setTimeout(() => {
       apresentSys.init();
       flayerSys.init();
+      carregarMsgsConscientizacao();
       // rotação agora é event-driven (YouTube IFrame API)
     }, 1500);
     setTimeout(ocultarLoading, 25000);
@@ -1379,17 +1431,61 @@ function criarPlayer(ids) {
   });
 }
 
+// Frases rotativas de conscientização
+const FALTO_MSGS_DEFAULT = [
+  { icon:'fa-heart', txt:'Sua consulta <strong>salva vidas</strong>. Compareça ou avise com antecedência.' },
+  { icon:'fa-users', txt:'Cada vaga vazia <strong>poderia ser de outra pessoa</strong> esperando atendimento.' },
+  { icon:'fa-calendar-check', txt:'Não pode comparecer? <strong>Ligue e cancele.</strong> A vaga pode ajudar alguém.' },
+  { icon:'fa-hand-holding-heart', txt:'Cuidar da saúde é um <strong>compromisso com você</strong> e com sua família.' },
+  { icon:'fa-clock', txt:'Reagende com antecedência. <strong>Seu horário tem valor</strong> para todos.' },
+];
+let FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
+let faltoMsgIdx = 0;
+let faltoMsgTimer = null;
+
+// Carregar mensagens personalizadas do Firebase
+function carregarMsgsConscientizacao() {
+  db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').on('value', s => {
+    const saved = s.val();
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      FALTO_MSGS = saved;
+    } else {
+      FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
+    }
+    faltoMsgIdx = 0;
+  });
+}
+
 function atualizarFaltometro() {
   const itens = dadosUnidade.unidade.especialidades || [];
   const total = itens.reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
+  const msg = FALTO_MSGS[faltoMsgIdx % FALTO_MSGS.length];
+
   let h = `<div class="falto-inner">`;
-  h += `<div class="falto-context-badge"><i class="fas fa-user-clock"></i> Mês anterior</div>`;
-  h += `<h2 class="section-title">FALTÔMETRO</h2>`;
+
+  // Cabeçalho
+  h += `<div class="falto-header">
+    <div class="falto-header-icon"><i class="fas fa-calendar-times"></i></div>
+    <div class="falto-header-text">
+      <div class="falto-header-title">Faltômetro</div>
+      <div class="falto-header-period">mês anterior</div>
+    </div>
+  </div>`;
+
+  // Card total
   h += `<div class="total-container">
     <div class="total-label">Pessoas que não compareceram</div>
     <div class="total-value">${total}</div>
     <div class="total-sub">consultas perdidas</div>
   </div>`;
+
+  // Mensagem de conscientização rotativa
+  h += `<div class="falto-msg" id="faltoMsg">
+    <i class="fas ${msg.icon} falto-msg-icon"></i>
+    <div class="falto-msg-text">${msg.txt}</div>
+  </div>`;
+
+  // Lista
   h += `<div class="lista-container">`;
   itens.forEach(e => {
     h += `<div class="item-lista">
@@ -1398,7 +1494,23 @@ function atualizarFaltometro() {
     </div>`;
   });
   h += `</div></div>`;
+
   document.getElementById('faltometroPanel').innerHTML = h;
+
+  // Rotacionar mensagem a cada 8 segundos
+  if (faltoMsgTimer) clearInterval(faltoMsgTimer);
+  faltoMsgTimer = setInterval(() => {
+    faltoMsgIdx = (faltoMsgIdx + 1) % FALTO_MSGS.length;
+    const el = document.getElementById('faltoMsg');
+    if (!el) return;
+    const m = FALTO_MSGS[faltoMsgIdx];
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.innerHTML = `<i class="fas ${m.icon} falto-msg-icon"></i><div class="falto-msg-text">${m.txt}</div>`;
+      el.style.transition = 'opacity .8s ease';
+      el.style.opacity = '1';
+    }, 500);
+  }, 8000);
 }
 
 function atualizarAvisos() {
@@ -1642,7 +1754,36 @@ const sections = {
         <div class="adm-action-bar">
           <button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>
         </div>
-      </div>`;
+      </div>
+
+      <!-- Card: Mensagens de Conscientização -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div>
+            <div class="adm-card-title"><i class="fas fa-comment-dots"></i> Mensagens de Conscientização</div>
+            <div class="adm-card-desc">Textos rotativos exibidos no Faltômetro — trocam a cada 8 segundos</div>
+          </div>
+          <button class="adm-btn-green adm-btn-sm" onclick="APP.adicionarMsg()"><i class="fas fa-plus"></i> Adicionar</button>
+        </div>
+        <div class="adm-info-box">
+          <i class="fas fa-info-circle"></i>
+          Use <strong>*texto*</strong> para destacar em negrito. Exemplo: <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px">Sua vaga tem *valor*!</code>
+          → aparece como: Sua vaga tem <strong>valor</strong>!
+        </div>
+        <div id="listaMsgs">
+          ${FALTO_MSGS.map((m,i) => `
+            <div class="texto-row" id="msgRow${i}">
+              <input type="text" class="adm-input msg-input" data-idx="${i}"
+                value="${(m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*')}"
+                placeholder="Digite a mensagem...">
+              <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(${i})"><i class="fas fa-trash"></i></button>
+            </div>`).join('')}
+        </div>
+        <div class="adm-action-bar">
+          <button class="adm-btn-green" onclick="APP.salvarMsgs()"><i class="fas fa-save"></i> Salvar Mensagens</button>
+          <button class="adm-btn-muted" onclick="APP.resetarMsgs()"><i class="fas fa-undo"></i> Restaurar Padrão</button>
+        </div>
+      </div>\`;
   },
 
   avisos() {
@@ -2105,6 +2246,46 @@ window.APP = {
     document.getElementById('headerSubtitle').textContent = 'PMPF — '+sanitize(dadosUnidade.unidade.nome);
     document.getElementById('admUnitLabel').textContent = dadosUnidade.unidade.nome;
     this.salvarDados();
+  },
+
+  // Mensagens de conscientização
+  adicionarMsg() {
+    const lista = document.getElementById('listaMsgs');
+    if (!lista) return;
+    const idx = lista.querySelectorAll('.texto-row').length;
+    const div = document.createElement('div');
+    div.className = 'texto-row';
+    div.id = 'msgRow'+idx;
+    div.innerHTML = `<input type="text" class="adm-input msg-input" data-idx="${idx}" placeholder="Digite a mensagem...">
+      <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(${idx})"><i class="fas fa-trash"></i></button>`;
+    lista.appendChild(div);
+  },
+
+  removerMsg(i) {
+    const row = document.getElementById('msgRow'+i);
+    if (row) row.remove();
+  },
+
+  salvarMsgs() {
+    const inputs = [...document.querySelectorAll('.msg-input')];
+    const iconPool = ['fa-heart','fa-users','fa-calendar-check','fa-hand-holding-heart','fa-clock','fa-heartbeat','fa-star-of-life','fa-shield-alt'];
+    const msgs = inputs
+      .map((el,i) => ({
+        icon: (FALTO_MSGS[i] && FALTO_MSGS[i].icon) ? FALTO_MSGS[i].icon : iconPool[i % iconPool.length],
+        txt: el.value.trim().replace(/\*([^*]+)\*/g,'<strong>$1</strong>')
+      }))
+      .filter(m => m.txt !== '');
+    if (msgs.length === 0) { notif('Adicione pelo menos uma mensagem!','warning'); return; }
+    db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').set(msgs)
+      .then(() => { FALTO_MSGS = msgs; notif('Mensagens salvas!','success'); })
+      .catch(() => notif('Erro ao salvar!','error'));
+  },
+
+  resetarMsgs() {
+    if (!confirm('Restaurar as mensagens padrão do sistema?')) return;
+    db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').remove()
+      .then(() => { FALTO_MSGS = [...FALTO_MSGS_DEFAULT]; notif('Mensagens restauradas!','success'); sections.faltometro(); })
+      .catch(() => notif('Erro!','error'));
   },
 
   // Faltômetro
