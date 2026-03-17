@@ -1559,8 +1559,8 @@ function configurarMenus() {
   };
 
   show('navFalto', isAdm);
-  show('navApresentacao', isAdm);
-  show('navFlayers', isAdm);
+  show('navApresentacao', IS_MATRIZ && isAdm);
+  show('navFlayers', IS_MATRIZ && isAdm);
   show('navVideo', IS_MATRIZ && isAdm);
   show('navSincronizacao', IS_MATRIZ && isSA);
   show('navUsuarios', IS_MATRIZ && isSA);
@@ -1893,6 +1893,7 @@ const sections = {
   },
 
   unidades() {
+    // Mostrar loading imediato enquanto busca do Firebase
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
@@ -1902,32 +1903,19 @@ const sections = {
             <button class="adm-btn-muted" onclick="APP.recarregarUnidades()"><i class="fas fa-sync-alt"></i> Atualizar</button>
           </div>
         </div>
-        <div class="adm-unidades-grid">
-          ${listaUnidades.length===0?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-building" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>Nenhuma unidade cadastrada</div>`
-          :listaUnidades.map(u=>`
-            <div class="adm-unit-card">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-                <div>
-                  <div style="font-size:16px;font-weight:700;color:#1a1a2e">${sanitize(u.nome)}</div>
-                  <code style="font-size:11px;color:#6b7280;background:#f0f2f5;padding:2px 7px;border-radius:6px">ID: ${sanitize(u.id)}</code>
-                </div>
-              </div>
-              <div class="adm-unit-stats">
-                <div><span class="adm-unit-stat-val">${u.especialidades||0}</span><div class="adm-unit-stat-label">Especialidades</div></div>
-                <div><span class="adm-unit-stat-val">${u.avisos||0}</span><div class="adm-unit-stat-label">Avisos</div></div>
-              </div>
-              <div style="font-size:11px;color:#9ca3af;margin-bottom:10px"><i class="fas fa-clock"></i> ${u.ultima_atualizacao?new Date(u.ultima_atualizacao).toLocaleString('pt-BR'):'Nunca sincronizado'}</div>
-              <div class="adm-unit-actions">
-                <button class="adm-btn-green" style="flex:2;padding:9px 12px;font-size:12px" onclick="APP.abrirUnidade('${u.id}')"><i class="fas fa-external-link-alt"></i> Acessar</button>
-                <button class="adm-btn-muted" style="padding:9px 12px;font-size:12px" onclick="APP.editarUnidade('${u.id}')"><i class="fas fa-cog"></i></button>
-                <button class="adm-btn-danger" style="padding:9px 12px;font-size:12px" onclick="APP.excluirUnidade('${u.id}','${sanitize(u.nome)}')"><i class="fas fa-trash"></i></button>
-              </div>
-            </div>`).join('')}
+        <div id="unidadesGrid" class="adm-unidades-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af">
+            <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#93c5fd;display:block;margin-bottom:12px"></i>
+            Carregando unidades...
+          </div>
         </div>
       </div>`;
+    // Buscar sempre do Firebase
+    carregarTodasUnidades(() => renderizarGridUnidades());
   },
 
-  monitor() {
+
+  _renderMonitor() {
     const agora = Date.now();
     const lista = listaUnidades.map(u => {
       const ult = u.ultima_sincronizacao || u.ultima_atualizacao || 0;
@@ -1993,6 +1981,38 @@ function salvarFirebase() {
 // ─────────────────────────────────────────────
 // USUÁRIOS
 // ─────────────────────────────────────────────
+function renderizarGridUnidades() {
+  const grid = document.getElementById('unidadesGrid');
+  if (!grid) return;
+  grid.innerHTML = listaUnidades.length === 0
+    ? `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af">
+        <i class="fas fa-building" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>
+        <div style="font-size:15px;font-weight:600">Nenhuma unidade cadastrada</div>
+        <div style="font-size:13px;margin-top:6px">Clique em "Nova Unidade" para adicionar</div>
+       </div>`
+    : listaUnidades.map(u=>`
+        <div class="adm-unit-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#1a1a2e">${sanitize(u.nome)}</div>
+              <code style="font-size:11px;color:#6b7280;background:#f0f2f5;padding:2px 7px;border-radius:6px">ID: ${sanitize(u.id)}</code>
+            </div>
+          </div>
+          <div class="adm-unit-stats">
+            <div><span class="adm-unit-stat-val">${u.especialidades||0}</span><div class="adm-unit-stat-label">Especialidades</div></div>
+            <div><span class="adm-unit-stat-val">${u.avisos||0}</span><div class="adm-unit-stat-label">Avisos</div></div>
+          </div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:10px">
+            <i class="fas fa-clock"></i> ${u.ultima_atualizacao?new Date(u.ultima_atualizacao).toLocaleString('pt-BR'):'Nunca sincronizado'}
+          </div>
+          <div class="adm-unit-actions">
+            <button class="adm-btn-green" style="flex:2;padding:9px 12px;font-size:12px" onclick="APP.abrirUnidade('${u.id}')"><i class="fas fa-external-link-alt"></i> Acessar</button>
+            <button class="adm-btn-muted" style="padding:9px 12px;font-size:12px" onclick="APP.editarUnidade('${u.id}')"><i class="fas fa-cog"></i></button>
+            <button class="adm-btn-danger" style="padding:9px 12px;font-size:12px" onclick="APP.excluirUnidade('${u.id}','${sanitize(u.nome)}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`).join('');
+}
+
 function carregarTodosUsuarios() {
   db.ref('usuarios').once('value').then(s => {
     listaUsuarios = [];
@@ -2050,7 +2070,7 @@ window.APP = {
     const n = permissoesUsuario?.nivel;
     const bloqueado = {
       visualizador: ['faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor'],
-      admin_unidade: IS_MATRIZ ? [] : ['video','sincronizacao','usuarios','unidades','monitor']
+      admin_unidade: IS_MATRIZ ? [] : ['apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor']
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
@@ -2296,7 +2316,7 @@ window.APP = {
   },
 
   // Unidades
-  recarregarUnidades() { carregarTodasUnidades(()=>{ notif('Lista atualizada!','success'); this.showSection('unidades'); }); },
+  recarregarUnidades() { carregarTodasUnidades(()=>{ renderizarGridUnidades(); notif('Lista atualizada!','success'); }); },
   abrirUnidade(id) { window.open(location.origin+location.pathname+'?id='+id,'_blank'); },
   novaUnidade() {
     document.getElementById('admContent').innerHTML = `
