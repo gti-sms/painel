@@ -173,10 +173,16 @@ body::after{
   background:linear-gradient(90deg,transparent,var(--red),#ff8a80,var(--red),transparent);
   z-index:2;
 }
-.falto-inner{display:flex;flex-direction:column;flex:1;padding:22px 20px 18px;overflow:hidden}
+.falto-inner{display:flex;flex-direction:column;flex:1;padding:18px 18px 14px;overflow:hidden}
+.falto-context-badge{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:rgba(239,83,80,.55);margin-bottom:6px;
+}
+.falto-context-badge i{font-size:10px}
 
 .section-title{
-  font-size:13px;font-weight:800;color:var(--text3);text-align:center;
+  font-size:16px;font-weight:800;color:var(--text3);text-align:center;
   margin-bottom:14px;text-transform:uppercase;letter-spacing:4px;
   padding-bottom:0;position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
 }
@@ -195,16 +201,16 @@ body::after{
   pointer-events:none;
 }
 .total-label{
-  font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.65);
-  text-transform:uppercase;margin-bottom:4px;
+  font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.6);
+  text-transform:none;margin-bottom:4px;
 }
 .total-value{
-  font-size:64px;font-weight:900;font-family:var(--font-mono);
+  font-size:48px;font-weight:900;font-family:var(--font-mono);
   color:#fff;line-height:1;letter-spacing:3px;
   text-shadow:0 2px 16px rgba(0,0,0,.6),0 0 40px rgba(255,120,120,.3);
 }
 .total-sub{
-  font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
   color:rgba(255,200,200,.75);margin-top:6px;
   animation:subtlePulse 3s ease-in-out infinite;
   text-shadow:0 0 10px rgba(255,100,100,.3);
@@ -217,7 +223,7 @@ body::after{
 .lista-container{flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden}
 .item-lista{
   display:flex;justify-content:space-between;align-items:center;
-  padding:9px 16px;border-radius:10px;flex:1 1 auto;min-height:0;max-height:70px;
+  padding:10px 16px;border-radius:10px;flex:1 1 auto;min-height:0;max-height:76px;
   background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.07);
   position:relative;overflow:hidden;transition:background .25s;
@@ -228,15 +234,15 @@ body::after{
   border-radius:3px 0 0 3px;
 }
 .item-nome{
-  font-size:18px;font-weight:700;flex:1;
+  font-size:22px;font-weight:700;flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  color:rgba(255,255,255,.9);padding-left:10px;
-  letter-spacing:.1px;
+  color:rgba(255,255,255,.95);padding-left:10px;
+  letter-spacing:.2px;
 }
 .item-valor{
-  font-size:42px;font-weight:900;font-family:var(--font-mono);
-  color:var(--red);letter-spacing:1px;line-height:1;min-width:75px;text-align:right;
-  text-shadow:0 0 20px rgba(239,83,80,.4);
+  font-size:28px;font-weight:900;font-family:var(--font-mono);
+  color:var(--red);letter-spacing:1px;line-height:1;min-width:58px;text-align:right;
+  text-shadow:0 0 16px rgba(239,83,80,.35);
 }
 
 /* ── APRESENTAÇÃO FULLSCREEN ─────────────────────────────── */
@@ -270,11 +276,12 @@ body::after{
 .apres-header-right{display:flex;align-items:center;gap:25px}
 .apres-header-tag{background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.3);color:#ff8a80;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;animation:tagBlink 3s ease-in-out infinite}
 @keyframes tagBlink{0%,100%{opacity:1}50%{opacity:.55}}
-.apres-timer-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.apres-timer-label{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px}
-.apres-timer-bar-outer{width:180px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
-.apres-timer-bar-inner{height:100%;width:100%;background:linear-gradient(90deg,var(--green),#69f0ae);border-radius:2px}
-.apres-timer-count{font-size:26px;font-weight:700;color:var(--green);font-family:'Bebas Neue',monospace;letter-spacing:2px}
+.apres-timer-wrap{display:flex;align-items:center;gap:8px;opacity:.55;transition:opacity .3s}
+.apres-timer-wrap:hover{opacity:.9}
+.apres-timer-label{display:none}
+.apres-timer-bar-outer{width:120px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.apres-timer-bar-inner{height:100%;width:100%;background:rgba(255,255,255,.35);border-radius:2px}
+.apres-timer-count{font-size:13px;font-weight:500;color:rgba(255,255,255,.6);font-family:'Outfit',sans-serif;letter-spacing:.5px;min-width:26px;text-align:right}
 .apres-main{flex:1;display:grid;grid-template-columns:1fr 1.5fr;gap:0;position:relative;z-index:2;overflow:hidden}
 .apres-divider{position:absolute;top:30px;bottom:30px;left:40%;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08) 30%,rgba(255,255,255,.08) 70%,transparent)}
 .apres-left{padding:40px 45px 40px 55px;display:flex;flex-direction:column;justify-content:center}
@@ -998,7 +1005,6 @@ const apresentSys = {
         <div class="apres-header-right">
           <div class="apres-header-tag"><i class="fas fa-info-circle"></i> Informação à Comunidade</div>
           <div class="apres-timer-wrap">
-            <div class="apres-timer-label">RETORNANDO EM</div>
             <div class="apres-timer-bar-outer"><div id="apresBar" class="apres-timer-bar-inner"></div></div>
             <div id="apresCount" class="apres-timer-count">1:30</div>
           </div>
@@ -1369,11 +1375,12 @@ function atualizarFaltometro() {
   const itens = dadosUnidade.unidade.especialidades || [];
   const total = itens.reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
   let h = `<div class="falto-inner">`;
+  h += `<div class="falto-context-badge"><i class="fas fa-user-clock"></i> Mês anterior</div>`;
   h += `<h2 class="section-title">FALTÔMETRO</h2>`;
   h += `<div class="total-container">
-    <div class="total-label">Total — Mês Anterior</div>
+    <div class="total-label">Pessoas que não compareceram</div>
     <div class="total-value">${total}</div>
-    <div class="total-sub">consultas não realizadas</div>
+    <div class="total-sub">consultas perdidas</div>
   </div>`;
   h += `<div class="lista-container">`;
   itens.forEach(e => {
