@@ -51,15 +51,15 @@ body{background:linear-gradient(135deg,#0a1929 0%,#1a2332 50%,#0f1b2d 100%);colo
 .flayer-progress{position:absolute;bottom:0;left:0;height:4px;background:#00e676;transition:width 30s linear;z-index:41}
 
 /* === FALTÔMETRO COLUNA DIREITA === */
-.right-column{background:rgba(13,27,42,.9);border-radius:16px;padding:15px;border:2px solid rgba(255,82,82,.3);overflow:hidden;backdrop-filter:blur(10px);display:flex;flex-direction:column}
-.section-title{font-size:22px;font-weight:800;color:#00e676;text-align:center;margin-bottom:15px;text-transform:uppercase;border-bottom:3px solid rgba(0,230,118,.3);padding-bottom:8px}
-.total-container{border-radius:12px;padding:15px;text-align:center;margin-bottom:15px;border:2px solid rgba(255,255,255,.3);background:linear-gradient(135deg,#d32f2f,#f44336);box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.total-value{font-size:42px;font-weight:900;font-family:'Courier New',monospace;text-shadow:2px 2px 4px rgba(0,0,0,.3);margin-top:5px;color:#fff}
-.total-label{font-size:14px;opacity:.9;font-weight:500;letter-spacing:.5px;color:#fff}
-.lista-container{flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden;padding:5px 0}
-.item-lista{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;flex:1 1 auto;min-height:0;max-height:65px;border:1px solid rgba(255,255,255,.1);transition:all .3s ease}
-.item-nome{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.item-valor{font-size:32px;font-weight:800;font-family:'Courier New',monospace;margin-left:15px;min-width:120px;text-align:right}
+.right-column{background:linear-gradient(180deg,rgba(10,20,38,.97) 0%,rgba(13,27,42,.97) 100%);border-radius:18px;padding:20px 18px;border:1.5px solid rgba(255,82,82,.35);overflow:hidden;backdrop-filter:blur(16px);display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.45)}
+.section-title{font-size:26px;font-weight:900;color:#00e676;text-align:center;margin-bottom:16px;text-transform:uppercase;border-bottom:2px solid rgba(0,230,118,.25);padding-bottom:10px;letter-spacing:3px;text-shadow:0 0 20px rgba(0,230,118,.4)}
+.total-container{border-radius:14px;padding:18px 15px;text-align:center;margin-bottom:16px;border:1.5px solid rgba(255,255,255,.2);background:linear-gradient(135deg,#b71c1c,#d32f2f 50%,#e53935);box-shadow:0 6px 20px rgba(211,47,47,.4),inset 0 1px 0 rgba(255,255,255,.1)}
+.total-value{font-size:58px;font-weight:900;font-family:'Bebas Neue','Courier New',monospace;text-shadow:0 2px 12px rgba(0,0,0,.5);margin-top:4px;color:#fff;line-height:1;letter-spacing:2px}
+.total-label{font-size:13px;opacity:.8;font-weight:600;letter-spacing:1.5px;color:#fff;text-transform:uppercase}
+.lista-container{flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden;padding:4px 0}
+.item-lista{background:rgba(255,255,255,.06);border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex:1 1 auto;min-height:0;max-height:68px;border:1px solid rgba(255,255,255,.08);transition:all .3s ease;position:relative;overflow:hidden}
+.item-nome{font-size:19px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;color:rgba(255,255,255,.92);letter-spacing:.2px}
+.item-valor{font-size:40px;font-weight:900;font-family:'Bebas Neue','Courier New',monospace;margin-left:12px;min-width:80px;text-align:right;letter-spacing:1px;line-height:1}
 
 /* === APRESENTAÇÃO COMUNITÁRIA FULLSCREEN === */
 #apresentacaoFullscreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:none;flex-direction:column;background:#020b16;overflow:hidden;font-family:'Outfit',sans-serif}
@@ -1136,7 +1136,7 @@ function atualizarAvisos() {
     return;
   }
   container.innerHTML = todos.map(a => `
-    <div class="ticker-item">${a.central?'<span class="ticker-central-badge">CENTRAL</span>':''}${sanitize(a.texto)}</div>`
+    <div class="ticker-item">${a.central?'<span class="ticker-central-badge">SMS</span>':''}${sanitize(a.texto)}</div>`
   ).join('');
   const items = container.querySelectorAll('.ticker-item');
   let idx = 0;
@@ -1390,8 +1390,8 @@ const sections = {
       ${podeEditarCentral ? `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-globe"></i> Avisos Centrais</div><div class="adm-card-desc">Aparecem em <strong>todas</strong> as unidades</div></div>
-          <span class="avisos-badge-central">CENTRAL</span>
+          <div><div class="adm-card-title"><i class="fas fa-globe"></i> Avisos SMS</div><div class="adm-card-desc">Aparecem em <strong>todas</strong> as unidades</div></div>
+          <span class="avisos-badge-central">SMS</span>
         </div>
         <div id="listAvisoCentral">${avisosCentralHtml}</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px;align-items:center">
@@ -1401,8 +1401,8 @@ const sections = {
       </div>` : `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-globe"></i> Avisos Centrais</div><div class="adm-card-desc">Gerenciados pela Matriz</div></div>
-          <span class="avisos-badge-central">SOMENTE LEITURA</span>
+          <div><div class="adm-card-title"><i class="fas fa-globe"></i> Avisos SMS</div><div class="adm-card-desc">Gerenciados pela SMS</div></div>
+          <span class="avisos-badge-central">SMS — SOMENTE LEITURA</span>
         </div>
         ${avisosCentralHtml || '<div style="color:#9ca3af;font-size:14px;padding:12px 0">Nenhum aviso central.</div>'}
       </div>`}
