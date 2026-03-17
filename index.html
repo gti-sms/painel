@@ -808,9 +808,16 @@ const rotacao = {
 
   resetar() {
     this.emCiclo = false;
-    flayerSys.parar(false);
-    apresentSys.parar(false);
-    carregarVideo();
+    // Garantir que flayers e apresentação estejam limpos
+    flayerSys.isPlaying = false;
+    if (flayerSys.timer) { clearTimeout(flayerSys.timer); flayerSys.timer = null; }
+    // Garantir visibilidade do container de vídeo
+    const vc = document.getElementById('videoContainer');
+    const fc = document.getElementById('flayerContainer');
+    if (vc) vc.style.display = 'block';
+    if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
+    // Pequeno delay para o DOM se estabilizar antes de recriar o player
+    setTimeout(() => carregarVideo(), 400);
   }
 };
 
@@ -992,7 +999,7 @@ const apresentSys = {
           <div class="apres-header-logo-ring"><i class="fas fa-hospital-alt"></i></div>
           <div>
             <div class="apres-header-brand-name">${sanitize(dadosUnidade.unidade.nome||'Secretaria Municipal de Saúde')}</div>
-            <div class="apres-header-brand-sub">Sistema de Saúde — Passo Fundo / RS</div>
+            <div class="apres-header-brand-sub">Secretaria Municipal de Saúde — Passo Fundo / RS</div>
           </div>
         </div>
         <div class="apres-header-right">
@@ -1292,20 +1299,33 @@ function carregarVideo() {
 }
 
 function criarPlayer(ids) {
-  // Usar IDs atuais se não fornecidos
   if (!ids) {
     ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
   }
   if (ids.length === 0) return;
 
-  const container = document.getElementById('videoContainer');
-  container.innerHTML = '<div id="ytPlayerEl"></div>';
-
-  // Destruir player anterior se existir
-  if (ytPlayer && typeof ytPlayer.destroy === 'function') {
-    try { ytPlayer.destroy(); } catch(e) {}
-    ytPlayer = null;
+  // Se o player já existe e está funcional, apenas reinicia a playlist
+  if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
+    try {
+      ytPlayer.cuePlaylist({ listType:'playlist', list: ids.join(',') });
+      ytPlayer.loadVideoById(ids[0]);
+      if (!isMuted) ytPlayer.unMute();
+      return;
+    } catch(e) {
+      // player morreu — recria abaixo
+      ytPlayer = null;
+    }
   }
+
+  // Criar novo player do zero
+  const container = document.getElementById('videoContainer');
+  if (!container) return;
+  container.style.display = 'block';
+
+  // Remover iframe anterior se existir
+  try { if (ytPlayer) ytPlayer.destroy(); } catch(e) {}
+  ytPlayer = null;
+  container.innerHTML = '<div id="ytPlayerEl" style="width:100%;height:100%"></div>';
 
   ytPlayer = new YT.Player('ytPlayerEl', {
     width: '100%',
@@ -1316,32 +1336,37 @@ function criarPlayer(ids) {
       mute: isMuted ? 1 : 0,
       controls: 0,
       rel: 0,
-      loop: 0,          // SEM loop — queremos detectar o fim da fila
+      loop: 0,
       playlist: ids.join(','),
       playsinline: 1,
       modestbranding: 1,
       iv_load_policy: 3
     },
     events: {
-      onReady(e) { e.target.playVideo(); },
+      onReady(e) {
+        e.target.playVideo();
+      },
       onStateChange(e) {
-        // YT.PlayerState.ENDED = 0
-        // Quando um vídeo termina, verificar se é o último da fila
-        if (e.data === 0) {
-          const lista = ytPlayer.getPlaylist();
-          const idx   = ytPlayer.getPlaylistIndex();
-          const ultimo = !lista || idx >= lista.length - 1;
-          if (ultimo) {
+        if (rotacao.emCiclo) return; // já em ciclo, ignorar
+        // Estado 0 = ENDED, -1 = não iniciado (fim da lista volta a -1 em alguns casos)
+        if (e.data === 0 || e.data === -1) {
+          const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
+          const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
+          const total = lista ? lista.length : 1;
+          const ultimo = !lista || idx < 0 || idx >= total - 1;
+          if (ultimo && e.data === 0) {
             rotacao.playlistTerminou();
           }
-          // Se não é o último, o YouTube avança sozinho
         }
       },
-      onError() {
-        // Em caso de erro num vídeo, avançar para o próximo
-        if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
-          setTimeout(() => ytPlayer.nextVideo(), 2000);
-        }
+      onError(e) {
+        // Erros 2, 5, 100, 101, 150: vídeo inválido/bloqueado
+        // Tentar próximo vídeo
+        setTimeout(() => {
+          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
+            ytPlayer.nextVideo();
+          }
+        }, 2000);
       }
     }
   });
