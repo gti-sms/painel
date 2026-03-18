@@ -634,7 +634,7 @@ let isMuted = true, tickerInterval = null;
 let loginAttempts = 0, loginBloqueado = false, loginBloqueioTimer = null;
 
 const syncConfig = {
-  interval: 10,
+  interval: 30,
   intervalMap: {
     3: {label:'3 minutos', cost:'Alto', costClass:'cost-alto'},
     6: {label:'6 minutos', cost:'Médio', costClass:'cost-medio'},
@@ -1626,10 +1626,10 @@ const sections = {
     while (textos.length < 3) textos.push('');
     const duracaoAtual = cfg.duracao || 90;
     const durOpts = [
-      {val:30,  label:'30 seg'},
-      {val:60,  label:'1 min'},
-      {val:90,  label:'1:30 min'},
-      {val:120, label:'2 min'}
+      {val:30,  label:'30s',      desc:'Rápida'},
+      {val:60,  label:'1 min',    desc:'Curta'},
+      {val:90,  label:'1:30',     desc:'Padrão'},
+      {val:120, label:'2 min',    desc:'Completa'}
     ];
 
     document.getElementById('admContent').innerHTML = `
@@ -1652,17 +1652,42 @@ const sections = {
         </div>
 
         <!-- Seletor de duração -->
-        <div style="margin-bottom:20px">
-          <label class="adm-label"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
-          <div style="display:flex;gap:10px;margin-top:8px">
-            ${durOpts.map(op=>`
-              <label style="cursor:pointer;flex:1">
-                <input type="radio" name="apres_duracao" value="${op.val}" ${duracaoAtual===op.val?'checked':''} style="display:none">
-                <div onclick="document.querySelectorAll('[name=apres_duracao]').forEach(r=>r.closest('label').querySelector('.dur-opt').style.cssText='border:2px solid #e2e8f0;background:#fff;color:#1e293b');this.style.cssText='border:2px solid #1565c0;background:#eff6ff;color:#1565c0';this.previousElementSibling.checked=true"
-                  class="dur-opt" style="border:2px solid ${duracaoAtual===op.val?'#1565c0':'#e2e8f0'};background:${duracaoAtual===op.val?'#eff6ff':'#fff'};color:${duracaoAtual===op.val?'#1565c0':'#1e293b'};border-radius:10px;padding:12px;text-align:center;font-size:18px;font-weight:800;transition:all .2s">
-                  ${op.label}
+        <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px 20px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="width:32px;height:32px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center"><i class="fas fa-clock" style="color:var(--blue-700);font-size:14px"></i></div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#1e293b">Duração da Apresentação</div>
+              <div style="font-size:11px;color:#9ca3af">Tempo de exibição a cada ciclo</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            ${durOpts.map(op => {
+              const sel = duracaoAtual === op.val;
+              return `<label style="cursor:pointer">
+                <input type="radio" name="apres_duracao" value="${op.val}" ${sel?'checked':''} style="display:none">
+                <div class="dur-opt" onclick="
+                  document.querySelectorAll('.dur-opt').forEach(d=>{
+                    d.style.background='#fff';
+                    d.style.borderColor='#e2e8f0';
+                    d.style.boxShadow='none';
+                    d.querySelector('.dur-label').style.color='#64748b';
+                    d.querySelector('.dur-value').style.color='#1e293b';
+                    d.querySelector('.dur-check').style.display='none';
+                  });
+                  this.style.background='linear-gradient(135deg,#eff6ff,#dbeafe)';
+                  this.style.borderColor='#1565c0';
+                  this.style.boxShadow='0 4px 14px rgba(21,101,192,.18)';
+                  this.querySelector('.dur-label').style.color='#1565c0';
+                  this.querySelector('.dur-value').style.color='#1565c0';
+                  this.querySelector('.dur-check').style.display='flex';
+                  this.previousElementSibling.checked=true;"
+                  style="border:2px solid ${sel?'#1565c0':'#e2e8f0'};background:${sel?'linear-gradient(135deg,#eff6ff,#dbeafe)':'#fff'};border-radius:12px;padding:16px 10px 14px;text-align:center;transition:all .2s;position:relative;box-shadow:${sel?'0 4px 14px rgba(21,101,192,.18)':'none'}">
+                  <div class="dur-check" style="display:${sel?'flex':'none'};position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:#1565c0;align-items:center;justify-content:center"><i class="fas fa-check" style="color:#fff;font-size:9px"></i></div>
+                  <div class="dur-value" style="font-family:'Bebas Neue',monospace;font-size:26px;line-height:1;color:${sel?'#1565c0':'#1e293b'};margin-bottom:4px">${op.label}</div>
+                  <div class="dur-label" style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${sel?'#1565c0':'#64748b'}">${op.desc}</div>
                 </div>
-              </label>`).join('')}
+              </label>`;
+            }).join('')}
           </div>
         </div>
 
