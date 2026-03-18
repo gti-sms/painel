@@ -582,14 +582,12 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div class="adm-nav-item" id="navUsuarios" onclick="APP.showSection('usuarios')" style="display:none"><i class="fas fa-users-cog"></i> Usuários</div>
       <div class="adm-nav-item" id="navUnidades" onclick="APP.showSection('unidades')" style="display:none"><i class="fas fa-building"></i> Unidades</div>
       <div class="adm-nav-item" id="navMonitor" onclick="APP.showSection('monitor')" style="display:none"><i class="fas fa-satellite-dish"></i> Monitor</div>
-      <!-- NOVO: Log do Sistema -->
       <div class="adm-nav-item" id="navLog" onclick="APP.showSection('log')" style="display:none"><i class="fas fa-history"></i> Log do Sistema</div>
-      <!-- NOVO: Backup -->
       <div class="adm-nav-item" id="navBackup" onclick="APP.showSection('backup')" style="display:none"><i class="fas fa-database"></i> Backup / Restaurar</div>
     </nav>
     <div class="adm-content" id="admContent"></div>
   </div>
-  <div class="version-tag">Sistema de Saúde PMPF v4.0 · Seguro · Profissional</div>
+  <div class="version-tag">Sistema de Saúde PMPF v5.0 · Seguro · Profissional</div>
 </div>
 
 <script>
@@ -692,6 +690,9 @@ window.onYouTubeIframeAPIReady = function() {
   if (ytPendente) { ytPendente = false; criarPlayer(); }
 };
 
+// ════════════════════════════════════════════════════════════
+// ROTAÇÃO: VÍDEOS → FLAYERS → APRESENTAÇÃO → LOOP
+// ════════════════════════════════════════════════════════════
 const rotacao = {
   emCiclo: false,
   playlistTerminou() {
@@ -785,19 +786,19 @@ const flayerSys = {
   }
 };
 
-// ─────────────────────────────────────────────
-// APRESENTAÇÃO COMUNITÁRIA
-// ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+// APRESENTAÇÃO COMUNITÁRIA - PADRÃO 30 SEGUNDOS
+// ════════════════════════════════════════════════════════════
 const apresentSys = {
   isPlaying: false,
-  duration: 90000,
+  duration: 30000, // Padrão: 30 segundos
   progressInterval: null,
   onConcluido: null,
   _encerrarTimer: null,
 
   defaultConfig: {
     enabled: true,
-    duracao: 90,
+    duracao: 30, // Padrão 30 segundos
     titulo: 'Sua Consulta\nFaz a Diferença!',
     mensagemPrincipal: 'As faltas às consultas afetam você, sua família e toda a comunidade. Cada vaga não utilizada é um recurso desperdiçado que poderia ajudar outra pessoa.',
     textosAdicionais: [
@@ -813,6 +814,7 @@ const apresentSys = {
     if (dadosUnidade.apresentacaoConfig) {
       this.config = Object.assign({}, this.defaultConfig, dadosUnidade.apresentacaoConfig);
     }
+    this.duration = (this.config.duracao || 30) * 1000;
     db.ref('paineis/'+UNIDADE_ID+'/apresentacaoConfig').on('value', s => {
       if (s.val()) this.config = Object.assign({}, this.defaultConfig, s.val());
     });
@@ -825,8 +827,7 @@ const apresentSys = {
       if (onConcluido) onConcluido();
       return;
     }
-    // Duração configurável: 30s, 1min (60s) ou 2min (120s)
-    this.duration = (this.config.duracao || 90) * 1000;
+    this.duration = (this.config.duracao || 30) * 1000;
     this.isPlaying = true;
     this.renderizar();
   },
@@ -971,7 +972,7 @@ const apresentSys = {
   },
 
   encerrar() {
-    if (!this.isPlaying) return; // guard contra dupla chamada
+    if (!this.isPlaying) return;
     this.isPlaying = false;
     if (this._encerrarTimer) { clearTimeout(this._encerrarTimer); this._encerrarTimer = null; }
     if (this.progressInterval) { clearInterval(this.progressInterval); this.progressInterval = null; }
@@ -1077,7 +1078,7 @@ const syncMgr = {
 };
 
 // ─────────────────────────────────────────────
-// NOVO: REGISTRO DE LOG
+// REGISTRO DE LOG
 // ─────────────────────────────────────────────
 function registrarLog(acao, detalhes) {
   if (!usuarioAtual) return;
@@ -1174,7 +1175,6 @@ function criarPlayer(ids) {
   if (!ids) { ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean); }
   if (ids.length === 0) return;
 
-  // Se o player já existe e está funcional, apenas reinicia a playlist
   if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
     try {
       ytPlayer.cuePlaylist(ids);
@@ -1182,7 +1182,6 @@ function criarPlayer(ids) {
       if (!isMuted) ytPlayer.unMute();
       return;
     } catch(e) {
-      // player morreu — recria abaixo
       ytPlayer = null;
     }
   }
@@ -1210,29 +1209,19 @@ function criarPlayer(ids) {
       iv_load_policy: 3
     },
     events: {
-      onReady(e) {
-        e.target.playVideo();
-      },
+      onReady(e) { e.target.playVideo(); },
       onStateChange(e) {
         if (rotacao.emCiclo) return;
-        // Estado 0 = ENDED, -1 = não iniciado
         if (e.data === 0 || e.data === -1) {
           const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
           const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
           const total = lista ? lista.length : 1;
           const ultimo = !lista || idx < 0 || idx >= total - 1;
-          if (ultimo && e.data === 0) {
-            rotacao.playlistTerminou();
-          }
+          if (ultimo && e.data === 0) { rotacao.playlistTerminou(); }
         }
       },
       onError(e) {
-        // Tentar próximo vídeo em caso de erro
-        setTimeout(() => {
-          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
-            ytPlayer.nextVideo();
-          }
-        }, 2000);
+        setTimeout(() => { if (ytPlayer && typeof ytPlayer.nextVideo === 'function') { ytPlayer.nextVideo(); } }, 2000);
       }
     }
   });
@@ -1414,7 +1403,6 @@ const auth = {
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
-    // Suspender rotação enquanto o painel está aberto
     rotacao.emCiclo = true;
     apresentSys.parar(false);
     flayerSys.parar(false);
@@ -1423,7 +1411,6 @@ const auth = {
   resetSessionTimer() {
     if (sessionTimer) clearTimeout(sessionTimer);
     sessionTimer = setTimeout(() => { notif('Sessão expirada por inatividade.','warning'); APP.logout(); }, SESSION_TIMEOUT);
-    // AbortController evita acumular listeners a cada chamada
     if (this._sessionAbort) this._sessionAbort.abort();
     this._sessionAbort = new AbortController();
     document.getElementById('adminPanel').addEventListener('click', () => {
@@ -1461,9 +1448,7 @@ function configurarMenus() {
   show('navUsuarios', IS_MATRIZ && isSA);
   show('navUnidades', IS_MATRIZ && isSA);
   show('navMonitor', IS_MATRIZ && isSA);
-  // NOVO: navLog apenas super_admin matriz
   show('navLog', IS_MATRIZ && isSA);
-  // NOVO: navBackup apenas super_admin matriz
   show('navBackup', IS_MATRIZ && isSA);
 
   const showAdminSection = IS_MATRIZ && isSA;
@@ -1500,7 +1485,6 @@ const sections = {
       </div>`;
   },
 
-  // MODIFICADO: remove bloco de mensagens para não-matriz
   faltometro() {
     const itens = dadosUnidade.unidade.especialidades || [];
     if (permissoesUsuario?.nivel === 'visualizador') {
@@ -1536,7 +1520,6 @@ const sections = {
         + '<button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>'
       + '</div>'
     + '</div>'
-    // MODIFICADO: bloco de mensagens de conscientização somente para matriz
     + (IS_MATRIZ ? (() => {
         const msgRows = FALTO_MSGS.map((m, i) => {
           const plain = (m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*');
@@ -1625,9 +1608,9 @@ const sections = {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const textos = (cfg.textosAdicionais||[]);
     while (textos.length < 3) textos.push('');
-    const duracaoAtual = cfg.duracao || 90;
+    const duracaoAtual = cfg.duracao || 30;
     const durOpts = [
-      {val:30,  label:'30 seg'},
+      {val:30,  label:'30 seg (padrão)'},
       {val:60,  label:'1 min'},
       {val:90,  label:'1:30 min'},
       {val:120, label:'2 min'}
@@ -1652,7 +1635,6 @@ const sections = {
           <div><strong>Ciclo de rotação:</strong> Todos os Vídeos → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos (loop infinito)</div>
         </div>
 
-        <!-- Seletor de duração -->
         <div style="margin-bottom:20px">
           <label class="adm-label"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
           <div style="display:flex;gap:10px;margin-top:8px">
@@ -1704,7 +1686,7 @@ const sections = {
         <div style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
           <div style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
             <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b19"></i></div>
-            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'1:30 min'} — aparece após todos os flayers no ciclo</span>
+            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'30 seg'} — aparece após todos os flayers no ciclo</span>
             <div style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
           </div>
           <div style="display:grid;grid-template-columns:1.5fr 1fr;min-height:200px">
@@ -1852,7 +1834,6 @@ const sections = {
     carregarTodasUnidades(() => renderizarGridUnidades());
   },
 
-  // NOVO: Monitor estilo Grafana
   monitor() {
     const c = document.getElementById('admContent');
     c.innerHTML = `
@@ -1869,7 +1850,6 @@ const sections = {
       <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando dados...</div></div>`;
 
     carregarTodasUnidades(() => {
-      // Buscar últimos logs para enriquecer o monitor
       db.ref('logs').orderByChild('ts').limitToLast(50).once('value').then(s => {
         const logs = [];
         s.forEach(c => logs.unshift({id:c.key,...c.val()}));
@@ -1878,7 +1858,6 @@ const sections = {
     });
   },
 
-  // NOVO: Log do sistema
   log() {
     const c = document.getElementById('admContent');
     c.innerHTML = `
@@ -1921,7 +1900,6 @@ const sections = {
         <div id="logFooter" style="margin-top:12px;font-size:12px;color:#9ca3af;text-align:right"></div>
       </div>`;
 
-    // Preencher filtro de unidades
     carregarTodasUnidades(() => {
       const sel = document.getElementById('logFiltroUnidade');
       if (sel) {
@@ -1933,7 +1911,6 @@ const sections = {
       }
     });
 
-    // Carregar logs do Firebase
     db.ref('logs').orderByChild('ts').limitToLast(500).once('value').then(s => {
       const logs = [];
       s.forEach(entry => logs.unshift({id:entry.key,...entry.val()}));
@@ -1945,7 +1922,6 @@ const sections = {
     });
   },
 
-  // NOVO: Backup / Restaurar
   backup() {
     const c = document.getElementById('admContent');
     c.innerHTML = `
@@ -1964,8 +1940,6 @@ const sections = {
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-
-          <!-- Download -->
           <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:26px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <div style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center"><i class="fas fa-file-download" style="color:#16a34a;font-size:18px"></i></div>
@@ -1977,7 +1951,6 @@ const sections = {
             </button>
           </div>
 
-          <!-- Upload / Restaurar -->
           <div style="background:#fff0f0;border:1.5px solid #fca5a5;border-radius:14px;padding:26px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <div style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center"><i class="fas fa-file-upload" style="color:#dc2626;font-size:18px"></i></div>
@@ -1993,7 +1966,6 @@ const sections = {
           </div>
         </div>
 
-        <!-- Progress -->
         <div id="bkpProgress" style="display:none;border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #86efac;background:#f0fdf4">
           <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#166534">
             <i class="fas fa-spinner fa-spin"></i>
@@ -2001,7 +1973,6 @@ const sections = {
           </div>
         </div>
 
-        <!-- Preview do arquivo selecionado -->
         <div id="bkpPreviewCard" style="display:none;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px">
           <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px">
             <i class="fas fa-file-code" style="color:#1565c0"></i> Arquivo selecionado: <span id="bkpArquivoNome" style="color:#1565c0;font-weight:600"></span>
@@ -2021,7 +1992,7 @@ const sections = {
 };
 
 // ─────────────────────────────────────────────
-// NOVO: Renderizar Log
+// Renderizar Log
 // ─────────────────────────────────────────────
 function renderizarLog(logs) {
   const container = document.getElementById('logContainer');
@@ -2029,7 +2000,6 @@ function renderizarLog(logs) {
   const stats     = document.getElementById('logStats');
   if (!container) return;
 
-  // Stats
   const contadores = {salvar:0,criar:0,excluir:0,login:0,config:0,outros:0};
   logs.forEach(l => {
     const a = (l.acao||'').toLowerCase();
@@ -2091,7 +2061,7 @@ function renderizarLog(logs) {
 }
 
 // ─────────────────────────────────────────────
-// NOVO: Monitor Grafana-style
+// Renderizar Monitor Grafana
 // ─────────────────────────────────────────────
 function renderMonitorGrafana(logs) {
   const mc = document.getElementById('monitorContent');
@@ -2117,7 +2087,6 @@ function renderMonitorGrafana(logs) {
     const barColor = {ativo:'#16a34a',atencao:'#d97706',alerta:'#ea580c',critico:'#dc2626'}[status];
     const logsUnit = logs.filter(l => l.unidade === u.id);
     const ultimaAcao = logsUnit[0];
-    // Faltômetro mensal: verificar se atualizou no mês atual
     const atualizouEsteMes = u.ultima_atualizacao >= inicioDomes;
     const totalFaltas = (u.espDados||[]).reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
     return { ...u, horas, status, statusLabel, tempoStr, barPct, barColor, logsUnit, ultimaAcao, atualizouEsteMes, totalFaltas };
@@ -2127,14 +2096,12 @@ function renderMonitorGrafana(logs) {
   unidades.forEach(u => cnt[u.status]++);
   const recenteLogs = logs.slice(0,15);
 
-  // Faltômetro: stats mensais
   const updatedThisMonth = unidades.filter(u => u.atualizouEsteMes).length;
   const pendentes = unidades.length - updatedThisMonth;
   const totalSistema = unidades.reduce((a,u) => a + u.totalFaltas, 0);
   const maxFaltasUnit = Math.max(...unidades.map(u => u.totalFaltas), 1);
 
   mc.innerHTML = `
-    <!-- KPIs conectividade -->
     <div class="grafana-grid">
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#16a34a,#22c55e)"></div>
@@ -2162,9 +2129,7 @@ function renderMonitorGrafana(logs) {
       </div>
     </div>
 
-    <!-- ═══ FALTÔMETRO MENSAL ═══ -->
     <div style="background:#fff;border-radius:14px;border:1.5px solid #e2e8f0;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)">
-      <!-- Header da seção -->
       <div style="background:linear-gradient(135deg,#1e293b,#334155);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:12px">
           <div style="width:36px;height:36px;border-radius:9px;background:rgba(239,83,80,.2);border:1px solid rgba(239,83,80,.4);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-times" style="color:#ff8a80;font-size:15px"></i></div>
@@ -2186,7 +2151,6 @@ function renderMonitorGrafana(logs) {
           </div>
         </div>
       </div>
-      <!-- KPIs faltômetro -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f1f5f9">
         <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
           <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-check-circle" style="color:#16a34a;margin-right:4px"></i>Atualizaram este mês</div>
@@ -2206,7 +2170,6 @@ function renderMonitorGrafana(logs) {
           <div style="font-size:11px;color:#9ca3af;margin-top:4px">Dados referentes às consultas não realizadas</div>
         </div>
       </div>
-      <!-- Grid por unidade -->
       <div style="padding:18px 22px">
         <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px"><i class="fas fa-chart-bar" style="margin-right:6px;color:#1565c0"></i>Detalhamento por Unidade — Mês anterior (${mesAnterior})</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
@@ -2224,7 +2187,6 @@ function renderMonitorGrafana(logs) {
                     <div style="font-size:14px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px" title="${sanitize(u.nome)}">${sanitize(u.nome)}</div>
                     <span style="background:${sfBg};color:${sfColor};border:1px solid ${sfBorder};font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:4px"><i class="fas ${sfIcon}" style="font-size:9px"></i>${sfLabel}</span>
                   </div>
-                  <!-- Total faltas -->
                   <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:12px">
                     <div style="font-family:'Bebas Neue',monospace;font-size:42px;color:#ef5350;line-height:1">${u.totalFaltas}</div>
                     <div style="font-size:11px;color:#9ca3af;line-height:1.3">consultas<br>perdidas</div>
@@ -2234,14 +2196,12 @@ function renderMonitorGrafana(logs) {
                       </div>
                     </div>
                   </div>
-                  <!-- Barra relativa ao sistema -->
                   <div style="margin-bottom:10px">
                     <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:3px"><span>Participação no total</span><span>${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%</span></div>
                     <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
                       <div style="height:100%;width:${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%;background:linear-gradient(90deg,#ef5350,#ff1744);border-radius:3px"></div>
                     </div>
                   </div>
-                  <!-- Mini especialidades -->
                   ${espList.length > 0 ? `<div style="border-top:1px solid #e2e8f0;padding-top:10px">${espList.map(e=>`
                     <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:5px">
                       <div>
@@ -2252,7 +2212,6 @@ function renderMonitorGrafana(logs) {
                       </div>
                       <div style="font-weight:800;color:#dc2626;font-size:14px;min-width:28px;text-align:right">${parseInt(e.faltas)||0}</div>
                     </div>`).join('')}</div>` : '<div style="font-size:11px;color:#9ca3af;margin-top:8px">Sem especialidades cadastradas</div>'}
-                  <!-- Última atualização -->
                   <div style="margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:5px">
                     <i class="fas fa-history" style="font-size:9px"></i>
                     ${u.ultima_atualizacao ? `Atualizado em ${new Date(u.ultima_atualizacao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}` : 'Nunca atualizado'}
@@ -2263,7 +2222,6 @@ function renderMonitorGrafana(logs) {
       </div>
     </div>
 
-    <!-- Timeline de conectividade -->
     <div class="grafana-timeline">
       <div class="grafana-timeline-title">
         <i class="fas fa-chart-bar" style="color:#1565c0"></i>
@@ -2287,7 +2245,6 @@ function renderMonitorGrafana(logs) {
         </div>`).join('')}
     </div>
 
-    <!-- Atividade recente + tabela detalhada -->
     <div class="grafana-two-col">
       <div class="grafana-activity-feed">
         <div class="grafana-timeline-title" style="margin-bottom:14px">
@@ -2424,7 +2381,6 @@ window.APP = {
   entrarPainel() { auth.entrarPainel(); },
   trocarUsuario() { auth.trocarUsuario(); },
 
-  // NOVO: Preview ampliado da Apresentação
   expandirPreview() {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const esp = dadosUnidade.unidade.especialidades || [];
@@ -2508,7 +2464,6 @@ window.APP = {
     if (auth._sessionAbort) { auth._sessionAbort.abort(); auth._sessionAbort = null; }
     document.getElementById('adminPanel').style.display = 'none';
     notif('Sessão encerrada.','info');
-    // Retomar ciclo de rotação
     rotacao.emCiclo = false;
     setTimeout(() => carregarVideo(), 300);
   },
@@ -2546,7 +2501,6 @@ window.APP = {
     this.salvarDados();
   },
 
-  // Mensagens de conscientização (apenas matriz)
   adicionarMsg() {
     const lista = document.getElementById('listaMsgs');
     if (!lista) return;
@@ -2697,14 +2651,13 @@ window.APP = {
     c.appendChild(d);
   },
 
-  // MODIFICADO: salva duração junto com a config
   salvarApresentacao() {
     const titulo   = document.getElementById('apresTitulo')?.value||'';
     const mensagem = document.getElementById('apresMensagem')?.value||'';
     const enabled  = document.getElementById('apresEnabled')?.checked !== false;
     const textos   = [...document.querySelectorAll('.texto-adicional-input')].map(i=>i.value.trim()).filter(t=>t!=='');
     const duracaoEl = document.querySelector('[name="apres_duracao"]:checked');
-    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 90;
+    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 30;
     apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos,duracao})
       .then(() => {
         registrarLog('config','Apresentação configurada — duração: '+duracao+'s, ativa: '+(enabled?'sim':'não'));
@@ -2724,7 +2677,6 @@ window.APP = {
     notif('Voltando ao vídeo...','info');
   },
 
-  // NOVO: filtrar log
   filtrarLog() {
     if (!window._logsTodos) return;
     const unidade = document.getElementById('logFiltroUnidade')?.value||'';
@@ -2735,7 +2687,6 @@ window.APP = {
     renderizarLog(filtrados);
   },
 
-  // NOVO: limpar log
   limparLog() {
     if (!confirm('Limpar TODOS os logs? Esta ação não pode ser desfeita.')) return;
     db.ref('logs').remove()
@@ -2746,7 +2697,6 @@ window.APP = {
       }).catch(() => notif('Erro!','error'));
   },
 
-  // Usuários
   novoUsuario() {
     carregarTodasUnidades(() => {
       document.getElementById('admContent').innerHTML = `
@@ -2931,7 +2881,6 @@ window.APP = {
     }
   },
 
-  // ── BACKUP / RESTAURAR ───────────────────────
   async _coletarDados() {
     const [paineis, usuarios] = await Promise.all([
       db.ref('paineis').once('value'),
@@ -3060,9 +3009,6 @@ window.APP = {
   }
 };
 
-// ─────────────────────────────────────────────
-// NOTIFICAÇÕES
-// ─────────────────────────────────────────────
 function notif(msg, tipo='info') {
   const el = document.createElement('div');
   el.className = `notif notif-${tipo}`;
@@ -3075,9 +3021,6 @@ function notif(msg, tipo='info') {
   }, 4500);
 }
 
-// ─────────────────────────────────────────────
-// START
-// ─────────────────────────────────────────────
 function garantirAdminInicial() {
   if (localStorage.getItem('admin_init_ok')) return;
   db.ref('usuarios').once('value').then(snap => {
