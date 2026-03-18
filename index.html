@@ -13,7 +13,10 @@
 <style>
 /* ═══════════════════════════════════════════════════════════════
    SISTEMA DE SAÚDE PMPF — Design System v5.0
+   Paleta: Azul Royal · Verde Neon · Vermelho Vivo · Grafite Escuro
    ═══════════════════════════════════════════════════════════════ */
+
+/* — Base — */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --blue-900:#0d1b6e;--blue-700:#1565c0;--blue-500:#1e88e5;--blue-300:#90caf9;
@@ -31,6 +34,8 @@
   --font-mono:'Bebas Neue','Courier New',monospace;
 }
 html,body{width:1920px;height:1080px;overflow:hidden;position:fixed;top:0;left:0;background:var(--bg);color:var(--text1);font-family:var(--font)}
+
+/* — Background pattern — */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(21,101,192,.12),transparent 60%),
@@ -43,9 +48,13 @@ body::after{
     linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
   background-size:80px 80px;
 }
+
+/* — Gear icon — */
 .admin-gear{position:fixed;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2000;opacity:.1;transition:opacity .3s;border-radius:50%;background:rgba(255,255,255,.05)}
 .admin-gear:hover{opacity:.9;background:rgba(255,255,255,.12)}
 .admin-gear i{color:rgba(255,255,255,.7);font-size:17px}
+
+/* — Footer accent line — */
 .footer-line{position:fixed;bottom:0;left:0;width:100%;height:3px;z-index:100;
   background:linear-gradient(90deg,transparent 0%,var(--blue-700) 15%,var(--green) 40%,var(--blue-500) 65%,var(--green) 85%,transparent 100%);
   filter:blur(.4px)}
@@ -87,6 +96,8 @@ body::after{
   z-index:1;
 }
 .left-column{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+
+/* — Video section — */
 .video-section{
   position:relative;flex:4;overflow:hidden;
   border-radius:var(--radius-lg);
@@ -113,9 +124,13 @@ body::after{
 }
 .btn-som i{font-size:11px}
 .btn-som:hover{opacity:1;border-color:rgba(0,230,118,.65);background:rgba(6,20,12,.88);box-shadow:0 4px 18px rgba(0,230,118,.25)}
+
+/* — Flayer container — */
 #flayerContainer{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#000;z-index:40}
 #flayerContainer img{width:100%;height:100%;object-fit:contain;position:absolute;inset:0}
 .flayer-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--green);z-index:41;box-shadow:0 0 8px var(--green)}
+
+/* — Ticker / Avisos — */
 .announcements-section{
   height:96px;position:relative;overflow:hidden;
   border-radius:var(--radius);
@@ -143,7 +158,7 @@ body::after{
   border:1px solid rgba(255,193,7,.3);flex-shrink:0;
 }
 
-/* ── FALTÔMETRO ─────────────────────────────────────────── */
+/* ── FALTÔMETRO (coluna direita) ─────────────────────────── */
 .right-column{
   position:relative;z-index:1;
   border-radius:var(--radius-lg);overflow:hidden;
@@ -153,34 +168,133 @@ body::after{
   box-shadow:0 0 0 1px rgba(0,0,0,.95),0 16px 48px rgba(0,0,0,.7),
     inset 0 1px 0 rgba(255,255,255,.04);
 }
-.right-column::after{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent 0%,var(--red) 30%,rgba(239,83,80,.4) 70%,transparent 100%);z-index:2}
-.right-column::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(239,83,80,.8),#ff8a80,rgba(239,83,80,.8),transparent);z-index:2}
+/* Brilho lateral esquerdo */
+.right-column::after{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,transparent 0%,var(--red) 30%,rgba(239,83,80,.4) 70%,transparent 100%);
+  z-index:2;
+}
+/* Brilho topo */
+.right-column::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(239,83,80,.8),#ff8a80,rgba(239,83,80,.8),transparent);
+  z-index:2;
+}
+
+/* Wrapper interno */
 .falto-inner{display:flex;flex-direction:column;flex:1;padding:16px 16px 12px;overflow:hidden;gap:0}
-.falto-header{display:flex;align-items:center;justify-content:center;gap:10px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);position:relative}
-.falto-header-icon{width:32px;height:32px;border-radius:8px;background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.25);display:flex;align-items:center;justify-content:center;animation:iconGlow 3s ease-in-out infinite}
+
+/* ── Cabeçalho do painel ── */
+.falto-header{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding-bottom:12px;margin-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+.falto-header-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.25);
+  display:flex;align-items:center;justify-content:center;
+  animation:iconGlow 3s ease-in-out infinite;
+}
 @keyframes iconGlow{0%,100%{box-shadow:0 0 0 0 rgba(239,83,80,0)}50%{box-shadow:0 0 12px rgba(239,83,80,.35)}}
 .falto-header-icon i{font-size:14px;color:var(--red)}
 .falto-header-text{display:flex;flex-direction:column;align-items:flex-start}
-.falto-header-title{font-size:18px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.5);line-height:1}
-.falto-header-period{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(239,83,80,.5);margin-top:2px;display:flex;align-items:center;gap:4px}
+.falto-header-title{
+  font-size:18px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);line-height:1;
+}
+.falto-header-period{
+  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(239,83,80,.5);margin-top:2px;
+  display:flex;align-items:center;gap:4px;
+}
 .falto-header-period::before{content:'';width:14px;height:1px;background:rgba(239,83,80,.4)}
-.total-container{border-radius:14px;padding:14px 12px 12px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden;background:linear-gradient(145deg,#5c0000 0%,#9e1010 40%,#c62828 80%,#d32f2f 100%);border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 28px rgba(183,28,28,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.25)}
-.total-container::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);pointer-events:none}
-.total-container::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120%;height:120%;background:radial-gradient(ellipse,rgba(255,255,255,.06) 0%,transparent 65%);pointer-events:none}
-.total-label{font-size:15px;font-weight:700;letter-spacing:.2px;color:rgba(255,255,255,.9);text-transform:none;margin-bottom:2px;line-height:1.2;position:relative;z-index:1}
-.total-value{font-size:60px;font-weight:900;font-family:var(--font-mono);color:#fff;line-height:1;letter-spacing:3px;text-shadow:0 2px 16px rgba(0,0,0,.7),0 0 50px rgba(255,150,150,.4);position:relative;z-index:1}
-.total-sub{font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(255,200,200,.95);margin-top:6px;animation:subtlePulse 3s ease-in-out infinite;position:relative;z-index:1}
-@keyframes subtlePulse{0%,100%{opacity:.75;text-shadow:0 0 8px rgba(255,100,100,.25)}50%{opacity:1;text-shadow:0 0 20px rgba(255,140,140,.75),0 0 40px rgba(255,80,80,.3)}}
-.falto-msg{background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.14);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;animation:msgFade 6s ease-in-out infinite}
+
+/* ── Card de total ── */
+.total-container{
+  border-radius:14px;padding:14px 12px 12px;text-align:center;
+  margin-bottom:12px;position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#5c0000 0%,#9e1010 40%,#c62828 80%,#d32f2f 100%);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 8px 28px rgba(183,28,28,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.25);
+}
+/* Brilho interno */
+.total-container::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);
+  pointer-events:none;
+}
+/* Partícula de brilho central */
+.total-container::after{
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:120%;height:120%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.06) 0%,transparent 65%);
+  pointer-events:none;
+}
+.total-label{
+  font-size:15px;font-weight:700;letter-spacing:.2px;
+  color:rgba(255,255,255,.9);
+  text-transform:none;margin-bottom:2px;line-height:1.2;
+  position:relative;z-index:1;
+}
+.total-value{
+  font-size:60px;font-weight:900;font-family:var(--font-mono);
+  color:#fff;line-height:1;letter-spacing:3px;
+  text-shadow:0 2px 16px rgba(0,0,0,.7),0 0 50px rgba(255,150,150,.4);
+  position:relative;z-index:1;
+}
+.total-sub{
+  font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(255,200,200,.95);margin-top:6px;
+  animation:subtlePulse 3s ease-in-out infinite;
+  position:relative;z-index:1;
+}
+@keyframes subtlePulse{
+  0%,100%{opacity:.75;text-shadow:0 0 8px rgba(255,100,100,.25)}
+  50%{opacity:1;text-shadow:0 0 20px rgba(255,140,140,.75),0 0 40px rgba(255,80,80,.3)}
+}
+
+/* ── Mensagem de impacto ── */
+.falto-msg{
+  background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.14);
+  border-radius:10px;padding:10px 14px;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:10px;
+  animation:msgFade 6s ease-in-out infinite;
+}
 @keyframes msgFade{0%,100%{opacity:.8}50%{opacity:1}}
 .falto-msg-icon{color:var(--red);font-size:15px;margin-top:1px;flex-shrink:0;opacity:.7}
-.falto-msg-text{font-size:13px;line-height:1.45;color:rgba(255,255,255,.65);font-weight:500}
+.falto-msg-text{
+  font-size:13px;line-height:1.45;color:rgba(255,255,255,.65);font-weight:500;
+}
 .falto-msg-text strong{color:rgba(255,180,180,.9);font-weight:700}
+
+/* ── Lista de especialidades ── */
 .lista-container{flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden}
-.item-lista{display:flex;justify-content:space-between;align-items:center;padding:9px 14px 9px 0;border-radius:10px;flex:1 1 auto;min-height:0;max-height:72px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);position:relative;overflow:hidden;transition:all .25s}
-.item-lista::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,rgba(239,83,80,.8),rgba(239,83,80,.2));border-radius:3px 0 0 3px}
-.item-nome{font-size:19px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.88);padding-left:14px;letter-spacing:.1px}
-.item-valor{font-size:28px;font-weight:900;font-family:var(--font-mono);color:var(--red);letter-spacing:1px;line-height:1;min-width:58px;text-align:right;text-shadow:0 0 16px rgba(239,83,80,.35)}
+.item-lista{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 14px 9px 0;border-radius:10px;flex:1 1 auto;min-height:0;max-height:72px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.055);
+  position:relative;overflow:hidden;transition:all .25s;
+}
+.item-lista::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,rgba(239,83,80,.8),rgba(239,83,80,.2));
+  border-radius:3px 0 0 3px;
+}
+.item-nome{
+  font-size:19px;font-weight:700;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:rgba(255,255,255,.88);padding-left:14px;
+  letter-spacing:.1px;
+}
+.item-valor{
+  font-size:28px;font-weight:900;font-family:var(--font-mono);
+  color:var(--red);letter-spacing:1px;line-height:1;min-width:58px;text-align:right;
+  text-shadow:0 0 16px rgba(239,83,80,.35);
+}
 
 /* ── APRESENTAÇÃO FULLSCREEN ─────────────────────────────── */
 #apresentacaoFullscreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:none;flex-direction:column;background:#030c18;overflow:hidden;font-family:var(--font)}
@@ -188,8 +302,13 @@ body::after{
 #apresentacaoFullscreen.apres-saida{animation:apresSair .7s ease-in forwards}
 @keyframes apresEntrar{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
 @keyframes apresSair{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.96)}}
-.apres-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 15% 20%,rgba(0,230,118,.06),transparent 60%),radial-gradient(ellipse 60% 70% at 85% 80%,rgba(21,101,192,.08),transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(239,83,80,.04),transparent 70%)}
-.apres-bg::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,118,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.02) 1px,transparent 1px);background-size:70px 70px;animation:gridDrift 20s linear infinite}
+.apres-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  background:radial-gradient(ellipse 80% 60% at 15% 20%,rgba(0,230,118,.06),transparent 60%),
+  radial-gradient(ellipse 60% 70% at 85% 80%,rgba(21,101,192,.08),transparent 60%),
+  radial-gradient(ellipse 50% 50% at 50% 50%,rgba(239,83,80,.04),transparent 70%)}
+.apres-bg::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,230,118,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.02) 1px,transparent 1px);
+  background-size:70px 70px;animation:gridDrift 20s linear infinite}
 @keyframes gridDrift{from{transform:translate(0,0)}to{transform:translate(70px,70px)}}
 .apres-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px);opacity:.15}
 .apres-orb-1{width:500px;height:500px;background:var(--green);top:-150px;left:-100px;animation:orbFloat1 18s ease-in-out infinite}
@@ -235,8 +354,15 @@ body::after{
 .apres-falto-title{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--red);letter-spacing:2px;line-height:1;margin-bottom:20px;text-shadow:0 0 40px rgba(239,83,80,.3)}
 .apres-total-card{background:linear-gradient(135deg,rgba(239,83,80,.12),rgba(239,83,80,.06));border:1px solid rgba(239,83,80,.22);border-radius:16px;padding:22px 25px;text-align:center;margin-bottom:25px;position:relative;overflow:hidden}
 .apres-total-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(239,83,80,.1),transparent 70%)}
-.apres-total-num{font-family:'Bebas Neue',sans-serif;font-size:108px;color:var(--red);line-height:1;display:block;position:relative;z-index:1;animation:numPulse 4s ease-in-out infinite}
-@keyframes numPulse{0%,100%{text-shadow:0 0 30px rgba(239,83,80,.4),0 0 60px rgba(239,83,80,.15)}50%{text-shadow:0 0 50px rgba(239,83,80,.7),0 0 100px rgba(239,83,80,.3),0 2px 16px rgba(0,0,0,.4)}}
+.apres-total-num{
+  font-family:'Bebas Neue',sans-serif;font-size:108px;color:var(--red);
+  line-height:1;display:block;position:relative;z-index:1;
+  animation:numPulse 4s ease-in-out infinite;
+}
+@keyframes numPulse{
+  0%,100%{text-shadow:0 0 30px rgba(239,83,80,.4),0 0 60px rgba(239,83,80,.15)}
+  50%{text-shadow:0 0 50px rgba(239,83,80,.7),0 0 100px rgba(239,83,80,.3),0 2px 16px rgba(0,0,0,.4)}
+}
 .apres-total-sublabel{font-size:16px;color:rgba(255,255,255,.4);margin-top:4px;position:relative;z-index:1}
 .apres-esp-lista{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden}
 .apres-esp-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;animation:fadeUp .5s ease-out both}
@@ -259,20 +385,53 @@ body::after{
 .loading-text{color:#fff;font-size:17px;font-weight:600;margin-top:4px}
 .loading-details{color:rgba(255,255,255,.45);font-size:13px;margin-top:6px;letter-spacing:.5px}
 
-/* ── ADMIN PANEL ─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   ADMIN PANEL — Design profissional
+   ═══════════════════════════════════════════════════════════ */
 #loginScreen,#adminPanel{display:none;position:fixed;inset:0;z-index:3000;justify-content:center;align-items:center}
 #loginScreen{background:radial-gradient(ellipse at 30% 50%,rgba(21,101,192,.25),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(0,230,118,.1),transparent 60%),#040c18;backdrop-filter:blur(20px)}
 #adminPanel{background:#eef1f6;color:#1a1a2e;flex-direction:column}
-.login-box{background:rgba(8,18,34,.96);border-radius:24px;width:460px;padding:52px 48px;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.08);position:relative;overflow:hidden}
-.login-box::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--blue-500),transparent)}
-.login-icon-wrap{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,var(--blue-900),var(--blue-700));display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:0 8px 30px rgba(21,101,192,.5),inset 0 1px 0 rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.1)}
+
+/* Login */
+.login-box{
+  background:rgba(8,18,34,.96);border-radius:24px;width:460px;padding:52px 48px;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 40px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.08);
+  position:relative;overflow:hidden;
+}
+.login-box::before{
+  content:'';position:absolute;top:-1px;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue-500),transparent);
+}
+.login-icon-wrap{
+  width:76px;height:76px;border-radius:20px;
+  background:linear-gradient(135deg,var(--blue-900),var(--blue-700));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 28px;
+  box-shadow:0 8px 30px rgba(21,101,192,.5),inset 0 1px 0 rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.1);
+}
 .login-icon-wrap i{font-size:32px;color:#fff}
 .login-box h2{color:#fff;font-size:22px;font-weight:700;margin-bottom:8px;text-align:center}
 .login-box p{color:rgba(255,255,255,.45);font-size:14px;margin-bottom:32px;text-align:center;line-height:1.5}
-.login-input{width:100%;padding:15px 18px;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;font-size:15px;color:#fff;background:rgba(255,255,255,.06);font-family:var(--font);transition:all .2s;margin-bottom:14px}
+.login-input{
+  width:100%;padding:15px 18px;
+  border:1.5px solid rgba(255,255,255,.1);border-radius:12px;
+  font-size:15px;color:#fff;background:rgba(255,255,255,.06);
+  font-family:var(--font);transition:all .2s;margin-bottom:14px;
+}
 .login-input::placeholder{color:rgba(255,255,255,.35)}
 .login-input:focus{outline:none;border-color:var(--blue-500);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(30,136,229,.15)}
-.login-btn{width:100%;padding:16px;margin-top:4px;background:linear-gradient(135deg,var(--blue-700),var(--blue-500));color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;box-shadow:0 6px 24px rgba(21,101,192,.45);letter-spacing:.3px}
+.login-btn{
+  width:100%;padding:16px;margin-top:4px;
+  background:linear-gradient(135deg,var(--blue-700),var(--blue-500));
+  color:#fff;border:none;border-radius:12px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .2s;
+  box-shadow:0 6px 24px rgba(21,101,192,.45);
+  letter-spacing:.3px;
+}
 .login-btn:hover{background:linear-gradient(135deg,#0d47a1,var(--blue-700));transform:translateY(-2px);box-shadow:0 10px 30px rgba(21,101,192,.55)}
 .login-btn:active{transform:translateY(0)}
 .login-error{color:#ff8a80;font-size:13px;margin-bottom:12px;display:none;text-align:center;padding:10px;background:rgba(239,83,80,.1);border-radius:8px;border:1px solid rgba(239,83,80,.2)}
@@ -285,7 +444,16 @@ body::after{
 .role-super{background:rgba(239,83,80,.2);color:#ff8a80;border:1px solid rgba(239,83,80,.3)}
 .role-admin{background:rgba(30,136,229,.2);color:var(--blue-300);border:1px solid rgba(30,136,229,.3)}
 .role-view{background:rgba(255,193,7,.15);color:var(--gold);border:1px solid rgba(255,193,7,.3)}
-.adm-header{background:linear-gradient(90deg,#0b1852 0%,#163fa8 55%,#1a4db5 100%);color:#fff;padding:0 32px;width:100%;height:68px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 24px rgba(0,0,0,.4);flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08);position:relative}
+
+/* Admin header */
+.adm-header{
+  background:linear-gradient(90deg,#0b1852 0%,#163fa8 55%,#1a4db5 100%);
+  color:#fff;padding:0 32px;width:100%;height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 24px rgba(0,0,0,.4);flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:relative;
+}
 .adm-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green) 30%,var(--blue-300) 70%,transparent)}
 .adm-header-left{display:flex;align-items:center;gap:16px}
 .adm-header-logo{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
@@ -301,37 +469,57 @@ body::after{
 .adm-btn-save:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,230,118,.45)}
 .adm-btn-logout{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
 .adm-btn-logout:hover{background:rgba(239,83,80,.25);border-color:rgba(239,83,80,.4)}
+
+/* Admin layout */
 .adm-body{display:grid;grid-template-columns:255px 1fr;width:100%;height:calc(100% - 68px);overflow:hidden}
+
+/* Sidebar */
 .adm-sidebar{background:#fff;border-right:1px solid #dde4ee;display:flex;flex-direction:column;overflow-y:auto;box-shadow:2px 0 12px rgba(0,0,0,.06)}
 .adm-sidebar-section{padding:18px 20px 8px;font-size:10px;font-weight:800;letter-spacing:2px;color:#94a3b8;text-transform:uppercase}
-.adm-nav-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;font-size:14px;font-weight:500;color:#475569;transition:all .2s;border-left:3px solid transparent}
+.adm-nav-item{
+  display:flex;align-items:center;gap:12px;padding:13px 20px;
+  cursor:pointer;font-size:14px;font-weight:500;color:#475569;
+  transition:all .2s;border-left:3px solid transparent;
+}
 .adm-nav-item i{width:18px;text-align:center;font-size:14px;color:#94a3b8;transition:color .2s}
 .adm-nav-item:hover{background:#f1f5f9;color:var(--blue-700);border-left-color:#93c5fd}
 .adm-nav-item:hover i{color:var(--blue-700)}
 .adm-nav-item.active{background:linear-gradient(90deg,#eff6ff,#f8fbff);color:#1e40af;font-weight:700;border-left-color:var(--blue-700)}
 .adm-nav-item.active i{color:var(--blue-700)}
 .adm-sidebar-divider{height:1px;background:#e2e8f0;margin:8px 16px}
+
+/* Content */
 .adm-content{overflow-y:auto;padding:28px 32px;background:#eef1f6}
+
+/* Cards */
 .adm-card{background:#fff;border-radius:16px;padding:28px 30px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);border:1px solid #e2e8f0;transition:box-shadow .2s}
 .adm-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.06)}
 .adm-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid #f1f5f9}
 .adm-card-title{font-size:17px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:11px}
 .adm-card-title i{font-size:16px;color:var(--blue-700)}
 .adm-card-desc{font-size:12px;color:#94a3b8;margin-top:3px;font-weight:400}
+
+/* Info boxes */
 .adm-info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:13px 16px;margin-bottom:18px;font-size:13px;color:#1e40af;display:flex;align-items:flex-start;gap:10px;line-height:1.55}
 .adm-info-box.warning{background:#fffbeb;border-color:#fde68a;color:#92400e}
 .adm-info-box.success{background:#f0fdf4;border-color:#bbf7d0;color:#14532d}
 .adm-info-box i{flex-shrink:0;margin-top:1px}
+
+/* Inputs */
 .adm-label{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:7px;letter-spacing:.2px}
 .adm-label-sub{font-size:12px;color:#9ca3af;font-weight:400;margin-left:6px}
 .adm-input{width:100%;padding:12px 16px;border:1.5px solid #d1d9e0;border-radius:10px;font-size:15px;color:#1e293b;background:#fff;transition:all .2s;font-family:var(--font)}
 .adm-input:focus{outline:none;border-color:var(--blue-700);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
 .adm-input-lg{font-size:17px;padding:14px 18px;font-weight:600}
 textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
+
+/* Faltômetro rows */
 .falto-row{display:grid;grid-template-columns:1fr 145px 44px;gap:12px;align-items:center;padding:14px 18px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:10px;transition:all .2s}
 .falto-row:hover{background:#f0f6ff;border-color:#c7d7f0}
 .falto-row-nome{font-size:18px;font-weight:600;padding:12px 16px}
 .falto-row-num{font-size:22px;font-weight:800;color:#dc2626;padding:10px 14px;text-align:right}
+
+/* Botões */
 .adm-action-bar{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
 .adm-btn-primary{background:linear-gradient(135deg,var(--blue-700),var(--blue-500));color:#fff;padding:12px 24px;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s;box-shadow:0 4px 14px rgba(21,101,192,.3);font-family:var(--font)}
 .adm-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(21,101,192,.4)}
@@ -346,6 +534,8 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .adm-btn-icon-danger:hover{background:#fee2e2}
 .adm-btn-add{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#eff6ff;color:var(--blue-700);border:1.5px dashed #93c5fd;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;margin-top:8px;font-family:var(--font)}
 .adm-btn-add:hover{background:#dbeafe;border-color:#60a5fa}
+
+/* Toggle */
 .toggle-row{display:flex;align-items:center;gap:14px;padding:14px 0;margin-bottom:8px}
 .toggle-label{font-weight:600;color:#374151;font-size:15px}
 .toggle-switch{position:relative;display:inline-block;width:52px;height:28px}
@@ -356,11 +546,15 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .toggle-switch input:checked+.toggle-slider:before{transform:translateX(24px)}
 .toggle-status-on{color:#16a34a;font-weight:700;font-size:14px}
 .toggle-status-off{color:#94a3b8;font-size:14px}
+
+/* Avisos */
 .avisos-badge-central{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
 .avisos-badge-local{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
 .aviso-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px}
 .aviso-item-central{background:#fff9f0;border-color:#fed7aa}
 .aviso-item-text{font-size:15px;color:#374151;font-weight:500}
+
+/* Tabela */
 .adm-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .adm-table th{padding:14px 18px;text-align:left;background:linear-gradient(135deg,var(--blue-700),var(--blue-500));color:#fff;font-weight:700;font-size:13px;letter-spacing:.3px}
 .adm-table td{padding:13px 18px;text-align:left;border-bottom:1px solid #f1f5f9;color:#374151;font-size:14px}
@@ -369,6 +563,8 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .adm-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
 .adm-badge-success{background:#dcfce7;color:#166534}.adm-badge-danger{background:#fee2e2;color:#991b1b}
 .adm-badge-info{background:#dbeafe;color:#1e40af}.adm-badge-warn{background:#fef9c3;color:#713f12}
+
+/* Unidades */
 .adm-unidades-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:18px}
 .adm-unit-card{background:#fff;border-radius:14px;padding:22px;border:1.5px solid #e2e8f0;transition:all .3s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .adm-unit-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.1);border-color:#93c5fd}
@@ -376,6 +572,8 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .adm-unit-stat-val{font-size:24px;font-weight:800;color:var(--blue-700);display:block}
 .adm-unit-stat-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
 .adm-unit-actions{display:flex;gap:8px;margin-top:14px}
+
+/* Sync */
 .sync-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px;margin-top:18px}
 .sync-card{background:#fff;border:2px solid #e2e8f0;border-radius:14px;padding:24px;text-align:center;cursor:pointer;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .sync-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.1)}
@@ -386,65 +584,26 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .sync-cost-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block}
 .cost-alto{background:#fee2e2;color:#991b1b}.cost-medio{background:#fef9c3;color:#713f12}
 .cost-baixo{background:#dcfce7;color:#166534}.cost-minimo{background:#f0fdf4;color:#14532d}
+
+/* Texto adicional */
 .texto-row{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;margin-bottom:10px;padding:12px 16px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;transition:all .2s}
 .texto-row:hover{background:#eff6ff;border-color:#c7d7f0}
+
+/* Flayer grid */
 .flayer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:16px;margin-top:16px}
 .flayer-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;overflow:hidden;transition:all .3s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .flayer-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.1)}
 .flayer-thumb{height:110px;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .flayer-thumb img{width:100%;height:100%;object-fit:contain}
 .flayer-card-info{padding:10px 12px;border-top:1px solid #f1f5f9}
+
+/* Monitor */
 .monitor-status-ativo{color:#166534;background:#dcfce7;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #86efac}
 .monitor-status-atencao{color:#713f12;background:#fef9c3;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #fde047}
 .monitor-status-alerta{color:#7c2d12;background:#ffedd5;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #fdba74}
 .monitor-status-critico{color:#991b1b;background:#fee2e2;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #fca5a5}
 
-/* ── NOVO: LOG DO SISTEMA ────────────────────────────────── */
-.log-entry{display:grid;grid-template-columns:160px 120px 140px 1fr;gap:0;align-items:stretch;border-bottom:1px solid #f1f5f9;transition:background .15s}
-.log-entry:hover{background:#f8fafc}
-.log-entry:last-child{border-bottom:none}
-.log-cell{padding:10px 14px;font-size:13px;color:#374151;display:flex;align-items:center}
-.log-cell-ts{color:#6b7280;font-size:12px;font-family:monospace}
-.log-cell-user{font-weight:600;color:#1e293b}
-.log-cell-acao{font-size:12px}
-.log-cell-det{color:#475569;font-size:13px}
-.log-badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap}
-.log-badge-save{background:#dcfce7;color:#166534}
-.log-badge-delete{background:#fee2e2;color:#991b1b}
-.log-badge-create{background:#dbeafe;color:#1e40af}
-.log-badge-login{background:#f0fdf4;color:#15803d}
-.log-badge-update{background:#fef9c3;color:#713f12}
-.log-badge-config{background:#f3e8ff;color:#6b21a8}
-
-/* ── NOVO: MONITOR GRAFANA STYLE ─────────────────────────── */
-.grafana-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.grafana-kpi{background:#fff;border-radius:14px;padding:20px 22px;border:1.5px solid #e2e8f0;position:relative;overflow:hidden;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.grafana-kpi:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
-.grafana-kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
-.grafana-kpi-val{font-size:38px;font-weight:800;line-height:1;margin-bottom:4px}
-.grafana-kpi-label{font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.grafana-kpi-sub{font-size:11px;color:#94a3b8;margin-top:6px}
-.grafana-timeline{background:#fff;border-radius:14px;padding:22px 24px;border:1.5px solid #e2e8f0;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.grafana-timeline-title{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.grafana-bar-row{display:grid;grid-template-columns:140px 1fr 80px;gap:12px;align-items:center;margin-bottom:10px}
-.grafana-bar-label{font-size:13px;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.grafana-bar-outer{height:22px;background:#f1f5f9;border-radius:6px;overflow:hidden;position:relative}
-.grafana-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;padding-left:8px}
-.grafana-bar-fill span{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
-.grafana-bar-meta{font-size:12px;color:#6b7280;text-align:right;white-space:nowrap}
-.grafana-two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px}
-.grafana-activity-feed{background:#fff;border-radius:14px;padding:22px 24px;border:1.5px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.grafana-feed-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f8fafc}
-.grafana-feed-item:last-child{border-bottom:none}
-.grafana-feed-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.grafana-feed-content{flex:1;min-width:0}
-.grafana-feed-title{font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.grafana-feed-sub{font-size:11px;color:#9ca3af;margin-top:2px}
-.grafana-heatmap{background:#fff;border-radius:14px;padding:22px 24px;border:1.5px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.grafana-heatmap-grid{display:flex;gap:4px;flex-wrap:wrap;margin-top:12px}
-.hm-cell{width:16px;height:16px;border-radius:3px;cursor:default;transition:transform .15s}
-.hm-cell:hover{transform:scale(1.3)}
-
+/* Notificações */
 .notif{position:fixed;top:22px;right:22px;padding:14px 22px;border-radius:12px;color:#fff;font-weight:600;z-index:9999;display:flex;align-items:center;gap:10px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.3);animation:notifIn .3s cubic-bezier(.22,1,.36,1)}
 @keyframes notifIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes notifOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
@@ -452,6 +611,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .notif-error{background:linear-gradient(135deg,#b91c1c,#ef4444)}
 .notif-warning{background:linear-gradient(135deg,#d97706,#f59e0b);color:#1a1a2e}
 .notif-info{background:linear-gradient(135deg,var(--blue-900),var(--blue-700))}
+
 .version-tag{font-size:11px;color:rgba(255,255,255,.25);padding:8px 20px;text-align:right;background:rgba(0,0,0,.15)}
 @media(max-width:1920px){html,body{width:100%;height:100%}}
 </style>
@@ -473,6 +633,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div id="headerSubtitle">Carregando...</div>
     </div>
   </div>
+
   <div class="datetime-container">
     <div id="currentDate"></div>
     <div id="currentTime"></div>
@@ -556,8 +717,6 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div class="adm-nav-item" id="navUsuarios" onclick="APP.showSection('usuarios')" style="display:none"><i class="fas fa-users-cog"></i> Usuários</div>
       <div class="adm-nav-item" id="navUnidades" onclick="APP.showSection('unidades')" style="display:none"><i class="fas fa-building"></i> Unidades</div>
       <div class="adm-nav-item" id="navMonitor" onclick="APP.showSection('monitor')" style="display:none"><i class="fas fa-satellite-dish"></i> Monitor</div>
-      <!-- NOVO: Log do Sistema -->
-      <div class="adm-nav-item" id="navLog" onclick="APP.showSection('log')" style="display:none"><i class="fas fa-history"></i> Log do Sistema</div>
     </nav>
     <div class="adm-content" id="admContent"></div>
   </div>
@@ -568,7 +727,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 (function() {
 'use strict';
 // ─────────────────────────────────────────────
-// FIREBASE
+// FIREBASE (v10 compat)
 // ─────────────────────────────────────────────
 const FB_CONFIG = {
   apiKey:"AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
@@ -582,6 +741,9 @@ const FB_CONFIG = {
 firebase.initializeApp(FB_CONFIG);
 const db = firebase.database();
 
+// ─────────────────────────────────────────────
+// SEGURANÇA — validação de URL e sanitização
+// ─────────────────────────────────────────────
 function validarUnidadeId(id) {
   if (!id) return false;
   return /^[a-z0-9_]{1,30}$/.test(id);
@@ -589,14 +751,20 @@ function validarUnidadeId(id) {
 function sanitize(str) {
   if (!str) return '';
   return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
 }
 
+// ─────────────────────────────────────────────
+// VARIÁVEIS GLOBAIS
+// ─────────────────────────────────────────────
 const rawId = new URLSearchParams(window.location.search).get('id') || 'geral';
 const UNIDADE_ID = validarUnidadeId(rawId) ? rawId : 'geral';
 const IS_MATRIZ = UNIDADE_ID === 'geral';
-const SESSION_TIMEOUT = 30 * 60 * 1000;
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 min
 
 let dadosUnidade = { unidade:{ nome:'', especialidades:[] }, avisos:[] };
 let dadosGerais  = { unidade:{ videoUrls:[] }, avisos:[] };
@@ -605,6 +773,9 @@ let usuarioAtual = null, permissoesUsuario = null, sessionTimer = null;
 let isMuted = true, tickerInterval = null;
 let loginAttempts = 0, loginBloqueado = false, loginBloqueioTimer = null;
 
+// ─────────────────────────────────────────────
+// SYNC CONFIG
+// ─────────────────────────────────────────────
 const syncConfig = {
   interval: 10,
   intervalMap: {
@@ -615,12 +786,18 @@ const syncConfig = {
     30:{label:'30 minutos',cost:'Mínimo',costClass:'cost-minimo'}
   },
   load() {
-    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||10; } catch(e) {}
+    try {
+      const s = localStorage.getItem('syncCfg_'+UNIDADE_ID);
+      if (s) this.interval = parseInt(JSON.parse(s).interval) || 10;
+    } catch(e) {}
   },
   save() { localStorage.setItem('syncCfg_'+UNIDADE_ID, JSON.stringify({interval:this.interval})); }
 };
 syncConfig.load();
 
+// ─────────────────────────────────────────────
+// CACHE (IndexedDB)
+// ─────────────────────────────────────────────
 const cache = {
   db: null,
   async init() {
@@ -655,10 +832,15 @@ const cache = {
   }
 };
 
+// ─────────────────────────────────────────────
+// ROTAÇÃO: YouTube IFrame API detecta fim da
+// playlist → flayers → apresentação → reinicia
+// ─────────────────────────────────────────────
 let ytPlayer = null;
 let ytApiPronto = false;
 let ytPendente = false;
 
+// Callback global exigido pela YouTube IFrame API
 window.onYouTubeIframeAPIReady = function() {
   ytApiPronto = true;
   if (ytPendente) { ytPendente = false; criarPlayer(); }
@@ -666,12 +848,14 @@ window.onYouTubeIframeAPIReady = function() {
 
 const rotacao = {
   emCiclo: false,
+
   playlistTerminou() {
     if (this.emCiclo) return;
     if (flayerSys.isPlaying || apresentSys.isPlaying) return;
     this.emCiclo = true;
     this.iniciarCiclo();
   },
+
   iniciarCiclo() {
     const temFlayers = (flayerSys.flayers || []).length > 0;
     if (temFlayers) {
@@ -680,34 +864,57 @@ const rotacao = {
       apresentSys.iniciar(() => this.resetar());
     }
   },
+
   resetar() {
     this.emCiclo = false;
+    // Garantir que flayers e apresentação estejam limpos
     flayerSys.isPlaying = false;
     if (flayerSys.timer) { clearTimeout(flayerSys.timer); flayerSys.timer = null; }
+    // Garantir visibilidade do container de vídeo
     const vc = document.getElementById('videoContainer');
     const fc = document.getElementById('flayerContainer');
     if (vc) vc.style.display = 'block';
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
+    // Pequeno delay para o DOM se estabilizar antes de recriar o player
     setTimeout(() => carregarVideo(), 400);
   }
 };
 
+// ─────────────────────────────────────────────
+// SISTEMA DE FLAYERS
+// ─────────────────────────────────────────────
 const flayerSys = {
-  flayers: [], isPlaying: false, currentIndex: 0, timer: null, onConcluido: null,
+  flayers: [],
+  isPlaying: false,
+  currentIndex: 0,
+  timer: null,
+  onConcluido: null,
+
   init() {
-    db.ref('paineis/'+UNIDADE_ID+'/flayers').on('value', s => { this.flayers = s.val() || []; });
+    db.ref('paineis/'+UNIDADE_ID+'/flayers').on('value', s => {
+      this.flayers = s.val() || [];
+    });
   },
+
   iniciarCiclo(onConcluido) {
-    this.onConcluido = onConcluido; this.currentIndex = 0; this.isPlaying = true; this.proxFlayer();
+    this.onConcluido = onConcluido;
+    this.currentIndex = 0;
+    this.isPlaying = true;
+    this.proxFlayer();
   },
+
   proxFlayer() {
     if (!this.isPlaying) return;
-    if (this.currentIndex >= this.flayers.length) { this.concluir(); return; }
+    if (this.currentIndex >= this.flayers.length) {
+      this.concluir();
+      return;
+    }
     this.mostrarFlayer(this.flayers[this.currentIndex]);
     this.currentIndex++;
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => this.proxFlayer(), 30000);
   },
+
   mostrarFlayer(url) {
     const vc = document.getElementById('videoContainer');
     const fc = document.getElementById('flayerContainer');
@@ -715,6 +922,8 @@ const flayerSys = {
     if (!fc) return;
     if (bs) bs.style.display = 'none';
     if (vc) vc.style.display = 'none';
+
+    // Limpar conteúdo anterior
     fc.innerHTML = '<div class="flayer-progress" id="flayerProgress"></div>';
     const img = document.createElement('img');
     img.alt = 'Encarte';
@@ -724,33 +933,46 @@ const flayerSys = {
     };
     img.src = url;
     fc.appendChild(img);
-    fc.style.display = 'flex'; fc.style.position = 'absolute'; fc.style.inset = '0'; fc.style.zIndex = '40';
+    fc.style.display = 'flex';
+    fc.style.position = 'absolute';
+    fc.style.inset = '0';
+    fc.style.zIndex = '40';
+
+    // Barra de progresso
     const bar = document.getElementById('flayerProgress');
     if (bar) {
       bar.style.cssText = 'position:absolute;bottom:0;left:0;height:4px;background:#00e676;z-index:41;width:0;transition:none';
-      setTimeout(() => { bar.style.transition = 'width 30s linear'; bar.style.width = '100%'; }, 50);
+      setTimeout(() => {
+        bar.style.transition = 'width 30s linear';
+        bar.style.width = '100%';
+      }, 50);
     }
   },
+
   concluir() {
     this.isPlaying = false;
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-    const fc = document.getElementById('flayerContainer'); const vc = document.getElementById('videoContainer');
+    const fc = document.getElementById('flayerContainer');
+    const vc = document.getElementById('videoContainer');
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
     if (vc) vc.style.display = 'block';
     const bs = document.getElementById('btnSom');
     if (bs) bs.style.display = isMuted ? 'block' : 'none';
     if (this.onConcluido) this.onConcluido();
   },
+
   parar(reiniciar = true) {
     this.isPlaying = false;
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-    const fc = document.getElementById('flayerContainer'); const vc = document.getElementById('videoContainer');
+    const fc = document.getElementById('flayerContainer');
+    const vc = document.getElementById('videoContainer');
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
     if (vc) vc.style.display = 'block';
     const bs = document.getElementById('btnSom');
     if (bs) bs.style.display = isMuted ? 'block' : 'none';
     if (reiniciar) rotacao.resetar();
   },
+
   salvar(urls) {
     this.flayers = urls.filter(u => u.trim() !== '');
     return db.ref('paineis/'+UNIDADE_ID+'/flayers').set(this.flayers);
@@ -758,17 +980,16 @@ const flayerSys = {
 };
 
 // ─────────────────────────────────────────────
-// APRESENTAÇÃO — MODIFICADO: duração configurável, padrão 1 min
+// SISTEMA DE APRESENTAÇÃO COMUNITÁRIA
 // ─────────────────────────────────────────────
 const apresentSys = {
   isPlaying: false,
-  duration: 60000, // MODIFICADO: padrão 1 minuto (era 90000)
+  duration: 90000,
   progressInterval: null,
   onConcluido: null,
 
   defaultConfig: {
     enabled: true,
-    duracao: 60, // NOVO: segundos — opções: 30, 60, 120, 180
     titulo: 'Sua Consulta\nFaz a Diferença!',
     mensagemPrincipal: 'As faltas às consultas afetam você, sua família e toda a comunidade. Cada vaga não utilizada é um recurso desperdiçado que poderia ajudar outra pessoa.',
     textosAdicionais: [
@@ -796,8 +1017,6 @@ const apresentSys = {
       if (onConcluido) onConcluido();
       return;
     }
-    // NOVO: usar duração da config
-    this.duration = (this.config.duracao || 60) * 1000;
     this.isPlaying = true;
     this.renderizar();
   },
@@ -846,7 +1065,7 @@ const apresentSys = {
           <div class="apres-header-tag"><i class="fas fa-info-circle"></i> Informação à Comunidade</div>
           <div class="apres-timer-wrap">
             <div class="apres-timer-bar-outer"><div id="apresBar" class="apres-timer-bar-inner"></div></div>
-            <div id="apresCount" class="apres-timer-count"></div>
+            <div id="apresCount" class="apres-timer-count">1:30</div>
           </div>
         </div>
       </div>
@@ -909,27 +1128,26 @@ const apresentSys = {
     }, 16);
   },
 
-  // MODIFICADO: timer dinâmico baseado na duração configurada
   iniciarTimer() {
     const bar = document.getElementById('apresBar');
     const count = document.getElementById('apresCount');
-    const totalSec = Math.floor(this.duration / 1000);
-    const fmt = s => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
-
     if (bar) {
       bar.style.transition = 'none';
       bar.style.width = '100%';
       setTimeout(() => {
-        bar.style.transition = `width ${totalSec}s linear`;
+        bar.style.transition = `width ${this.duration/1000}s linear`;
         bar.style.width = '0%';
       }, 100);
     }
-    let rem = totalSec;
-    if (count) count.textContent = fmt(totalSec);
+    let rem = Math.floor(this.duration/1000);
+    if (count) count.textContent = '1:30';
     if (this.progressInterval) clearInterval(this.progressInterval);
     this.progressInterval = setInterval(() => {
       rem--;
-      if (count) count.textContent = fmt(Math.max(0,rem));
+      if (count) {
+        const m = Math.floor(rem/60), s = rem%60;
+        count.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      }
       if (rem <= 0) clearInterval(this.progressInterval);
     }, 1000);
   },
@@ -970,6 +1188,7 @@ const apresentSys = {
 // ─────────────────────────────────────────────
 const syncMgr = {
   timer: null, syncing: false, done: false,
+
   init() {
     this.loadCache();
     this.startAuto();
@@ -984,18 +1203,27 @@ const syncMgr = {
         if (v && (Date.now()-v) < 300000) this.sync();
       });
     }
-    db.ref('paineis/geral/avisos').on('value', s => { dadosGerais.avisos = s.val()||[]; atualizarAvisos(); });
-    db.ref('paineis/geral/unidade/videoUrls').on('value', s => { dadosGerais.unidade.videoUrls = s.val()||[]; carregarVideo(); });
+    db.ref('paineis/geral/avisos').on('value', s => {
+      dadosGerais.avisos = s.val()||[];
+      atualizarAvisos();
+    });
+    db.ref('paineis/geral/unidade/videoUrls').on('value', s => {
+      dadosGerais.unidade.videoUrls = s.val()||[];
+      carregarVideo();
+    });
   },
+
   async loadCache() {
     const c = await cache.get(UNIDADE_ID);
     if (c && c.data) { dadosUnidade = c.data; processarInterface(); }
     if (c && c.stale) this.sync();
     else if (!c) this.sync();
   },
+
   startAuto() {
     if (this.timer) clearInterval(this.timer);
     const ms = syncConfig.interval * 60000;
+    // offset por unidade para distribuir carga
     let hash=0;
     for (let i=0;i<UNIDADE_ID.length;i++){hash=((hash<<5)-hash)+UNIDADE_ID.charCodeAt(i);hash=hash&hash;}
     const offset = Math.abs(hash % syncConfig.interval);
@@ -1004,6 +1232,7 @@ const syncMgr = {
       this.timer = setInterval(() => this.sync(), ms);
     }, offset * 60000);
   },
+
   async sync() {
     if (this.syncing) return;
     this.syncing = true;
@@ -1011,13 +1240,20 @@ const syncMgr = {
       const s = await db.ref('paineis/'+UNIDADE_ID).once('value');
       let d = s.val();
       if (!d) d = {unidade:{nome:IS_MATRIZ?'Matriz':'Unidade '+UNIDADE_ID,especialidades:[]},avisos:[]};
+
+      // Verificação por timestamp em vez de JSON.stringify
       const cached = await cache.get(UNIDADE_ID);
       const cachedTs = (cached && cached.data) ? (cached.data.ultima_atualizacao || 0) : 0;
       const novoTs   = d.ultima_atualizacao || 0;
       const mudou    = novoTs > cachedTs || !this.done;
+
       d.ultima_sincronizacao = Date.now();
       await cache.set(UNIDADE_ID, d);
-      if (mudou || !this.done) { dadosUnidade = d; processarInterface(); }
+
+      if (mudou || !this.done) {
+        dadosUnidade = d;
+        processarInterface();
+      }
       this.done = true;
       ocultarLoading();
     } catch(e) {
@@ -1026,6 +1262,7 @@ const syncMgr = {
       this.syncing = false;
     }
   },
+
   setInterval(n) {
     if (!syncConfig.intervalMap[n]) return;
     syncConfig.interval = n;
@@ -1033,25 +1270,9 @@ const syncMgr = {
     this.startAuto();
     notif('Intervalo: '+n+' minutos','success');
   },
+
   forceSync() { this.sync(); }
 };
-
-// ─────────────────────────────────────────────
-// NOVO: REGISTRO DE LOG
-// ─────────────────────────────────────────────
-function registrarLog(acao, detalhes) {
-  if (!usuarioAtual) return;
-  const entry = {
-    ts: Date.now(),
-    usuario: usuarioAtual.login,
-    nome: usuarioAtual.nome || usuarioAtual.login,
-    unidade: UNIDADE_ID,
-    unidadeNome: dadosUnidade.unidade.nome || UNIDADE_ID,
-    acao,
-    detalhes: detalhes || ''
-  };
-  db.ref('logs').push(entry).catch(() => {});
-}
 
 // ─────────────────────────────────────────────
 // INICIALIZAÇÃO
@@ -1078,6 +1299,7 @@ async function iniciar() {
   atualizarRelogio();
   setInterval(atualizarRelogio, 1000);
 
+  // Carregar dados gerais
   const cgCache = await cache.get('geral');
   if (cgCache && cgCache.data) dadosGerais = cgCache.data;
   db.ref('paineis/geral').once('value').then(s => {
@@ -1090,11 +1312,13 @@ async function iniciar() {
       apresentSys.init();
       flayerSys.init();
       carregarMsgsConscientizacao();
+      // rotação agora é event-driven (YouTube IFrame API)
     }, 1500);
     setTimeout(ocultarLoading, 25000);
   }, 800);
 
   if (IS_MATRIZ) carregarTodosUsuarios();
+  // Garantir que o usuário admin existe no banco (primeira execução)
   garantirAdminInicial();
 }
 
@@ -1117,58 +1341,97 @@ function atualizarRelogio() {
   document.getElementById('currentTime').textContent = n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 
+// Extrai ID do YouTube de qualquer formato de URL
 function extrairYtId(url) {
   const m = url.match(/^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
   return (m && m[1].length === 11) ? m[1] : null;
 }
 
+// carregarVideo: cria/recria o player YT via IFrame API
 function carregarVideo() {
   if (flayerSys.isPlaying || apresentSys.isPlaying) return;
   const ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
   if (ids.length === 0) return;
+
   if (!ytApiPronto) { ytPendente = true; return; }
   criarPlayer(ids);
 }
 
 function criarPlayer(ids) {
-  if (!ids) { ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean); }
+  if (!ids) {
+    ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
+  }
   if (ids.length === 0) return;
+
+  // Se o player já existe e está funcional, apenas reinicia a playlist
   if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
     try {
       ytPlayer.cuePlaylist({ listType:'playlist', list: ids.join(',') });
       ytPlayer.loadVideoById(ids[0]);
       if (!isMuted) ytPlayer.unMute();
       return;
-    } catch(e) { ytPlayer = null; }
+    } catch(e) {
+      // player morreu — recria abaixo
+      ytPlayer = null;
+    }
   }
+
+  // Criar novo player do zero
   const container = document.getElementById('videoContainer');
   if (!container) return;
   container.style.display = 'block';
+
+  // Remover iframe anterior se existir
   try { if (ytPlayer) ytPlayer.destroy(); } catch(e) {}
   ytPlayer = null;
   container.innerHTML = '<div id="ytPlayerEl" style="width:100%;height:100%"></div>';
+
   ytPlayer = new YT.Player('ytPlayerEl', {
-    width: '100%', height: '100%', videoId: ids[0],
-    playerVars: { autoplay:1, mute:isMuted?1:0, controls:0, rel:0, loop:0, playlist:ids.join(','), playsinline:1, modestbranding:1, iv_load_policy:3 },
+    width: '100%',
+    height: '100%',
+    videoId: ids[0],
+    playerVars: {
+      autoplay: 1,
+      mute: isMuted ? 1 : 0,
+      controls: 0,
+      rel: 0,
+      loop: 0,
+      playlist: ids.join(','),
+      playsinline: 1,
+      modestbranding: 1,
+      iv_load_policy: 3
+    },
     events: {
-      onReady(e) { e.target.playVideo(); },
+      onReady(e) {
+        e.target.playVideo();
+      },
       onStateChange(e) {
-        if (rotacao.emCiclo) return;
+        if (rotacao.emCiclo) return; // já em ciclo, ignorar
+        // Estado 0 = ENDED, -1 = não iniciado (fim da lista volta a -1 em alguns casos)
         if (e.data === 0 || e.data === -1) {
           const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
           const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
           const total = lista ? lista.length : 1;
           const ultimo = !lista || idx < 0 || idx >= total - 1;
-          if (ultimo && e.data === 0) rotacao.playlistTerminou();
+          if (ultimo && e.data === 0) {
+            rotacao.playlistTerminou();
+          }
         }
       },
       onError(e) {
-        setTimeout(() => { if (ytPlayer && typeof ytPlayer.nextVideo === 'function') ytPlayer.nextVideo(); }, 2000);
+        // Erros 2, 5, 100, 101, 150: vídeo inválido/bloqueado
+        // Tentar próximo vídeo
+        setTimeout(() => {
+          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
+            ytPlayer.nextVideo();
+          }
+        }, 2000);
       }
     }
   });
 }
 
+// Frases rotativas de conscientização
 const FALTO_MSGS_DEFAULT = [
   { icon:'fa-heart', txt:'Sua consulta <strong>salva vidas</strong>. Compareça ou avise com antecedência.' },
   { icon:'fa-users', txt:'Cada vaga vazia <strong>poderia ser de outra pessoa</strong> esperando atendimento.' },
@@ -1180,6 +1443,7 @@ let FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
 let faltoMsgIdx = 0;
 let faltoMsgTimer = null;
 
+// Carregar mensagens personalizadas do Firebase
 function carregarMsgsConscientizacao() {
   db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').on('value', s => {
     const saved = s.val();
@@ -1198,6 +1462,8 @@ function atualizarFaltometro() {
   const msg = FALTO_MSGS[faltoMsgIdx % FALTO_MSGS.length];
 
   let h = `<div class="falto-inner">`;
+
+  // Cabeçalho
   h += `<div class="falto-header">
     <div class="falto-header-icon"><i class="fas fa-calendar-times"></i></div>
     <div class="falto-header-text">
@@ -1205,15 +1471,21 @@ function atualizarFaltometro() {
       <div class="falto-header-period">mês anterior</div>
     </div>
   </div>`;
+
+  // Card total
   h += `<div class="total-container">
     <div class="total-label">Pessoas que não compareceram</div>
     <div class="total-value">${total}</div>
     <div class="total-sub">consultas perdidas</div>
   </div>`;
+
+  // Mensagem de conscientização rotativa
   h += `<div class="falto-msg" id="faltoMsg">
     <i class="fas ${msg.icon} falto-msg-icon"></i>
     <div class="falto-msg-text">${msg.txt}</div>
   </div>`;
+
+  // Lista
   h += `<div class="lista-container">`;
   itens.forEach(e => {
     h += `<div class="item-lista">
@@ -1225,6 +1497,7 @@ function atualizarFaltometro() {
 
   document.getElementById('faltometroPanel').innerHTML = h;
 
+  // Rotacionar mensagem a cada 8 segundos
   if (faltoMsgTimer) clearInterval(faltoMsgTimer);
   faltoMsgTimer = setInterval(() => {
     faltoMsgIdx = (faltoMsgIdx + 1) % FALTO_MSGS.length;
@@ -1269,7 +1542,7 @@ function atualizarAvisos() {
 }
 
 // ─────────────────────────────────────────────
-// AUTENTICAÇÃO
+// AUTENTICAÇÃO — com brute force protection
 // ─────────────────────────────────────────────
 const auth = {
   openLogin() {
@@ -1279,21 +1552,26 @@ const auth = {
     document.getElementById('loginError').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
   },
+
   async verificarLogin() {
     if (loginBloqueado) { notif('Aguarde antes de tentar novamente.','error'); return; }
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value;
     if (!u||!p) { this.showError('Preencha usuário e senha.'); return; }
+
     try {
       const snap = await db.ref('usuarios').once('value');
       const us = snap.val() || {};
       let uf = null, uk = null;
       Object.entries(us).forEach(([k,d]) => { if(d.login===u){uf=d;uk=k;} });
+
       if (!uf || uf.status==='inativo') { this.failLogin(); return; }
       if (uf.senha !== p) { this.failLogin(); return; }
+
       loginAttempts = 0;
       usuarioAtual = { login:u, nome:uf.nome, key:uk };
       permissoesUsuario = uf;
+
       if (!this.temAcesso()) {
         notif('Sem permissão para esta unidade.','error');
         usuarioAtual = null; permissoesUsuario = null;
@@ -1301,11 +1579,11 @@ const auth = {
       }
       this.showUserInfo();
       this.iniciarSessionTimer();
-      registrarLog('login', 'Acesso ao sistema');
     } catch(e) {
       this.showError('Erro de conexão. Tente novamente.');
     }
   },
+
   failLogin() {
     loginAttempts++;
     const restantes = 5 - loginAttempts;
@@ -1316,27 +1594,44 @@ const auth = {
       box.textContent = 'Muitas tentativas. Aguarde 5 minutos.';
       box.style.display = 'block';
       if (loginBloqueioTimer) clearTimeout(loginBloqueioTimer);
-      loginBloqueioTimer = setTimeout(() => { loginBloqueado = false; loginAttempts = 0; box.style.display = 'none'; }, 300000);
+      loginBloqueioTimer = setTimeout(() => {
+        loginBloqueado = false;
+        loginAttempts = 0;
+        box.style.display = 'none';
+      }, 300000);
     } else {
       this.showError(`Credenciais inválidas. ${restantes} tentativa(s) restante(s).`);
     }
   },
-  showError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; },
+
+  showError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg;
+    el.style.display = 'block';
+  },
+
   temAcesso() {
     if (!permissoesUsuario) return false;
     if (permissoesUsuario.nivel==='super_admin') return true;
     const up = permissoesUsuario.unidades_permitidas || [];
     return up.includes('todas') || up.includes(UNIDADE_ID);
   },
+
   showUserInfo() {
     document.getElementById('uiName').textContent = usuarioAtual.nome || usuarioAtual.login;
-    const roleMap = {super_admin:['Super Administrador','role-super'],admin_unidade:['Administrador da Unidade','role-admin'],visualizador:['Visualizador','role-view']};
+    const roleMap = {
+      super_admin: ['Super Administrador','role-super'],
+      admin_unidade: ['Administrador da Unidade','role-admin'],
+      visualizador: ['Visualizador','role-view']
+    };
     const [rt,rc] = roleMap[permissoesUsuario?.nivel] || ['Usuário','role-view'];
     const roleEl = document.getElementById('uiRole');
-    roleEl.textContent = rt; roleEl.className = 'user-info-role ' + rc;
+    roleEl.textContent = rt;
+    roleEl.className = 'user-info-role ' + rc;
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('userInfoBox').style.display = 'block';
   },
+
   entrarPainel() {
     if (!usuarioAtual) return;
     configurarMenus();
@@ -1346,15 +1641,22 @@ const auth = {
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
   },
+
   iniciarSessionTimer() {},
+
   resetSessionTimer() {
     if (sessionTimer) clearTimeout(sessionTimer);
-    sessionTimer = setTimeout(() => { notif('Sessão expirada por inatividade.','warning'); APP.logout(); }, SESSION_TIMEOUT);
+    sessionTimer = setTimeout(() => {
+      notif('Sessão expirada por inatividade.','warning');
+      APP.logout();
+    }, SESSION_TIMEOUT);
+    // Resetar ao interagir
     document.getElementById('adminPanel').addEventListener('click', () => {
-      if (sessionTimer) clearTimeout(sessionTimer);
+      if (sessionTimer) { clearTimeout(sessionTimer); }
       sessionTimer = setTimeout(() => { notif('Sessão expirada.','warning'); APP.logout(); }, SESSION_TIMEOUT);
     }, {once:false});
   },
+
   trocarUsuario() {
     usuarioAtual = null; permissoesUsuario = null;
     document.getElementById('loginForm').style.display = 'block';
@@ -1385,8 +1687,6 @@ function configurarMenus() {
   show('navUsuarios', IS_MATRIZ && isSA);
   show('navUnidades', IS_MATRIZ && isSA);
   show('navMonitor', IS_MATRIZ && isSA);
-  // NOVO: navLog apenas super_admin matriz
-  show('navLog', IS_MATRIZ && isSA);
 
   const showAdminSection = IS_MATRIZ && isSA;
   document.getElementById('divAdmin').style.display = showAdminSection ? 'block' : 'none';
@@ -1419,32 +1719,43 @@ const sections = {
             <button class="adm-btn-green" onclick="APP.salvarNome()"><i class="fas fa-save"></i> Salvar Nome</button>
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
   },
 
-  // MODIFICADO: remove bloco de mensagens para não-matriz
   faltometro() {
     const itens = dadosUnidade.unidade.especialidades || [];
     if (permissoesUsuario?.nivel === 'visualizador') {
       document.getElementById('admContent').innerHTML =
-        '<div class="adm-card"><div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div></div>'
+        '<div class="adm-card">'
+        + '<div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-calendar-times"></i> Faltômetro</div></div>'
         + '<div class="adm-info-box"><i class="fas fa-eye"></i> Visualização somente leitura.</div>'
         + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">'
-        + itens.map(e=>'<div style="background:#f7f9fc;border:1px solid #e0e6ef;border-radius:10px;padding:16px"><div style="font-weight:700;color:#374151;font-size:16px;margin-bottom:8px">'+sanitize(e.nome)+'</div><div style="font-size:30px;font-weight:800;color:#d32f2f">'+(parseInt(e.faltas)||0)+'</div></div>').join('')
+        + itens.map(e=>'<div style="background:#f7f9fc;border:1px solid #e0e6ef;border-radius:10px;padding:16px"><div style="font-weight:700;color:#374151;font-size:16px;margin-bottom:8px">' + sanitize(e.nome) + '</div><div style="font-size:30px;font-weight:800;color:#d32f2f">' + (parseInt(e.faltas)||0) + '</div></div>').join('')
         + '</div></div>';
       return;
     }
-
+    // Funções auxiliares para evitar template literals aninhados
     const espRows = itens.map((e,i) => {
       const row = document.createElement('div');
       row.className = 'falto-row';
-      row.innerHTML = '<input type="text" class="adm-input falto-row-nome" value="'+sanitize(e.nome)+'" placeholder="Nome da especialidade" onchange="APP.atualizarEsp('+i+',\'nome\',this.value)">'
-        + '<input type="number" class="adm-input falto-row-num" value="'+(parseInt(e.faltas)||0)+'" min="0" placeholder="0" onchange="APP.atualizarEsp('+i+',\'faltas\',this.value)" style="font-size:22px;font-weight:700;color:#d32f2f;text-align:right">'
-        + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerEsp('+i+')" title="Remover"><i class="fas fa-trash"></i></button>';
+      row.innerHTML = '<input type="text" class="adm-input falto-row-nome" value="' + sanitize(e.nome) + '" placeholder="Nome da especialidade" onchange="APP.atualizarEsp(' + i + ',\'nome\',this.value)">'
+        + '<input type="number" class="adm-input falto-row-num" value="' + (parseInt(e.faltas)||0) + '" min="0" placeholder="0" onchange="APP.atualizarEsp(' + i + ',\'faltas\',this.value)" style="font-size:22px;font-weight:700;color:#d32f2f;text-align:right">'
+        + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerEsp(' + i + ')" title="Remover"><i class="fas fa-trash"></i></button>';
       return row.outerHTML;
     }).join('');
 
+    const msgRows = FALTO_MSGS.map((m, i) => {
+      const plain = (m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*');
+      return '<div class="texto-row" id="msgRow' + i + '">'
+        + '<input type="text" class="adm-input msg-input" data-idx="' + i + '" value="' + plain.replace(/"/g,'&quot;') + '" placeholder="Digite a mensagem...">'
+        + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(' + i + ')"><i class="fas fa-trash"></i></button>'
+        + '</div>';
+    }).join('');
+
     const admC = document.getElementById('admContent');
+    admC.innerHTML = '';
+
     admC.innerHTML =
       '<div class="adm-card">'
       + '<div class="adm-card-header">'
@@ -1458,35 +1769,28 @@ const sections = {
         + '<button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>'
       + '</div>'
     + '</div>'
-    // MODIFICADO: bloco de mensagens de conscientização somente para matriz
-    + (IS_MATRIZ ? (() => {
-        const msgRows = FALTO_MSGS.map((m, i) => {
-          const plain = (m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*');
-          return '<div class="texto-row" id="msgRow'+i+'">'
-            + '<input type="text" class="adm-input msg-input" data-idx="'+i+'" value="'+plain.replace(/"/g,'&quot;')+'" placeholder="Digite a mensagem...">'
-            + '<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg('+i+')"><i class="fas fa-trash"></i></button>'
-            + '</div>';
-        }).join('');
-        return '<div class="adm-card">'
-          + '<div class="adm-card-header">'
-            + '<div><div class="adm-card-title"><i class="fas fa-comment-dots"></i> Mensagens de Conscientização</div>'
-            + '<div class="adm-card-desc">Textos rotativos no Faltômetro — trocam a cada 8 segundos — editável apenas na Matriz</div></div>'
-            + '<button class="adm-btn-green adm-btn-sm" onclick="APP.adicionarMsg()"><i class="fas fa-plus"></i> Adicionar</button>'
-          + '</div>'
-          + '<div class="adm-info-box"><i class="fas fa-info-circle"></i> Use <strong>*texto*</strong> para negrito. Ex: <code>Sua vaga tem *valor*!</code></div>'
-          + '<div id="listaMsgs">' + msgRows + '</div>'
-          + '<div class="adm-action-bar">'
-            + '<button class="adm-btn-green" onclick="APP.salvarMsgs()"><i class="fas fa-save"></i> Salvar Mensagens</button>'
-            + '<button class="adm-btn-muted" onclick="APP.resetarMsgs()"><i class="fas fa-undo"></i> Restaurar Padrão</button>'
-          + '</div>'
-        + '</div>';
-      })() : '');
+    + '<div class="adm-card">'
+      + '<div class="adm-card-header">'
+        + '<div>'
+          + '<div class="adm-card-title"><i class="fas fa-comment-dots"></i> Mensagens de Conscientização</div>'
+          + '<div class="adm-card-desc">Textos rotativos no Faltômetro — trocam a cada 8 segundos</div>'
+        + '</div>'
+        + '<button class="adm-btn-green adm-btn-sm" onclick="APP.adicionarMsg()"><i class="fas fa-plus"></i> Adicionar</button>'
+      + '</div>'
+      + '<div class="adm-info-box"><i class="fas fa-info-circle"></i> Use <strong>*texto*</strong> para negrito. Ex: <code>Sua vaga tem *valor*!</code></div>'
+      + '<div id="listaMsgs">' + msgRows + '</div>'
+      + '<div class="adm-action-bar">'
+        + '<button class="adm-btn-green" onclick="APP.salvarMsgs()"><i class="fas fa-save"></i> Salvar Mensagens</button>'
+        + '<button class="adm-btn-muted" onclick="APP.resetarMsgs()"><i class="fas fa-undo"></i> Restaurar Padrão</button>'
+      + '</div>'
+    + '</div>';
   },
 
   avisos() {
     const avisosGlobal = dadosGerais.avisos || [];
     const avisosLocal  = dadosUnidade.avisos || [];
     const c = document.getElementById('admContent');
+
     const podeEditarCentral = IS_MATRIZ && (permissoesUsuario?.nivel === 'super_admin' || permissoesUsuario?.nivel === 'admin_unidade');
 
     let avisosCentralHtml = '';
@@ -1495,7 +1799,10 @@ const sections = {
     } else {
       avisosCentralHtml = avisosGlobal.map((a,i) => `
         <div class="aviso-item aviso-item-central">
-          <div><div class="aviso-item-text">${sanitize(a)}</div></div>
+          <div>
+            <div class="aviso-item-text">${sanitize(a)}</div>
+            ${podeEditarCentral ? '' : '<span class="aviso-item-tag">Apenas Matriz edita</span>'}
+          </div>
           ${podeEditarCentral ? `<button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerAvisoCentral(${i})"><i class="fas fa-trash"></i></button>` : ''}
         </div>`).join('');
     }
@@ -1520,9 +1827,10 @@ const sections = {
         </div>
         ${avisosCentralHtml || '<div style="color:#9ca3af;font-size:14px;padding:12px 0">Nenhum aviso central.</div>'}
       </div>`}
+
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-map-marker-alt"></i> Avisos desta Unidade</div><div class="adm-card-desc">Aparecem apenas aqui</div></div>
+          <div><div class="adm-card-title"><i class="fas fa-map-marker-alt"></i> Avisos desta Unidade</div><div class="adm-card-desc">Aparecem apenas aqui — você pode editar e excluir</div></div>
           <span class="avisos-badge-local">LOCAL</span>
         </div>
         <div id="listAvisoLocal">
@@ -1543,12 +1851,10 @@ const sections = {
       </div>`;
   },
 
-  // MODIFICADO: adiciona seletor de duração
   apresentacao() {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const textos = (cfg.textosAdicionais||[]);
     while (textos.length < 3) textos.push('');
-    const duracaoAtual = cfg.duracao || 60;
 
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
@@ -1566,40 +1872,7 @@ const sections = {
 
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ciclo de rotação:</strong> Vídeos → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos</div>
-        </div>
-
-        <!-- NOVO: Duração configurável -->
-        <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin-bottom:20px">
-          <label class="adm-label" style="margin-bottom:10px"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            ${[
-              {val:30,  label:'30 seg', sub:'Rápida'},
-              {val:60,  label:'1 min',  sub:'Padrão'},
-              {val:120, label:'2 min',  sub:'Detalhada'},
-              {val:180, label:'3 min',  sub:'Completa'}
-            ].map(op=>`
-              <label style="cursor:pointer;flex:1;min-width:90px">
-                <input type="radio" name="apres_duracao" value="${op.val}" ${duracaoAtual===op.val?'checked':''} style="display:none">
-                <div class="duracao-opt ${duracaoAtual===op.val?'duracao-sel':''}" onclick="document.querySelectorAll('.duracao-opt').forEach(d=>d.classList.remove('duracao-sel'));this.classList.add('duracao-sel')" style="border:2px solid ${duracaoAtual===op.val?'#1565c0':'#e2e8f0'};border-radius:10px;padding:12px;text-align:center;background:${duracaoAtual===op.val?'#eff6ff':'#fff'};transition:all .2s">
-                  <div style="font-size:22px;font-weight:800;color:${duracaoAtual===op.val?'#1565c0':'#1e293b'}">${op.label}</div>
-                  <div style="font-size:11px;color:#6b7280;margin-top:2px">${op.sub}</div>
-                </div>
-              </label>`).join('')}
-          </div>
-          <script>
-            document.querySelectorAll('[name="apres_duracao"]').forEach(r=>{
-              r.addEventListener('change',()=>{
-                document.querySelectorAll('.duracao-opt').forEach(d=>{
-                  d.style.borderColor='#e2e8f0';d.style.background='#fff';
-                  d.querySelector('div').style.color='#1e293b';
-                });
-                const sel=r.closest('label').querySelector('.duracao-opt');
-                sel.style.borderColor='#1565c0';sel.style.background='#eff6ff';
-                sel.querySelector('div').style.color='#1565c0';
-              });
-            });
-          <\/script>
+          <div><strong>Ciclo de rotação:</strong> Vídeos (10 min) → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> (1:30 min) → Volta aos Vídeos</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -1632,14 +1905,13 @@ const sections = {
         </div>
       </div>
 
+      <!-- Preview miniatura -->
       <div class="adm-card">
-        <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-eye"></i> Preview</div>
-          <button class="adm-btn-primary adm-btn-sm" onclick="APP.expandirPreview()"><i class="fas fa-expand-alt"></i> Ampliar Tela</button>
-        </div>
+        <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-eye"></i> Preview</div></div>
         <div style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
           <div style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
-            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b19"></i></div>
-            <span style="font-size:13px;color:rgba(255,255,255,.65)">Apresentação configurada para ${duracaoAtual>=60?Math.floor(duracaoAtual/60)+'min':(duracaoAtual+'seg')} — aparece após flayers no ciclo</span>
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b16"></i></div>
+            <span style="font-size:13px;color:rgba(255,255,255,.65)">Apresentação de 1:30 min — aparece após flayers no ciclo</span>
             <div style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
           </div>
           <div style="display:grid;grid-template-columns:1.5fr 1fr;min-height:200px">
@@ -1670,7 +1942,7 @@ const sections = {
         </div>
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ordem de exibição:</strong> Vídeos → <strong>Encartes aqui</strong> (30s/un.) → Apresentação Comunitária → Vídeos novamente</div>
+          <div><strong>Ordem de exibição:</strong> Vídeos (10 min) → <strong>Encartes aqui</strong> (30s/un.) → Apresentação Comunitária (1:30) → Vídeos novamente</div>
         </div>
         <div style="margin-bottom:20px">
           <label class="adm-label">URLs das Imagens <span class="adm-label-sub">Uma por linha • JPG/PNG hospedados publicamente</span></label>
@@ -1683,11 +1955,13 @@ const sections = {
           <button class="adm-btn-danger" onclick="APP.limparFlayers()" style="margin-left:auto"><i class="fas fa-trash"></i> Limpar Todos</button>
         </div>
       </div>
+
       <div class="adm-card">
         <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-th-large"></i> Preview (${urls.length} encarte${urls.length!==1?'s':''})</div></div>
         <div class="flayer-grid">
-          ${urls.length===0?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-images" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>Nenhum encarte configurado</div>`:
-          urls.map((u,i)=>`
+          ${urls.length===0?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af">
+            <i class="fas fa-images" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>Nenhum encarte configurado
+          </div>`:urls.map((u,i)=>`
             <div class="flayer-card">
               <div class="flayer-thumb">
                 <img src="${sanitize(u)}" alt="Encarte ${i+1}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
@@ -1710,7 +1984,7 @@ const sections = {
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div><div class="adm-card-desc">URLs do YouTube — exibidos em todas as unidades</div></div></div>
-        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole uma URL por linha. Os vídeos ficam em loop e sem controles visíveis.</div>
+        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole uma URL por linha. Ex: https://www.youtube.com/watch?v=... Os vídeos ficam em loop e sem controles visíveis.</div>
         <label class="adm-label">URLs do YouTube</label>
         <textarea id="vUrls" class="adm-input" style="min-height:180px;font-family:monospace;font-size:14px">${(dadosGerais.unidade.videoUrls||[]).join('\n')}</textarea>
         <div class="adm-action-bar">
@@ -1769,6 +2043,7 @@ const sections = {
   },
 
   unidades() {
+    // Mostrar loading imediato enquanto busca do Firebase
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
@@ -1780,425 +2055,61 @@ const sections = {
         </div>
         <div id="unidadesGrid" class="adm-unidades-grid">
           <div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af">
-            <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#93c5fd;display:block;margin-bottom:12px"></i>Carregando unidades...
+            <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#93c5fd;display:block;margin-bottom:12px"></i>
+            Carregando unidades...
           </div>
         </div>
       </div>`;
+    // Buscar sempre do Firebase
     carregarTodasUnidades(() => renderizarGridUnidades());
   },
 
-  // NOVO: Monitor estilo Grafana
-  monitor() {
-    const c = document.getElementById('admContent');
-    c.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div>
-          <h2 style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:2px"><i class="fas fa-satellite-dish" style="color:#1565c0;margin-right:8px"></i>Monitor de Atividades</h2>
-          <div style="font-size:13px;color:#6b7280">Visão em tempo real das unidades do sistema</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="adm-btn-muted" onclick="APP.recarregarUnidades();sections.monitor()"><i class="fas fa-sync-alt"></i> Atualizar</button>
-          <button class="adm-btn-primary" onclick="APP.forceSyncAll()"><i class="fas fa-broadcast-tower"></i> Sync Todas</button>
-        </div>
-      </div>
-      <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando dados...</div></div>`;
 
-    carregarTodasUnidades(() => {
-      // Buscar últimos logs para enriquecer o monitor
-      db.ref('logs').orderByChild('ts').limitToLast(50).once('value').then(s => {
-        const logs = [];
-        s.forEach(c => logs.unshift({id:c.key,...c.val()}));
-        renderMonitorGrafana(logs);
-      }).catch(() => renderMonitorGrafana([]));
-    });
-  },
+  _renderMonitor() {
+    const agora = Date.now();
+    const lista = listaUnidades.map(u => {
+      const ult = u.ultima_sincronizacao || u.ultima_atualizacao || 0;
+      const h   = ult ? Math.floor((agora-ult)/3600000) : 999;
+      const s   = h>168?'critico':h>72?'alerta':h>24?'atencao':'ativo';
+      const t   = {critico:'Crítico',alerta:'Alerta',atencao:'Atenção',ativo:'Ativo'}[s];
+      const tp  = h===0?'< 1h':h<24?`${h}h`:`${Math.floor(h/24)}d ${h%24}h`;
+      return{...u,h,s,t,tp,ultStr:ult?new Date(ult).toLocaleString('pt-BR'):'Nunca'};
+    }).sort((a,b)=>b.h-a.h);
+    const cnt = {critico:0,alerta:0,atencao:0,ativo:0};
+    lista.forEach(u=>cnt[u.s]++);
 
-  // NOVO: Log do sistema
-  log() {
-    const c = document.getElementById('admContent');
-    c.innerHTML = `
+    document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header">
-          <div>
-            <div class="adm-card-title"><i class="fas fa-history"></i> Log do Sistema</div>
-            <div class="adm-card-desc">Registro completo de todas as alterações realizadas no sistema</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select id="logFiltroUnidade" class="adm-input" style="width:200px;padding:9px 12px;font-size:13px" onchange="APP.filtrarLog()">
-              <option value="">Todas as unidades</option>
-            </select>
-            <select id="logFiltroAcao" class="adm-input" style="width:160px;padding:9px 12px;font-size:13px" onchange="APP.filtrarLog()">
-              <option value="">Todas as ações</option>
-              <option value="salvar">Salvar</option>
-              <option value="criar">Criar</option>
-              <option value="excluir">Excluir</option>
-              <option value="login">Login</option>
-              <option value="config">Configuração</option>
-            </select>
-            <button class="adm-btn-muted adm-btn-sm" onclick="APP.showSection('log')"><i class="fas fa-sync-alt"></i> Atualizar</button>
-            <button class="adm-btn-danger adm-btn-sm" onclick="APP.limparLog()"><i class="fas fa-trash"></i> Limpar</button>
+        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-satellite-dish"></i> Monitor de Inatividade</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="adm-btn-muted" onclick="APP.recarregarUnidades()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+            <button class="adm-btn-primary" onclick="APP.forceSyncAll()"><i class="fas fa-broadcast-tower"></i> Sync Todas</button>
           </div>
         </div>
-        <div id="logStats" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px"></div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
-          <div style="display:grid;grid-template-columns:160px 130px 150px 1fr;background:linear-gradient(135deg,#1565c0,#1e88e5);padding:10px 14px;gap:0">
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">DATA/HORA</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">USUÁRIO</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">AÇÃO</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">DETALHES</div>
-          </div>
-          <div id="logContainer" style="max-height:480px;overflow-y:auto">
-            <div style="text-align:center;padding:40px;color:#9ca3af">
-              <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:12px"></i>Carregando registros...
-            </div>
-          </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
+          <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:18px;text-align:center"><div style="font-size:28px;font-weight:800;color:#166534">${cnt.ativo}</div><div style="font-size:12px;color:#166534">Ativas (&lt;24h)</div></div>
+          <div style="background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:18px;text-align:center"><div style="font-size:28px;font-weight:800;color:#713f12">${cnt.atencao}</div><div style="font-size:12px;color:#713f12">Atenção (1-3d)</div></div>
+          <div style="background:#ffedd5;border:1px solid #fdba74;border-radius:10px;padding:18px;text-align:center"><div style="font-size:28px;font-weight:800;color:#7c2d12">${cnt.alerta}</div><div style="font-size:12px;color:#7c2d12">Alerta (3-7d)</div></div>
+          <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:10px;padding:18px;text-align:center"><div style="font-size:28px;font-weight:800;color:#991b1b">${cnt.critico}</div><div style="font-size:12px;color:#991b1b">Críticas (&gt;7d)</div></div>
         </div>
-        <div id="logFooter" style="margin-top:12px;font-size:12px;color:#9ca3af;text-align:right"></div>
+        <table class="adm-table">
+          <thead><tr><th>Unidade</th><th>Status</th><th>Inativo há</th><th>Última Sync</th><th>Ações</th></tr></thead>
+          <tbody>
+            ${lista.map(u=>`<tr>
+              <td><strong>${sanitize(u.nome)}</strong><div style="font-size:11px;color:#9ca3af">${sanitize(u.id)}</div></td>
+              <td><span class="monitor-status-${u.s}">${u.t}</span></td>
+              <td style="font-weight:600">${u.tp}</td>
+              <td style="font-size:12px;color:#6b7280">${u.ultStr}</td>
+              <td style="display:flex;gap:6px">
+                <button class="adm-btn-icon adm-btn-icon-danger" style="background:#fff;color:#1565c0;border-color:#bfdbfe" onclick="APP.forceSync1('${u.id}')"><i class="fas fa-sync-alt"></i></button>
+                <button class="adm-btn-icon" style="background:#eff6ff;color:#1565c0;border:1px solid #bfdbfe" onclick="APP.abrirUnidade('${u.id}')"><i class="fas fa-external-link-alt"></i></button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
       </div>`;
-
-    // Preencher filtro de unidades
-    carregarTodasUnidades(() => {
-      const sel = document.getElementById('logFiltroUnidade');
-      if (sel) {
-        listaUnidades.forEach(u => {
-          const opt = document.createElement('option');
-          opt.value = u.id; opt.textContent = u.nome;
-          sel.appendChild(opt);
-        });
-      }
-    });
-
-    // Carregar logs do Firebase
-    db.ref('logs').orderByChild('ts').limitToLast(500).once('value').then(s => {
-      const logs = [];
-      s.forEach(entry => logs.unshift({id:entry.key,...entry.val()}));
-      window._logsTodos = logs;
-      renderizarLog(logs);
-    }).catch(() => {
-      document.getElementById('logContainer').innerHTML =
-        '<div style="text-align:center;padding:40px;color:#ef4444"><i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px"></i>Erro ao carregar logs</div>';
-    });
   }
 };
-
-// ─────────────────────────────────────────────
-// NOVO: Renderizar Log
-// ─────────────────────────────────────────────
-function renderizarLog(logs) {
-  const container = document.getElementById('logContainer');
-  const footer    = document.getElementById('logFooter');
-  const stats     = document.getElementById('logStats');
-  if (!container) return;
-
-  // Stats
-  const contadores = {salvar:0,criar:0,excluir:0,login:0,config:0,outros:0};
-  logs.forEach(l => {
-    const a = (l.acao||'').toLowerCase();
-    if (a.includes('salv')) contadores.salvar++;
-    else if (a.includes('cri')) contadores.criar++;
-    else if (a.includes('excl')||a.includes('remov')||a.includes('delet')) contadores.excluir++;
-    else if (a.includes('login')) contadores.login++;
-    else if (a.includes('config')||a.includes('apres')) contadores.config++;
-    else contadores.outros++;
-  });
-  if (stats) {
-    const items = [
-      {label:'Total',val:logs.length,color:'#1565c0',bg:'#eff6ff',icon:'fa-list'},
-      {label:'Salvamentos',val:contadores.salvar,color:'#166534',bg:'#dcfce7',icon:'fa-save'},
-      {label:'Criações',val:contadores.criar,color:'#1e40af',bg:'#dbeafe',icon:'fa-plus-circle'},
-      {label:'Exclusões',val:contadores.excluir,color:'#991b1b',bg:'#fee2e2',icon:'fa-trash'},
-      {label:'Logins',val:contadores.login,color:'#15803d',bg:'#f0fdf4',icon:'fa-sign-in-alt'},
-    ];
-    stats.innerHTML = items.map(it=>`
-      <div style="background:${it.bg};border-radius:10px;padding:14px 16px;border:1px solid ${it.color}22">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <i class="fas ${it.icon}" style="color:${it.color};font-size:13px"></i>
-          <span style="font-size:11px;color:${it.color};font-weight:700;text-transform:uppercase;letter-spacing:.5px">${it.label}</span>
-        </div>
-        <div style="font-size:28px;font-weight:800;color:${it.color}">${it.val}</div>
-      </div>`).join('');
-  }
-
-  if (logs.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-clipboard-list" style="font-size:36px;display:block;margin-bottom:12px;opacity:.4"></i>Nenhum registro encontrado</div>';
-    if (footer) footer.textContent = '';
-    return;
-  }
-
-  const badgeMap = (acao) => {
-    const a = (acao||'').toLowerCase();
-    if (a.includes('salv')||a.includes('save')) return ['log-badge-save','Salvo'];
-    if (a.includes('cri')||a.includes('novo')) return ['log-badge-create','Criado'];
-    if (a.includes('excl')||a.includes('remov')||a.includes('delet')) return ['log-badge-delete','Excluído'];
-    if (a.includes('login')) return ['log-badge-login','Login'];
-    if (a.includes('config')||a.includes('apres')) return ['log-badge-config','Config'];
-    return ['log-badge-update','Update'];
-  };
-
-  container.innerHTML = logs.map(l => {
-    const dt = new Date(l.ts||0);
-    const dtStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const [bc,bl] = badgeMap(l.acao);
-    const unidStr = l.unidadeNome ? ` <span style="font-size:10px;color:#9ca3af">(${sanitize(l.unidadeNome)})</span>` : '';
-    return `<div class="log-entry">
-      <div class="log-cell log-cell-ts">${dtStr}</div>
-      <div class="log-cell log-cell-user"><i class="fas fa-user" style="color:#94a3b8;font-size:11px;margin-right:5px"></i>${sanitize(l.nome||l.usuario||'—')}</div>
-      <div class="log-cell log-cell-acao"><span class="log-badge ${bc}">${bl}</span></div>
-      <div class="log-cell log-cell-det">${sanitize(l.detalhes||l.acao||'—')}${unidStr}</div>
-    </div>`;
-  }).join('');
-
-  if (footer) footer.textContent = `Exibindo ${logs.length} de até 500 registros mais recentes`;
-}
-
-// ─────────────────────────────────────────────
-// NOVO: Monitor Grafana-style
-// ─────────────────────────────────────────────
-function renderMonitorGrafana(logs) {
-  const mc = document.getElementById('monitorContent');
-  if (!mc) return;
-
-  const agora = Date.now();
-  const hoje = new Date();
-  const mesAtualStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
-  const inicioDomes = new Date(hoje.getFullYear(), hoje.getMonth(), 1).getTime();
-  const diasNoMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate();
-  const diasDecorridos = hoje.getDate();
-  const pctMes = Math.round((diasDecorridos / diasNoMes) * 100);
-  const mesAnterior = new Date(hoje.getFullYear(), hoje.getMonth()-1, 1)
-    .toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-
-  const unidades = listaUnidades.map(u => {
-    const ult  = u.ultima_sincronizacao || u.ultima_atualizacao || 0;
-    const horas = ult ? (agora - ult) / 3600000 : 9999;
-    const status = horas > 168 ? 'critico' : horas > 72 ? 'alerta' : horas > 24 ? 'atencao' : 'ativo';
-    const statusLabel = {critico:'Crítico',alerta:'Alerta',atencao:'Atenção',ativo:'Ativo'}[status];
-    const tempoStr = !ult ? 'Nunca' : horas < 1 ? '< 1h' : horas < 24 ? `${Math.floor(horas)}h` : `${Math.floor(horas/24)}d`;
-    const barPct = ult ? Math.max(3, Math.min(100, 100 - (horas/168)*100)) : 0;
-    const barColor = {ativo:'#16a34a',atencao:'#d97706',alerta:'#ea580c',critico:'#dc2626'}[status];
-    const logsUnit = logs.filter(l => l.unidade === u.id);
-    const ultimaAcao = logsUnit[0];
-    // Faltômetro mensal: verificar se atualizou no mês atual
-    const atualizouEsteMes = u.ultima_atualizacao >= inicioDomes;
-    const totalFaltas = (u.espDados||[]).reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
-    return { ...u, horas, status, statusLabel, tempoStr, barPct, barColor, logsUnit, ultimaAcao, atualizouEsteMes, totalFaltas };
-  }).sort((a,b) => b.horas - a.horas);
-
-  const cnt = {ativo:0,atencao:0,alerta:0,critico:0};
-  unidades.forEach(u => cnt[u.status]++);
-  const recenteLogs = logs.slice(0,15);
-
-  // Faltômetro: stats mensais
-  const updatedThisMonth = unidades.filter(u => u.atualizouEsteMes).length;
-  const pendentes = unidades.length - updatedThisMonth;
-  const totalSistema = unidades.reduce((a,u) => a + u.totalFaltas, 0);
-  const maxFaltasUnit = Math.max(...unidades.map(u => u.totalFaltas), 1);
-
-  mc.innerHTML = `
-    <!-- KPIs conectividade -->
-    <div class="grafana-grid">
-      <div class="grafana-kpi">
-        <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#16a34a,#22c55e)"></div>
-        <div class="grafana-kpi-val" style="color:#16a34a">${cnt.ativo}</div>
-        <div class="grafana-kpi-label">Ativas (últimas 24h)</div>
-        <div class="grafana-kpi-sub">${unidades.length} unidades monitoradas</div>
-      </div>
-      <div class="grafana-kpi">
-        <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#d97706,#f59e0b)"></div>
-        <div class="grafana-kpi-val" style="color:#d97706">${cnt.atencao}</div>
-        <div class="grafana-kpi-label">Atenção (1–3 dias)</div>
-        <div class="grafana-kpi-sub">Verificar conectividade</div>
-      </div>
-      <div class="grafana-kpi">
-        <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#ea580c,#f97316)"></div>
-        <div class="grafana-kpi-val" style="color:#ea580c">${cnt.alerta}</div>
-        <div class="grafana-kpi-label">Alerta (3–7 dias)</div>
-        <div class="grafana-kpi-sub">Intervenção necessária</div>
-      </div>
-      <div class="grafana-kpi">
-        <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#dc2626,#ef4444)"></div>
-        <div class="grafana-kpi-val" style="color:#dc2626">${cnt.critico}</div>
-        <div class="grafana-kpi-label">Críticas (&gt;7 dias)</div>
-        <div class="grafana-kpi-sub">Inatividade severa</div>
-      </div>
-    </div>
-
-    <!-- ═══ FALTÔMETRO MENSAL ═══ -->
-    <div style="background:#fff;border-radius:14px;border:1.5px solid #e2e8f0;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)">
-      <!-- Header da seção -->
-      <div style="background:linear-gradient(135deg,#1e293b,#334155);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="width:36px;height:36px;border-radius:9px;background:rgba(239,83,80,.2);border:1px solid rgba(239,83,80,.4);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-times" style="color:#ff8a80;font-size:15px"></i></div>
-          <div>
-            <div style="font-size:15px;font-weight:700;color:#fff">Faltômetro Mensal das Unidades</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5)">Referência: <strong style="color:rgba(255,255,255,.75)">${mesAnterior}</strong> · Atualização mensal a partir do início do mês</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div style="text-align:right">
-            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px">Progresso do mês atual (${diasDecorridos}/${diasNoMes} dias)</div>
-            <div style="width:200px;height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
-              <div style="height:100%;width:${pctMes}%;background:linear-gradient(90deg,#1565c0,#00e676);border-radius:4px;transition:width 1s ease"></div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 16px;text-align:center">
-            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:2px">Total Geral</div>
-            <div style="font-size:26px;font-weight:800;color:#ff8a80;font-family:'Bebas Neue',monospace;line-height:1">${totalSistema.toLocaleString('pt-BR')}</div>
-          </div>
-        </div>
-      </div>
-      <!-- KPIs faltômetro -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f1f5f9">
-        <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-check-circle" style="color:#16a34a;margin-right:4px"></i>Atualizaram este mês</div>
-          <div style="font-size:32px;font-weight:800;color:#16a34a">${updatedThisMonth} <span style="font-size:14px;color:#6b7280;font-weight:400">de ${unidades.length}</span></div>
-          <div style="margin-top:8px;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden">
-            <div style="height:100%;width:${unidades.length?Math.round(updatedThisMonth/unidades.length*100):0}%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:2px"></div>
-          </div>
-        </div>
-        <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-clock" style="color:#d97706;margin-right:4px"></i>Pendentes de atualização</div>
-          <div style="font-size:32px;font-weight:800;color:${pendentes>0?'#d97706':'#16a34a'}">${pendentes}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px">${pendentes===0?'Todas as unidades atualizadas!':'Unidade(s) ainda não lançaram o mês'}</div>
-        </div>
-        <div style="padding:16px 22px">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-calendar-alt" style="color:#1565c0;margin-right:4px"></i>Mês de referência dos dados</div>
-          <div style="font-size:18px;font-weight:700;color:#1e293b;text-transform:capitalize;margin-top:4px">${mesAnterior}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Dados referentes às consultas não realizadas</div>
-        </div>
-      </div>
-      <!-- Grid por unidade -->
-      <div style="padding:18px 22px">
-        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px"><i class="fas fa-chart-bar" style="margin-right:6px;color:#1565c0"></i>Detalhamento por Unidade — Mês anterior (${mesAnterior})</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
-          ${unidades.length === 0
-            ? '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af">Nenhuma unidade cadastrada</div>'
-            : unidades.map(u => {
-                const espList = (u.espDados||[]).slice(0,4);
-                const maxEsp = Math.max(...(u.espDados||[]).map(e=>parseInt(e.faltas)||0), 1);
-                const statusFalto = u.atualizouEsteMes ? 'atualizado' : 'pendente';
-                const [sfBg,sfColor,sfBorder,sfIcon,sfLabel] = u.atualizouEsteMes
-                  ? ['#dcfce7','#166534','#86efac','fa-check-circle','Atualizado']
-                  : ['#fef9c3','#713f12','#fde047','fa-clock','Pendente'];
-                return `<div style="background:#f8fafc;border:1.5px solid ${u.atualizouEsteMes?'#bbf7d0':'#fde68a'};border-radius:12px;padding:16px;transition:all .2s;cursor:pointer" onclick="APP.abrirUnidade('${u.id}')">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-                    <div style="font-size:14px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px" title="${sanitize(u.nome)}">${sanitize(u.nome)}</div>
-                    <span style="background:${sfBg};color:${sfColor};border:1px solid ${sfBorder};font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:4px"><i class="fas ${sfIcon}" style="font-size:9px"></i>${sfLabel}</span>
-                  </div>
-                  <!-- Total faltas -->
-                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:12px">
-                    <div style="font-family:'Bebas Neue',monospace;font-size:42px;color:#ef5350;line-height:1">${u.totalFaltas}</div>
-                    <div style="font-size:11px;color:#9ca3af;line-height:1.3">consultas<br>perdidas</div>
-                    <div style="margin-left:auto">
-                      <div style="height:36px;width:36px;border-radius:50%;background:rgba(239,83,80,.1);border:2px solid rgba(239,83,80,.25);display:flex;align-items:center;justify-content:center">
-                        <div style="width:${Math.round(u.totalFaltas/maxFaltasUnit*100)}%;height:4px;background:#ef5350;border-radius:2px;max-width:20px"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Barra relativa ao sistema -->
-                  <div style="margin-bottom:10px">
-                    <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:3px"><span>Participação no total</span><span>${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%</span></div>
-                    <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
-                      <div style="height:100%;width:${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%;background:linear-gradient(90deg,#ef5350,#ff1744);border-radius:3px"></div>
-                    </div>
-                  </div>
-                  <!-- Mini especialidades -->
-                  ${espList.length > 0 ? `<div style="border-top:1px solid #e2e8f0;padding-top:10px">${espList.map(e=>`
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:5px">
-                      <div>
-                        <div style="font-size:11px;color:#475569;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(e.nome)}</div>
-                        <div style="height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden">
-                          <div style="height:100%;width:${Math.round(Math.max((parseInt(e.faltas)||0)/maxEsp*100,3))}%;background:#ef5350;border-radius:2px"></div>
-                        </div>
-                      </div>
-                      <div style="font-weight:800;color:#dc2626;font-size:14px;min-width:28px;text-align:right">${parseInt(e.faltas)||0}</div>
-                    </div>`).join('')}</div>` : '<div style="font-size:11px;color:#9ca3af;margin-top:8px">Sem especialidades cadastradas</div>'}
-                  <!-- Última atualização -->
-                  <div style="margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:5px">
-                    <i class="fas fa-history" style="font-size:9px"></i>
-                    ${u.ultima_atualizacao ? `Atualizado em ${new Date(u.ultima_atualizacao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}` : 'Nunca atualizado'}
-                  </div>
-                </div>`;
-              }).join('')}
-        </div>
-      </div>
-    </div>
-
-    <!-- Timeline de conectividade -->
-    <div class="grafana-timeline">
-      <div class="grafana-timeline-title">
-        <i class="fas fa-chart-bar" style="color:#1565c0"></i>
-        Conectividade por Unidade — Tempo desde última sincronização
-        <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:8px">(barra maior = mais recente)</span>
-      </div>
-      ${unidades.length === 0
-        ? '<div style="text-align:center;padding:30px;color:#9ca3af">Nenhuma unidade cadastrada</div>'
-        : unidades.map(u => `
-        <div class="grafana-bar-row">
-          <div class="grafana-bar-label" title="${sanitize(u.nome)}">${sanitize(u.nome)}</div>
-          <div class="grafana-bar-outer">
-            <div class="grafana-bar-fill" style="width:${u.barPct}%;background:linear-gradient(90deg,${u.barColor},${u.barColor}cc)">
-              ${u.barPct > 20 ? `<span>${u.statusLabel}</span>` : ''}
-            </div>
-          </div>
-          <div class="grafana-bar-meta">
-            <span style="color:${u.barColor};font-weight:700">${u.tempoStr}</span>
-            ${u.horas < 9990 ? `<div style="font-size:10px;color:#94a3b8">${new Date(u.ultima_sincronizacao||u.ultima_atualizacao||0).toLocaleDateString('pt-BR')}</div>` : ''}
-          </div>
-        </div>`).join('')}
-    </div>
-
-    <!-- Atividade recente + tabela detalhada -->
-    <div class="grafana-two-col">
-      <div class="grafana-activity-feed">
-        <div class="grafana-timeline-title" style="margin-bottom:14px">
-          <i class="fas fa-bolt" style="color:#f59e0b"></i> Atividade Recente
-          <button class="adm-btn-muted adm-btn-sm" style="margin-left:auto;font-size:11px" onclick="APP.showSection('log')"><i class="fas fa-history"></i> Ver Log Completo</button>
-        </div>
-        ${recenteLogs.length === 0
-          ? '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">Nenhuma atividade registrada ainda</div>'
-          : recenteLogs.map(l => {
-              const dotColor = (() => {
-                const a = (l.acao||'').toLowerCase();
-                if (a.includes('salv')) return '#16a34a';
-                if (a.includes('excl')||a.includes('remov')) return '#dc2626';
-                if (a.includes('cri')) return '#1565c0';
-                if (a.includes('login')) return '#7c3aed';
-                return '#d97706';
-              })();
-              const ago = Date.now() - (l.ts||0);
-              const agoStr = ago < 60000 ? 'agora' : ago < 3600000 ? `${Math.floor(ago/60000)}min atrás` : ago < 86400000 ? `${Math.floor(ago/3600000)}h atrás` : `${Math.floor(ago/86400000)}d atrás`;
-              return `<div class="grafana-feed-item">
-                <div class="grafana-feed-dot" style="background:${dotColor}"></div>
-                <div class="grafana-feed-content">
-                  <div class="grafana-feed-title">${sanitize(l.detalhes||l.acao||'Ação registrada')} <span style="font-weight:400;color:#9ca3af;font-size:11px">— ${sanitize(l.nome||l.usuario||'?')}</span></div>
-                  <div class="grafana-feed-sub"><i class="fas fa-map-marker-alt" style="font-size:9px"></i> ${sanitize(l.unidadeNome||l.unidade||'?')} · ${agoStr}</div>
-                </div>
-              </div>`;
-            }).join('')}
-      </div>
-      <div class="grafana-heatmap">
-        <div class="grafana-timeline-title" style="margin-bottom:14px">
-          <i class="fas fa-table" style="color:#1565c0"></i> Status Detalhado
-        </div>
-        <div style="overflow-y:auto;max-height:320px">
-          <table style="width:100%;border-collapse:collapse">
-            <tbody>
-              ${unidades.map(u => `
-                <tr style="border-bottom:1px solid #f1f5f9;cursor:pointer" onclick="APP.abrirUnidade('${u.id}')">
-                  <td style="padding:9px 4px;font-size:13px;font-weight:600;color:#1e293b;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sanitize(u.nome)}</td>
-                  <td style="padding:9px 4px;text-align:center"><span class="monitor-status-${u.status}">${u.statusLabel}</span></td>
-                  <td style="padding:9px 4px;text-align:right;font-size:12px;color:#6b7280">${u.tempoStr}</td>
-                  <td style="padding:9px 4px;text-align:right">
-                    <button class="adm-btn-icon" style="width:28px;height:28px;font-size:11px;background:#eff6ff;color:#1565c0;border:1px solid #bfdbfe" onclick="event.stopPropagation();APP.forceSync1('${u.id}')"><i class="fas fa-sync-alt"></i></button>
-                  </td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>`;
-}
 
 // ─────────────────────────────────────────────
 // OPERAÇÕES DE DADOS
@@ -2217,6 +2128,9 @@ function salvarFirebase() {
   return p1;
 }
 
+// ─────────────────────────────────────────────
+// USUÁRIOS
+// ─────────────────────────────────────────────
 function renderizarGridUnidades() {
   const grid = document.getElementById('unidadesGrid');
   if (!grid) return;
@@ -2265,7 +2179,6 @@ function carregarTodasUnidades(cb) {
       if (k !== 'geral') listaUnidades.push({
         id:k, nome:d.unidade?.nome||`Unidade ${k}`,
         especialidades:d.unidade?.especialidades?.length||0,
-        espDados:d.unidade?.especialidades||[],
         avisos:d.avisos?.length||0,
         ultima_atualizacao:d.ultima_atualizacao||0,
         ultima_sincronizacao:d.ultima_sincronizacao||0
@@ -2284,86 +2197,18 @@ window.APP = {
   verificarLogin() { auth.verificarLogin(); },
   entrarPainel() { auth.entrarPainel(); },
   trocarUsuario() { auth.trocarUsuario(); },
-
-  // NOVO: Preview ampliado da Apresentação
-  expandirPreview() {
-    const cfg = apresentSys.config || apresentSys.defaultConfig;
-    const esp = dadosUnidade.unidade.especialidades || [];
-    const total = esp.reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
-    const dur = cfg.duracao || 60;
-    const durStr = dur >= 60 ? Math.floor(dur/60)+'min' : dur+'seg';
-    const icones = ['fa-calendar-check','fa-heart','fa-users','fa-hand-holding-heart','fa-shield-alt','fa-star-of-life'];
-    const maxF = Math.max(...esp.map(e=>parseInt(e.faltas)||0), 1);
-    const prev = document.getElementById('previewModal');
-    if (prev) prev.remove();
-    const modal = document.createElement('div');
-    modal.id = 'previewModal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);animation:notifIn .25s ease-out';
-    const inner = document.createElement('div');
-    inner.style.cssText = 'width:92vw;max-width:1440px;height:88vh;background:#030c18;border-radius:20px;overflow:hidden;border:1px solid rgba(0,230,118,.25);box-shadow:0 32px 80px rgba(0,0,0,.95);display:flex;flex-direction:column;position:relative;font-family:Outfit,sans-serif';
-    const espHtml = esp.slice(0,7).map((e,i)=>{
-      const pct = Math.round(Math.max((parseInt(e.faltas)||0)/maxF*100,3));
-      return `<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-bottom:10px">
-        <div><div style="font-size:14px;color:rgba(255,255,255,.72);margin-bottom:5px;font-weight:500">${sanitize(e.nome)}</div>
-          <div style="height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden">
-            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#ef5350,#ff1744);border-radius:4px;transition:width 1.5s ease"></div>
-          </div>
-        </div>
-        <div style="font-family:'Bebas Neue',monospace;font-size:34px;color:#ff8a80;min-width:55px;text-align:right;line-height:1">${parseInt(e.faltas)||0}</div>
-      </div>`;
-    }).join('');
-    const textosHtml = (cfg.textosAdicionais||[]).filter(t=>t&&t.trim()!=='').map((t,i)=>`
-      <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px;margin-bottom:10px">
-        <div style="width:38px;height:38px;border-radius:8px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas ${icones[i%icones.length]}" style="color:#00e676;font-size:15px"></i></div>
-        <span style="font-size:16px;color:rgba(255,255,255,.8);line-height:1.5">${sanitize(t)}</span>
-      </div>`).join('');
-    inner.innerHTML = `
-      <div style="background:rgba(0,0,0,.55);padding:14px 28px;border-bottom:1px solid rgba(0,230,118,.12);display:flex;align-items:center;gap:16px;flex-shrink:0">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:17px;color:#020b19"></i></div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#fff">${sanitize(dadosUnidade.unidade.nome||'Unidade de Saúde')}</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.4)">Preview da Apresentação Comunitária · ${durStr}</div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
-          <div style="background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:11px;padding:5px 14px;border-radius:12px;letter-spacing:1px;font-weight:700">INFORMAÇÃO À COMUNIDADE</div>
-          <button onclick="document.getElementById('previewModal').remove()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
-        </div>
-      </div>
-      <div style="flex:1;display:grid;grid-template-columns:1fr 1.5fr;overflow:hidden">
-        <div style="padding:30px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,.05);overflow-y:auto;background:linear-gradient(170deg,rgba(239,83,80,.04),transparent)">
-          <div style="font-size:11px;letter-spacing:2px;color:rgba(239,83,80,.8);font-weight:700;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px"><span style="width:18px;height:2px;background:#ef5350;display:inline-block"></span>Dados do mês anterior</div>
-          <div style="font-family:'Bebas Neue',monospace;font-size:46px;color:#ef5350;letter-spacing:2px;line-height:1;margin-bottom:18px">FALTÔMETRO</div>
-          <div style="background:linear-gradient(135deg,rgba(239,83,80,.14),rgba(239,83,80,.06));border:1px solid rgba(239,83,80,.25);border-radius:16px;padding:18px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden">
-            <div style="font-family:'Bebas Neue',monospace;font-size:90px;color:#ef5350;line-height:1;text-shadow:0 0 50px rgba(239,83,80,.4)">${total}</div>
-            <div style="font-size:14px;color:rgba(255,255,255,.4);margin-top:4px">consultas não realizadas no mês</div>
-          </div>
-          ${espHtml}
-        </div>
-        <div style="padding:30px 36px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto">
-          <div style="font-size:12px;letter-spacing:2.5px;color:#00e676;font-weight:700;margin-bottom:14px;text-transform:uppercase;display:flex;align-items:center;gap:10px"><span style="width:26px;height:2px;background:#00e676;display:inline-block"></span>Compromisso com a saúde</div>
-          <div style="font-family:'Bebas Neue',monospace;font-size:64px;color:#fff;line-height:1;margin-bottom:16px;text-shadow:0 0 80px rgba(0,230,118,.15)">${sanitize((cfg.titulo||'').replace(/\n/g,'<br>'))}</div>
-          <div style="font-size:17px;color:rgba(255,255,255,.7);line-height:1.7;border-left:3px solid rgba(0,230,118,.4);padding-left:16px;margin-bottom:22px">${sanitize(cfg.mensagemPrincipal||'')}</div>
-          ${textosHtml}
-        </div>
-      </div>
-      <div style="background:rgba(0,0,0,.5);padding:14px 28px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-        <div style="display:flex;align-items:center;gap:14px;font-size:17px;color:rgba(255,255,255,.65)"><i class="fas fa-heart" style="color:#ef5350;font-size:22px"></i>Cuidar da sua saúde é um ato de amor à sua família e à comunidade</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.25)">Secretaria Municipal de Saúde — Prefeitura Municipal de Passo Fundo</div>
-      </div>`;
-    modal.appendChild(inner);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-    document.body.appendChild(modal);
-  },
-
-
+  ativarSom() {
     isMuted = false;
+    // Recriar player sem mute
     if (ytPlayer && typeof ytPlayer.unMute === 'function') {
-      ytPlayer.unMute(); ytPlayer.setVolume(80);
-    } else { criarPlayer(); }
+      ytPlayer.unMute();
+      ytPlayer.setVolume(80);
+    } else {
+      criarPlayer();
+    }
     document.getElementById('btnSom').style.display = 'none';
   },
   logout() {
-    registrarLog('logout','Sessão encerrada');
     usuarioAtual = null; permissoesUsuario = null;
     if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
     document.getElementById('adminPanel').style.display = 'none';
@@ -2371,16 +2216,19 @@ window.APP = {
   },
 
   showSection(id) {
+    // Verificar permissão
     const n = permissoesUsuario?.nivel;
     const bloqueado = {
-      visualizador: ['unidade','faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','log'],
-      admin_unidade: IS_MATRIZ ? [] : ['unidade','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','log']
+      visualizador: ['unidade','faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor'],
+      admin_unidade: IS_MATRIZ ? [] : ['unidade','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor']
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
+
     document.querySelectorAll('.adm-nav-item').forEach(i => i.classList.remove('active'));
     const navEl = document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1));
     if (navEl) navEl.classList.add('active');
+
     if (sections[id]) sections[id]();
     else notif('Seção não encontrada.','warning');
     auth.resetSessionTimer?.();
@@ -2389,70 +2237,67 @@ window.APP = {
   salvarDados() {
     salvarFirebase().then(() => {
       atualizarFaltometro();
-      registrarLog('salvar', 'Dados da unidade '+(dadosUnidade.unidade.nome||UNIDADE_ID)+' salvos');
       notif('Dados salvos com sucesso!','success');
     }).catch(() => notif('Erro ao salvar!','error'));
   },
 
   salvarNome() {
-    const novoNome = document.getElementById('uNome').value.trim();
-    dadosUnidade.unidade.nome = novoNome;
-    document.getElementById('headerSubtitle').textContent = 'PMPF — '+sanitize(novoNome);
-    document.getElementById('admUnitLabel').textContent = novoNome;
-    registrarLog('config','Nome da unidade alterado para "'+novoNome+'"');
+    dadosUnidade.unidade.nome = document.getElementById('uNome').value.trim();
+    document.getElementById('headerSubtitle').textContent = 'PMPF — '+sanitize(dadosUnidade.unidade.nome);
+    document.getElementById('admUnitLabel').textContent = dadosUnidade.unidade.nome;
     this.salvarDados();
   },
 
-  // Mensagens de conscientização (apenas matriz)
+  // Mensagens de conscientização
   adicionarMsg() {
     const lista = document.getElementById('listaMsgs');
     if (!lista) return;
     const idx = lista.querySelectorAll('.texto-row').length;
     const div = document.createElement('div');
-    div.className = 'texto-row'; div.id = 'msgRow'+idx;
+    div.className = 'texto-row';
+    div.id = 'msgRow'+idx;
     div.innerHTML = `<input type="text" class="adm-input msg-input" data-idx="${idx}" placeholder="Digite a mensagem...">
       <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerMsg(${idx})"><i class="fas fa-trash"></i></button>`;
     lista.appendChild(div);
   },
-  removerMsg(i) { const row = document.getElementById('msgRow'+i); if (row) row.remove(); },
+
+  removerMsg(i) {
+    const row = document.getElementById('msgRow'+i);
+    if (row) row.remove();
+  },
+
   salvarMsgs() {
     const inputs = [...document.querySelectorAll('.msg-input')];
     const iconPool = ['fa-heart','fa-users','fa-calendar-check','fa-hand-holding-heart','fa-clock','fa-heartbeat','fa-star-of-life','fa-shield-alt'];
-    const msgs = inputs.map((el,i) => ({
-      icon: (FALTO_MSGS[i]&&FALTO_MSGS[i].icon) ? FALTO_MSGS[i].icon : iconPool[i%iconPool.length],
-      txt: el.value.trim().replace(/\*([^*]+)\*/g,'<strong>$1</strong>')
-    })).filter(m => m.txt !== '');
+    const msgs = inputs
+      .map((el,i) => ({
+        icon: (FALTO_MSGS[i] && FALTO_MSGS[i].icon) ? FALTO_MSGS[i].icon : iconPool[i % iconPool.length],
+        txt: el.value.trim().replace(/\*([^*]+)\*/g,'<strong>$1</strong>')
+      }))
+      .filter(m => m.txt !== '');
     if (msgs.length === 0) { notif('Adicione pelo menos uma mensagem!','warning'); return; }
     db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').set(msgs)
-      .then(() => {
-        FALTO_MSGS = msgs;
-        registrarLog('salvar','Mensagens de conscientização atualizadas ('+msgs.length+' mensagens)');
-        notif('Mensagens salvas!','success');
-      }).catch(() => notif('Erro ao salvar!','error'));
+      .then(() => { FALTO_MSGS = msgs; notif('Mensagens salvas!','success'); })
+      .catch(() => notif('Erro ao salvar!','error'));
   },
+
   resetarMsgs() {
     if (!confirm('Restaurar as mensagens padrão do sistema?')) return;
     db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').remove()
-      .then(() => {
-        FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
-        registrarLog('config','Mensagens de conscientização restauradas para o padrão');
-        notif('Mensagens restauradas!','success');
-        sections.faltometro();
-      }).catch(() => notif('Erro!','error'));
+      .then(() => { FALTO_MSGS = [...FALTO_MSGS_DEFAULT]; notif('Mensagens restauradas!','success'); sections.faltometro(); })
+      .catch(() => notif('Erro!','error'));
   },
 
+  // Faltômetro
   adicionarEsp() {
     if (!dadosUnidade.unidade.especialidades) dadosUnidade.unidade.especialidades = [];
     dadosUnidade.unidade.especialidades.push({nome:'Nova Especialidade',faltas:0});
     sections.faltometro();
-    registrarLog('criar','Nova especialidade adicionada');
     this.salvarDados();
   },
   removerEsp(i) {
-    const nome = dadosUnidade.unidade.especialidades[i]?.nome || '';
     dadosUnidade.unidade.especialidades.splice(i,1);
     sections.faltometro();
-    registrarLog('excluir','Especialidade "'+nome+'" removida');
     this.salvarDados();
   },
   atualizarEsp(i,campo,valor) {
@@ -2462,29 +2307,22 @@ window.APP = {
     atualizarFaltometro();
   },
 
+  // Avisos
   adicionarAvisoCentral() {
     const el = document.getElementById('novoAvisoCentral');
     if (!el || !el.value.trim()) return;
     if (!dadosGerais.avisos) dadosGerais.avisos = [];
     dadosGerais.avisos.push(el.value.trim());
-    const textoAviso = el.value.trim();
     el.value = '';
     db.ref('paineis/geral/avisos').set(dadosGerais.avisos)
-      .then(() => {
-        registrarLog('criar','Aviso SMS criado: "'+textoAviso.substring(0,50)+'"');
-        notif('Aviso central adicionado!','success');
-        sections.avisos();
-      }).catch(() => notif('Erro!','error'));
+      .then(() => { notif('Aviso central adicionado!','success'); sections.avisos(); })
+      .catch(() => notif('Erro!','error'));
   },
   removerAvisoCentral(i) {
-    const texto = dadosGerais.avisos[i]||'';
     dadosGerais.avisos.splice(i,1);
     db.ref('paineis/geral/avisos').set(dadosGerais.avisos)
-      .then(() => {
-        registrarLog('excluir','Aviso SMS removido: "'+texto.substring(0,50)+'"');
-        notif('Aviso removido!','success');
-        sections.avisos();
-      }).catch(() => notif('Erro!','error'));
+      .then(() => { notif('Aviso removido!','success'); sections.avisos(); })
+      .catch(() => notif('Erro!','error'));
   },
   adicionarAvisoLocal() {
     const el = document.getElementById('novoAvisoLocal');
@@ -2494,56 +2332,50 @@ window.APP = {
     el.value = '';
     sections.avisos();
   },
-  removerAvisoLocal(i) { dadosUnidade.avisos.splice(i,1); sections.avisos(); },
-  editarAvisoLocal(i,v) { if (dadosUnidade.avisos && dadosUnidade.avisos[i] !== undefined) dadosUnidade.avisos[i] = v; },
+  removerAvisoLocal(i) {
+    dadosUnidade.avisos.splice(i,1);
+    sections.avisos();
+  },
+  editarAvisoLocal(i,v) {
+    if (dadosUnidade.avisos && dadosUnidade.avisos[i] !== undefined) dadosUnidade.avisos[i] = v;
+  },
   salvarAvisosLocais() {
     db.ref('paineis/'+UNIDADE_ID+'/avisos').set(dadosUnidade.avisos||[])
-      .then(() => {
-        registrarLog('salvar','Avisos locais da unidade atualizados ('+( dadosUnidade.avisos||[]).length+' avisos)');
-        notif('Avisos locais salvos!','success');
-      }).catch(() => notif('Erro!','error'));
+      .then(() => notif('Avisos locais salvos!','success'))
+      .catch(() => notif('Erro!','error'));
   },
 
+  // Vídeos
   salvarVideos() {
     dadosGerais.unidade.videoUrls = document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='');
-    registrarLog('salvar','URLs de vídeos globais atualizadas ('+dadosGerais.unidade.videoUrls.length+' vídeos)');
     this.salvarDados();
   },
 
+  // Flayers
   salvarFlayers() {
     const urls = document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='');
-    flayerSys.salvar(urls).then(() => {
-      registrarLog('salvar','Encartes atualizados ('+urls.length+' encarte(s))');
-      notif(`${urls.length} encarte(s) salvos!`,'success');
-      sections.flayers();
-    });
+    flayerSys.salvar(urls).then(() => { notif(`${urls.length} encarte(s) salvos!`,'success'); sections.flayers(); });
   },
   removerFlayer(i) {
     const urls = [...flayerSys.flayers]; urls.splice(i,1);
-    flayerSys.salvar(urls).then(() => {
-      registrarLog('excluir','Encarte #'+(i+1)+' removido');
-      notif('Removido!','success');
-      sections.flayers();
-    });
+    flayerSys.salvar(urls).then(() => { notif('Removido!','success'); sections.flayers(); });
   },
   limparFlayers() {
     if (confirm('Remover TODOS os encartes?')) {
-      flayerSys.salvar([]).then(() => {
-        registrarLog('excluir','Todos os encartes removidos');
-        notif('Limpo!','success');
-        flayerSys.parar();
-        sections.flayers();
-      });
+      flayerSys.salvar([]).then(() => { notif('Limpo!','success'); flayerSys.parar(); sections.flayers(); });
     }
   },
   testarFlayers() {
     if (!flayerSys.flayers.length) { notif('Sem encartes configurados!','warning'); return; }
     document.getElementById('adminPanel').style.display = 'none';
     flayerSys.parar(false);
-    setTimeout(() => { flayerSys.iniciarCiclo(() => notif('Encartes concluídos.','info')); }, 300);
+    setTimeout(() => {
+      flayerSys.iniciarCiclo(() => notif('Encartes concluídos — retornando ao vídeo.','info'));
+    }, 300);
     notif('Exibindo encartes...','success');
   },
 
+  // Apresentação
   addTextoAdicional() {
     const c = document.getElementById('listaTI');
     if (!c) return;
@@ -2553,55 +2385,27 @@ window.APP = {
     d.innerHTML = `<input type="text" class="adm-input texto-adicional-input" placeholder="Texto adicional ${idx}"><button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove()"><i class="fas fa-trash"></i></button>`;
     c.appendChild(d);
   },
-
-  // MODIFICADO: salva duração junto com a config
   salvarApresentacao() {
     const titulo   = document.getElementById('apresTitulo')?.value||'';
     const mensagem = document.getElementById('apresMensagem')?.value||'';
     const enabled  = document.getElementById('apresEnabled')?.checked !== false;
     const textos   = [...document.querySelectorAll('.texto-adicional-input')].map(i=>i.value.trim()).filter(t=>t!=='');
-    // NOVO: ler duração selecionada
-    const duracaoEl = document.querySelector('[name="apres_duracao"]:checked');
-    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 60;
-    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos,duracao})
-      .then(() => {
-        registrarLog('config','Apresentação configurada — duração: '+duracao+'s, ativa: '+(enabled?'sim':'não'));
-        this.salvarDados();
-        notif('Apresentação salva!','success');
-      }).catch(() => notif('Erro!','error'));
+    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos})
+      .then(() => { this.salvarDados(); notif('Apresentação salva!','success'); })
+      .catch(() => notif('Erro!','error'));
   },
   testarApresentacao() {
     document.getElementById('adminPanel').style.display = 'none';
     apresentSys.parar(false);
-    setTimeout(() => { apresentSys.iniciar(() => { notif('Apresentação concluída!','success'); }); }, 400);
+    setTimeout(() => {
+      apresentSys.iniciar(() => { notif('Apresentação concluída!','success'); });
+    }, 400);
     notif('Apresentação iniciada (teste)','success');
   },
   pararTudo() {
     apresentSys.parar(true);
     flayerSys.parar(true);
     notif('Voltando ao vídeo...','info');
-  },
-
-  // NOVO: filtrar log
-  filtrarLog() {
-    if (!window._logsTodos) return;
-    const unidade = document.getElementById('logFiltroUnidade')?.value||'';
-    const acao    = document.getElementById('logFiltroAcao')?.value||'';
-    let filtrados = window._logsTodos;
-    if (unidade) filtrados = filtrados.filter(l => l.unidade === unidade);
-    if (acao) filtrados = filtrados.filter(l => (l.acao||'').toLowerCase().includes(acao));
-    renderizarLog(filtrados);
-  },
-
-  // NOVO: limpar log
-  limparLog() {
-    if (!confirm('Limpar TODOS os logs? Esta ação não pode ser desfeita.')) return;
-    db.ref('logs').remove()
-      .then(() => {
-        window._logsTodos = [];
-        notif('Log limpo!','success');
-        sections.log();
-      }).catch(() => notif('Erro!','error'));
   },
 
   // Usuários
@@ -2624,7 +2428,7 @@ window.APP = {
             <div><label class="adm-label">Status</label>
               <select id="nUSt" class="adm-input"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select>
             </div>
-            <div><label class="adm-label">Unidades</label>
+            <div><label class="adm-label">Unidades <span class="adm-label-sub">Ctrl+Click = múltiplas</span></label>
               <div style="background:#f8f9fa;padding:12px;border-radius:8px;border:1.5px solid #d1d9e0">
                 <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="allUnits" onchange="document.querySelectorAll('.unit-cb').forEach(c=>c.checked=this.checked)"> <strong>Todas as unidades</strong></label>
                 ${listaUnidades.map(u=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;cursor:pointer"><input type="checkbox" class="unit-cb" value="${u.id}"> ${sanitize(u.nome)}</label>`).join('')}
@@ -2644,12 +2448,8 @@ window.APP = {
     if (listaUsuarios.find(u=>u.login===login)) { notif('Login já em uso!','error'); return; }
     const up = document.getElementById('allUnits')?.checked ? ['todas'] : [...document.querySelectorAll('.unit-cb:checked')].map(c=>c.value);
     db.ref('usuarios/u_'+Date.now()).set({nome,login,senha,nivel,unidades_permitidas:up,status,criado_em:new Date().toISOString()})
-      .then(() => {
-        registrarLog('criar','Usuário criado: '+nome+' ('+login+') nível '+nivel);
-        notif('Usuário criado!','success');
-        carregarTodosUsuarios();
-        setTimeout(()=>this.showSection('usuarios'),800);
-      }).catch(() => notif('Erro!','error'));
+      .then(() => { notif('Usuário criado!','success'); carregarTodosUsuarios(); setTimeout(()=>this.showSection('usuarios'),800); })
+      .catch(() => notif('Erro!','error'));
   },
   editarUsuario(uid) {
     const u = listaUsuarios.find(x=>x.id===uid);
@@ -2694,26 +2494,18 @@ window.APP = {
     db.ref('usuarios/'+uid).once('value').then(s => {
       const atual = s.val();
       db.ref('usuarios/'+uid).set({...atual, nome, login, nivel, unidades_permitidas:up, status, senha:ns||atual.senha, atualizado_em:new Date().toISOString()})
-        .then(()=>{
-          registrarLog('salvar','Usuário '+nome+' ('+login+') atualizado');
-          notif('Atualizado!','success');
-          carregarTodosUsuarios();
-          setTimeout(()=>this.showSection('usuarios'),800);
-        }).catch(()=>notif('Erro!','error'));
+        .then(()=>{ notif('Atualizado!','success'); carregarTodosUsuarios(); setTimeout(()=>this.showSection('usuarios'),800); })
+        .catch(()=>notif('Erro!','error'));
     });
   },
   excluirUsuario(uid,nome) {
     if (uid==='admin_gti') { notif('Não é possível excluir o admin principal!','error'); return; }
     if (confirm(`Excluir usuário "${nome}"?`)) {
-      db.ref('usuarios/'+uid).remove().then(()=>{
-        registrarLog('excluir','Usuário "'+nome+'" excluído');
-        notif('Excluído!','success');
-        carregarTodosUsuarios();
-        setTimeout(()=>this.showSection('usuarios'),800);
-      });
+      db.ref('usuarios/'+uid).remove().then(()=>{ notif('Excluído!','success'); carregarTodosUsuarios(); setTimeout(()=>this.showSection('usuarios'),800); });
     }
   },
 
+  // Unidades
   recarregarUnidades() { carregarTodasUnidades(()=>{ renderizarGridUnidades(); notif('Lista atualizada!','success'); }); },
   abrirUnidade(id) { window.open(location.origin+location.pathname+'?id='+id,'_blank'); },
   novaUnidade() {
@@ -2738,11 +2530,8 @@ window.APP = {
     db.ref('paineis/'+id).once('value').then(s=>{
       if (s.exists()) { notif('Unidade já existe!','error'); return; }
       db.ref('paineis/'+id).set({unidade:{nome,especialidades:[{nome:'Clínica Médica',faltas:0},{nome:'Pediatria',faltas:0}]},avisos:[],flayers:[],ultima_atualizacao:Date.now(),criado_em:new Date().toISOString()})
-        .then(()=>{
-          registrarLog('criar','Unidade "'+nome+'" criada (ID: '+id+')');
-          notif(`"${nome}" criada!`,'success');
-          carregarTodasUnidades(()=>this.showSection('unidades'));
-        }).catch(()=>notif('Erro!','error'));
+        .then(()=>{ notif(`"${nome}" criada!`,'success'); carregarTodasUnidades(()=>this.showSection('unidades')); })
+        .catch(()=>notif('Erro!','error'));
     });
   },
   editarUnidade(id) {
@@ -2771,24 +2560,17 @@ window.APP = {
     if (!nome) { notif('Digite um nome!','error'); return; }
     db.ref('paineis/'+id).once('value').then(s=>{
       db.ref('paineis/'+id).set({...s.val(),unidade:{...s.val().unidade,nome},ultima_atualizacao:Date.now()})
-        .then(()=>{
-          registrarLog('salvar','Nome da unidade '+id+' alterado para "'+nome+'"');
-          notif('Atualizada!','success');
-          carregarTodasUnidades(()=>this.showSection('unidades'));
-        });
+        .then(()=>{ notif('Atualizada!','success'); carregarTodasUnidades(()=>this.showSection('unidades')); });
     });
   },
   excluirUnidade(id,nome) {
     if (id==='geral') { notif('Não é possível excluir a Matriz!','error'); return; }
     if (confirm(`Excluir unidade "${nome}"? Esta ação não pode ser desfeita.`)) {
-      db.ref('paineis/'+id).remove().then(()=>{
-        registrarLog('excluir','Unidade "'+nome+'" (ID: '+id+') excluída');
-        notif('Unidade excluída!','success');
-        carregarTodasUnidades(()=>this.showSection('unidades'));
-      });
+      db.ref('paineis/'+id).remove().then(()=>{ notif('Unidade excluída!','success'); carregarTodasUnidades(()=>this.showSection('unidades')); });
     }
   },
 
+  // Monitor / Sync
   forceSync1(id) {
     db.ref('paineis/'+id+'/ultima_atualizacao').set(Date.now())
       .then(()=>notif('Sync solicitado!','success'));
@@ -2797,11 +2579,10 @@ window.APP = {
     if (!confirm('Forçar sincronização de TODAS as unidades?')) return;
     const agora = Date.now();
     Promise.all([...listaUnidades.map(u=>db.ref('paineis/'+u.id+'/ultima_atualizacao').set(agora)), db.ref('paineis/geral/ultima_atualizacao').set(agora)])
-      .then(()=>{
-        registrarLog('config','Sync forçado para todas as unidades ('+listaUnidades.length+')');
-        notif(`Sync enviado para ${listaUnidades.length+1} unidades!`,'success');
-      });
-  }
+      .then(()=>notif(`Sync enviado para ${listaUnidades.length+1} unidades!`,'success'));
+  },
+
+  salvarDados() { salvarFirebase().then(()=>{ atualizarFaltometro(); notif('Salvo!','success'); }).catch(()=>notif('Erro!','error')); }
 };
 
 // ─────────────────────────────────────────────
@@ -2822,13 +2603,20 @@ function notif(msg, tipo='info') {
 // ─────────────────────────────────────────────
 // START
 // ─────────────────────────────────────────────
+// Cria o admin padrão apenas se não existir NENHUM usuário no banco
 function garantirAdminInicial() {
+  // Bootstrap: cria admin padrão APENAS se o banco estiver vazio (primeira execução).
+  // IMPORTANTE: troque a senha imediatamente após o primeiro login em Gerenciar Usuários.
   db.ref('usuarios').once('value').then(snap => {
     const us = snap.val() || {};
-    if (Object.keys(us).length > 0) return;
+    if (Object.keys(us).length > 0) return; // já existe — não sobrescreve
     db.ref('usuarios/admin_gti').set({
-      nome: 'Administrador GTI', login: 'gti', senha: 'Itatilac2009',
-      nivel: 'super_admin', unidades_permitidas: ['todas'], status: 'ativo',
+      nome: 'Administrador GTI',
+      login: 'gti',
+      senha: 'Itatilac2009',  // Troque após o primeiro login!
+      nivel: 'super_admin',
+      unidades_permitidas: ['todas'],
+      status: 'ativo',
       criado_em: new Date().toISOString()
     });
   }).catch(() => {});
@@ -2836,7 +2624,7 @@ function garantirAdminInicial() {
 
 document.addEventListener('DOMContentLoaded', iniciar);
 
-})();
+})(); // fim do IIFE
 </script>
 </body>
 </html>
