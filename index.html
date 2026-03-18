@@ -632,7 +632,7 @@ let isMuted = true, tickerInterval = null;
 let loginAttempts = 0, loginBloqueado = false, loginBloqueioTimer = null;
 
 const syncConfig = {
-  interval: 10,
+  interval: 30,
   intervalMap: {
     3: {label:'3 minutos', cost:'Alto', costClass:'cost-alto'},
     6: {label:'6 minutos', cost:'Médio', costClass:'cost-medio'},
@@ -641,7 +641,7 @@ const syncConfig = {
     30:{label:'30 minutos',cost:'Mínimo',costClass:'cost-minimo'}
   },
   load() {
-    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||10; } catch(e) {}
+    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||30; } catch(e) {}
   },
   save() { localStorage.setItem('syncCfg_'+UNIDADE_ID, JSON.stringify({interval:this.interval})); }
 };
@@ -724,7 +724,7 @@ const rotacao = {
 const flayerSys = {
   flayers: [], isPlaying: false, currentIndex: 0, timer: null, onConcluido: null,
   init() {
-    db.ref('paineis/'+UNIDADE_ID+'/flayers').on('value', s => { this.flayers = s.val() || []; });
+    this.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
   },
   iniciarCiclo(onConcluido) {
     this.onConcluido = onConcluido; this.currentIndex = 0; this.isPlaying = true; this.proxFlayer();
@@ -815,9 +815,6 @@ const apresentSys = {
       this.config = Object.assign({}, this.defaultConfig, dadosUnidade.apresentacaoConfig);
     }
     this.duration = (this.config.duracao || 30) * 1000;
-    db.ref('paineis/'+UNIDADE_ID+'/apresentacaoConfig').on('value', s => {
-      if (s.val()) this.config = Object.assign({}, this.defaultConfig, s.val());
-    });
   },
 
   iniciar(onConcluido) {
@@ -1010,23 +1007,16 @@ const apresentSys = {
 // SYNC MANAGER
 // ─────────────────────────────────────────────
 const syncMgr = {
-  timer: null, syncing: false, done: false,
+  timer: null, syncing: false, done: false, started: false,
   init() {
+    if (this.started) return;
+    this.started = true;
     this.loadCache();
     this.startAuto();
-    db.ref('paineis/'+UNIDADE_ID+'/avisos').on('value', s => {
-      const a = s.val()||[];
-      dadosUnidade.avisos = a;
-      atualizarAvisos();
+    window.addEventListener('online', () => this.sync(true));
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) this.sync(true);
     });
-    if (!IS_MATRIZ) {
-      db.ref('paineis/'+UNIDADE_ID+'/ultima_atualizacao').on('value', s => {
-        const v = s.val();
-        if (v && (Date.now()-v) < 300000) this.sync();
-      });
-    }
-    db.ref('paineis/geral/avisos').on('value', s => { dadosGerais.avisos = s.val()||[]; atualizarAvisos(); });
-    db.ref('paineis/geral/unidade/videoUrls').on('value', s => { dadosGerais.unidade.videoUrls = s.val()||[]; carregarVideo(); });
   },
   async loadCache() {
     const c = await cache.get(UNIDADE_ID);
@@ -1049,16 +1039,24 @@ const syncMgr = {
     if (this.syncing) return;
     this.syncing = true;
     try {
-      const s = await db.ref('paineis/'+UNIDADE_ID).once('value');
-      let d = s.val();
+      const [unitSnap, geralSnap] = await Promise.all([
+        db.ref('paineis/'+UNIDADE_ID).once('value'),
+        db.ref('paineis/geral').once('value')
+      ]);
+      let d = unitSnap.val();
+      const gerais = geralSnap.val();
       if (!d) d = {unidade:{nome:IS_MATRIZ?'Matriz':'Unidade '+UNIDADE_ID,especialidades:[]},avisos:[]};
+      if (gerais) {
+        dadosGerais = gerais;
+        await cache.set('geral', dadosGerais);
+      }
       const cached = await cache.get(UNIDADE_ID);
       const cachedTs = (cached && cached.data) ? (cached.data.ultima_atualizacao || 0) : 0;
       const novoTs   = d.ultima_atualizacao || 0;
       const mudou    = novoTs > cachedTs || !this.done;
       d.ultima_sincronizacao = Date.now();
       await cache.set(UNIDADE_ID, d);
-      if (mudou || !this.done) { dadosUnidade = d; processarInterface(); }
+      if (mudou || !this.done || gerais) { dadosUnidade = d; processarInterface(); }
       this.done = true;
       ocultarLoading();
     } catch(e) {
@@ -1147,6 +1145,8 @@ function processarInterface() {
   if (dadosUnidade.apresentacaoConfig) {
     apresentSys.config = Object.assign({}, apresentSys.defaultConfig, dadosUnidade.apresentacaoConfig);
   }
+  flayerSys.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
+  carregarMsgsConscientizacao();
   atualizarFaltometro();
   carregarVideo();
   atualizarAvisos();
@@ -1239,15 +1239,13 @@ let faltoMsgIdx = 0;
 let faltoMsgTimer = null;
 
 function carregarMsgsConscientizacao() {
-  db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').on('value', s => {
-    const saved = s.val();
-    if (saved && Array.isArray(saved) && saved.length > 0) {
-      FALTO_MSGS = saved;
-    } else {
-      FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
-    }
-    faltoMsgIdx = 0;
-  });
+  const saved = dadosUnidade.faltoMsgs;
+  if (saved && Array.isArray(saved) && saved.length > 0) {
+    FALTO_MSGS = saved;
+  } else {
+    FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
+  }
+  faltoMsgIdx = 0;
 }
 
 function atualizarFaltometro() {
@@ -2303,6 +2301,9 @@ function salvarFirebase() {
   const agora = Date.now();
   dadosUnidade.ultima_atualizacao = agora;
   dadosUnidade.ultima_sincronizacao = agora;
+  dadosUnidade.flayers = Array.isArray(flayerSys.flayers) ? [...flayerSys.flayers] : [];
+  dadosUnidade.apresentacaoConfig = Object.assign({}, apresentSys.config || apresentSys.defaultConfig);
+  dadosUnidade.faltoMsgs = Array.isArray(FALTO_MSGS) ? [...FALTO_MSGS] : [];
   cache.set(UNIDADE_ID, dadosUnidade);
   const p1 = db.ref('paineis/'+UNIDADE_ID).set(dadosUnidade);
   if (IS_MATRIZ) {
@@ -2542,15 +2543,12 @@ window.APP = {
     if (!dadosUnidade.unidade.especialidades) dadosUnidade.unidade.especialidades = [];
     dadosUnidade.unidade.especialidades.push({nome:'Nova Especialidade',faltas:0});
     sections.faltometro();
-    registrarLog('criar','Nova especialidade adicionada');
-    this.salvarDados();
+    atualizarFaltometro();
   },
   removerEsp(i) {
-    const nome = dadosUnidade.unidade.especialidades[i]?.nome || '';
     dadosUnidade.unidade.especialidades.splice(i,1);
     sections.faltometro();
-    registrarLog('excluir','Especialidade "'+nome+'" removida');
-    this.salvarDados();
+    atualizarFaltometro();
   },
   atualizarEsp(i,campo,valor) {
     if (!dadosUnidade.unidade.especialidades[i]) return;
