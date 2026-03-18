@@ -793,6 +793,7 @@ const apresentSys = {
   duration: 90000,
   progressInterval: null,
   onConcluido: null,
+  _encerrarTimer: null,
 
   defaultConfig: {
     enabled: true,
@@ -913,7 +914,8 @@ const apresentSys = {
       setTimeout(() => this.animar(total), 400);
     });
     this.iniciarTimer();
-    setTimeout(() => this.encerrar(), this.duration);
+    if (this._encerrarTimer) clearTimeout(this._encerrarTimer);
+    this._encerrarTimer = setTimeout(() => this.encerrar(), this.duration);
   },
 
   animar(total) {
@@ -969,7 +971,9 @@ const apresentSys = {
   },
 
   encerrar() {
+    if (!this.isPlaying) return; // guard contra dupla chamada
     this.isPlaying = false;
+    if (this._encerrarTimer) { clearTimeout(this._encerrarTimer); this._encerrarTimer = null; }
     if (this.progressInterval) { clearInterval(this.progressInterval); this.progressInterval = null; }
     const el = document.getElementById('apresentacaoFullscreen');
     if (el) {
@@ -986,6 +990,8 @@ const apresentSys = {
 
   parar(reiniciar=true) {
     this.isPlaying = false;
+    if (this._encerrarTimer) { clearTimeout(this._encerrarTimer); this._encerrarTimer = null; }
+    this.onConcluido = null;
     if (this.progressInterval) { clearInterval(this.progressInterval); this.progressInterval = null; }
     const el = document.getElementById('apresentacaoFullscreen');
     if (el && el.parentNode) el.parentNode.removeChild(el);
@@ -1417,10 +1423,13 @@ const auth = {
   resetSessionTimer() {
     if (sessionTimer) clearTimeout(sessionTimer);
     sessionTimer = setTimeout(() => { notif('Sessão expirada por inatividade.','warning'); APP.logout(); }, SESSION_TIMEOUT);
+    // AbortController evita acumular listeners a cada chamada
+    if (this._sessionAbort) this._sessionAbort.abort();
+    this._sessionAbort = new AbortController();
     document.getElementById('adminPanel').addEventListener('click', () => {
       if (sessionTimer) clearTimeout(sessionTimer);
       sessionTimer = setTimeout(() => { notif('Sessão expirada.','warning'); APP.logout(); }, SESSION_TIMEOUT);
-    }, {once:false});
+    }, { signal: this._sessionAbort.signal });
   },
   trocarUsuario() {
     usuarioAtual = null; permissoesUsuario = null;
@@ -2496,6 +2505,7 @@ window.APP = {
     registrarLog('logout','Sessão encerrada');
     usuarioAtual = null; permissoesUsuario = null;
     if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
+    if (auth._sessionAbort) { auth._sessionAbort.abort(); auth._sessionAbort = null; }
     document.getElementById('adminPanel').style.display = 'none';
     notif('Sessão encerrada.','info');
     // Retomar ciclo de rotação
