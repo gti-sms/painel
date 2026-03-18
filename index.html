@@ -1752,58 +1752,86 @@ const sections = {
 
   flayers() {
     const urls = flayerSys.flayers || [];
+    const rows = urls.map((u,i) => `
+      <div class="falto-row" id="flayerRow${i}" style="grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center">
+        <div style="width:54px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          <img src="${sanitize(u)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextSibling.style.display='block'">
+          <i class="fas fa-image" style="display:none;color:#cbd5e1;font-size:16px"></i>
+        </div>
+        <input type="text" class="adm-input flayer-url-input" value="${sanitize(u)}" placeholder="URL da imagem (JPG/PNG)"
+          onchange="APP._flayerAutoSave()"
+          style="font-family:monospace;font-size:13px">
+        <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
+        <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerFlayer(${i})" title="Remover"><i class="fas fa-trash"></i></button>
+      </div>`).join('');
+
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div><div class="adm-card-desc">Exibidos 30 segundos cada, após os vídeos</div></div>
+          <div>
+            <div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div>
+            <div class="adm-card-desc">Exibidos 30 segundos cada, após os vídeos — alterações salvas automaticamente</div>
+          </div>
+          <button class="adm-btn-green" onclick="APP.adicionarFlayer()"><i class="fas fa-plus"></i> Adicionar</button>
         </div>
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ordem de exibição:</strong> Vídeos → <strong>Encartes aqui</strong> (30s/un.) → Apresentação Comunitária → Vídeos novamente</div>
+          <div><strong>Ordem:</strong> Vídeos → <strong>Encartes</strong> (30s cada) → Apresentação Comunitária → Vídeos</div>
         </div>
-        <div style="margin-bottom:20px">
-          <label class="adm-label">URLs das Imagens <span class="adm-label-sub">Uma por linha • JPG/PNG hospedados publicamente</span></label>
-          <textarea id="flayerUrls" class="adm-input" style="min-height:150px;font-family:monospace;font-size:13px">${urls.join('\n')}</textarea>
+        <div id="listaFlayers">
+          ${rows.length > 0 ? rows : `<div style="text-align:center;padding:32px;color:#9ca3af;border:2px dashed #e2e8f0;border-radius:12px">
+            <i class="fas fa-images" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:10px"></i>
+            Nenhum encarte cadastrado. Clique em <strong>Adicionar</strong>.
+          </div>`}
         </div>
-        <div class="adm-action-bar">
-          <button class="adm-btn-green" onclick="APP.salvarFlayers()"><i class="fas fa-save"></i> Salvar Encartes</button>
-          <button class="adm-btn-primary" onclick="APP.testarFlayers()"><i class="fas fa-play"></i> Testar Agora</button>
-          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Voltar ao Vídeo</button>
+        <div id="flayerSaveStatus" style="margin-top:10px;font-size:12px;color:#16a34a;display:none"><i class="fas fa-check-circle"></i> Salvo automaticamente</div>
+        <div class="adm-action-bar" style="margin-top:16px">
+          <button class="adm-btn-green" onclick="APP._flayerSalvarManual()"><i class="fas fa-save"></i> Salvar Agora</button>
+          <button class="adm-btn-primary" onclick="APP.testarFlayers()"><i class="fas fa-play"></i> Testar</button>
+          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar</button>
           <button class="adm-btn-danger" onclick="APP.limparFlayers()" style="margin-left:auto"><i class="fas fa-trash"></i> Limpar Todos</button>
-        </div>
-      </div>
-      <div class="adm-card">
-        <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-th-large"></i> Preview (${urls.length} encarte${urls.length!==1?'s':''})</div></div>
-        <div class="flayer-grid">
-          ${urls.length===0?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-images" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>Nenhum encarte configurado</div>`:
-          urls.map((u,i)=>`
-            <div class="flayer-card">
-              <div class="flayer-thumb">
-                <img src="${sanitize(u)}" alt="Encarte ${i+1}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
-                <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:12px;color:#9ca3af"><i class="fas fa-image" style="font-size:24px"></i></div>
-              </div>
-              <div class="flayer-card-info">
-                <div style="font-size:10px;color:#6b7280;word-break:break-all;margin-bottom:8px">${sanitize(u.length>35?u.substring(0,35)+'…':u)}</div>
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                  <span style="font-size:10px;background:#1565c0;color:#fff;padding:2px 8px;border-radius:12px;font-weight:700">${i+1}</span>
-                  <button class="adm-btn-icon adm-btn-icon-danger" style="width:28px;height:28px;font-size:11px" onclick="APP.removerFlayer(${i})"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-            </div>`).join('')}
         </div>
       </div>`;
   },
 
   video() {
     if (!IS_MATRIZ) { document.getElementById('admContent').innerHTML = `<div class="adm-card"><div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-lock"></i> Acesso Restrito</div></div><p style="color:#6b7280">Configuração de vídeos disponível apenas na Matriz.</p></div>`; return; }
+    const urls = dadosGerais.unidade.videoUrls || [];
+    const rows = urls.map((u,i) => {
+      const ytId = u.match(/(?:youtu\.be\/|v\/|watch\?v=|embed\/)([^#&?]{11})/)?.[1];
+      const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/default.jpg` : '';
+      return `<div class="falto-row" style="grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center">
+        <div style="width:64px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          ${thumb ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextSibling.style.display='block'"><i class="fas fa-video" style="display:none;color:#cbd5e1;font-size:16px"></i>` : '<i class="fas fa-video" style="color:#cbd5e1;font-size:16px"></i>'}
+        </div>
+        <input type="text" class="adm-input video-url-input" value="${sanitize(u)}" placeholder="URL do YouTube (youtube.com/watch?v=...)"
+          onchange="APP._videoAutoSave()"
+          style="font-family:monospace;font-size:13px">
+        <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
+        <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerVideo(${i})" title="Remover"><i class="fas fa-trash"></i></button>
+      </div>`;
+    }).join('');
+
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div><div class="adm-card-desc">URLs do YouTube — exibidos em todas as unidades</div></div></div>
-        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole uma URL por linha. Os vídeos ficam em loop e sem controles visíveis.</div>
-        <label class="adm-label">URLs do YouTube</label>
-        <textarea id="vUrls" class="adm-input" style="min-height:180px;font-family:monospace;font-size:14px">${(dadosGerais.unidade.videoUrls||[]).join('\n')}</textarea>
-        <div class="adm-action-bar">
-          <button class="adm-btn-green" onclick="APP.salvarVideos()"><i class="fas fa-save"></i> Salvar Vídeos</button>
+        <div class="adm-card-header">
+          <div>
+            <div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div>
+            <div class="adm-card-desc">YouTube — exibidos em todas as unidades — alterações salvas automaticamente</div>
+          </div>
+          <button class="adm-btn-green" onclick="APP.adicionarVideo()"><i class="fas fa-plus"></i> Adicionar</button>
+        </div>
+        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Os vídeos são reproduzidos em sequência, em loop, sem controles visíveis. Cole a URL completa do YouTube.</div>
+        <div id="listaVideos">
+          ${rows.length > 0 ? rows : `<div style="text-align:center;padding:32px;color:#9ca3af;border:2px dashed #e2e8f0;border-radius:12px">
+            <i class="fas fa-video" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:10px"></i>
+            Nenhum vídeo cadastrado. Clique em <strong>Adicionar</strong>.
+          </div>`}
+        </div>
+        <div id="videoSaveStatus" style="margin-top:10px;font-size:12px;color:#16a34a;display:none"><i class="fas fa-check-circle"></i> Salvo automaticamente</div>
+        <div class="adm-action-bar" style="margin-top:16px">
+          <button class="adm-btn-green" onclick="APP._videoSalvarManual()"><i class="fas fa-save"></i> Salvar Agora</button>
+          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Recarregar Vídeo</button>
         </div>
       </div>`;
   },
@@ -1812,11 +1840,11 @@ const sections = {
     const ci = syncConfig.interval;
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Frequência com que as TVs buscam dados atualizados</div></div></div>
+        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Frequência com que as TVs buscam dados atualizados — padrão: 30 min</div></div></div>
         <div class="adm-info-box warning"><i class="fas fa-exclamation-triangle"></i> Intervalos menores consomem mais leituras do Firebase. Intervalos maiores economizam custo mas atrasam atualizações.</div>
         <div class="sync-grid">
           ${Object.entries(syncConfig.intervalMap).map(([min,cfg])=>`
-            <div class="sync-card ${parseInt(min)===ci?'selected':''}" onclick="syncMgr.setInterval(${min})">
+            <div class="sync-card ${parseInt(min)===ci?'selected':''}" onclick="syncMgr.setInterval(${min});sections.sincronizacao()">
               <div class="sync-card-time">${min} min</div>
               <div class="sync-card-desc">${cfg.label}</div>
               <span class="sync-cost-badge ${cfg.costClass}">${cfg.cost}</span>
@@ -1883,23 +1911,40 @@ const sections = {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div>
           <h2 style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:2px"><i class="fas fa-satellite-dish" style="color:#1565c0;margin-right:8px"></i>Monitor de Atividades</h2>
-          <div style="font-size:13px;color:#6b7280">Visão em tempo real das unidades do sistema</div>
+          <div style="font-size:13px;color:#6b7280">Atualização em tempo real <span id="monitorLastUpdate" style="color:#16a34a;font-weight:600"></span></div>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="adm-btn-muted" onclick="APP.recarregarUnidades();sections.monitor()"><i class="fas fa-sync-alt"></i> Atualizar</button>
           <button class="adm-btn-primary" onclick="APP.forceSyncAll()"><i class="fas fa-broadcast-tower"></i> Sync Todas</button>
         </div>
       </div>
-      <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando dados...</div></div>`;
+      <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando...</div></div>`;
 
-    carregarTodasUnidades(() => {
-      // Buscar últimos logs para enriquecer o monitor
-      db.ref('logs').orderByChild('ts').limitToLast(50).once('value').then(s => {
-        const logs = [];
-        s.forEach(c => logs.unshift({id:c.key,...c.val()}));
-        renderMonitorGrafana(logs);
-      }).catch(() => renderMonitorGrafana([]));
-    });
+    // Cancelar listener anterior se existir
+    if (window._monitorUnsubscribe) { window._monitorUnsubscribe(); window._monitorUnsubscribe = null; }
+
+    const atualizar = () => {
+      carregarTodasUnidades(() => {
+        db.ref('logs').orderByChild('ts').limitToLast(50).once('value').then(s => {
+          const logs = [];
+          s.forEach(c => logs.unshift({id:c.key,...c.val()}));
+          renderMonitorGrafana(logs);
+          const el = document.getElementById('monitorLastUpdate');
+          if (el) el.textContent = '· ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }).catch(() => renderMonitorGrafana([]));
+      });
+    };
+
+    atualizar();
+
+    // Listener em tempo real: qualquer mudança nos paineis ou logs re-renderiza
+    const refPaineis = db.ref('paineis');
+    const refLogs = db.ref('logs').orderByChild('ts').limitToLast(1);
+    const cbPaineis = refPaineis.on('value', atualizar);
+    const cbLogs = refLogs.on('value', atualizar);
+    window._monitorUnsubscribe = () => {
+      refPaineis.off('value', cbPaineis);
+      refLogs.off('value', cbLogs);
+    };
   },
 
   // NOVO: Log do sistema
@@ -1945,6 +1990,9 @@ const sections = {
         <div id="logFooter" style="margin-top:12px;font-size:12px;color:#9ca3af;text-align:right"></div>
       </div>`;
 
+    // Cancelar listener anterior se existir
+    if (window._logUnsubscribe) { window._logUnsubscribe(); window._logUnsubscribe = null; }
+
     // Preencher filtro de unidades
     carregarTodasUnidades(() => {
       const sel = document.getElementById('logFiltroUnidade');
@@ -1957,16 +2005,16 @@ const sections = {
       }
     });
 
-    // Carregar logs do Firebase
-    db.ref('logs').orderByChild('ts').limitToLast(500).once('value').then(s => {
+    // Listener em tempo real para novos logs
+    const refLogs = db.ref('logs').orderByChild('ts').limitToLast(500);
+    const cbLogs = refLogs.on('value', s => {
       const logs = [];
       s.forEach(entry => logs.unshift({id:entry.key,...entry.val()}));
       window._logsTodos = logs;
       renderizarLog(logs);
-    }).catch(() => {
-      document.getElementById('logContainer').innerHTML =
-        '<div style="text-align:center;padding:40px;color:#ef4444"><i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px"></i>Erro ao carregar logs</div>';
+      APP.filtrarLog();
     });
+    window._logUnsubscribe = () => refLogs.off('value', cbLogs);
   },
 
   // NOVO: Backup / Restaurar
@@ -2545,6 +2593,9 @@ window.APP = {
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
+    // Cancelar listeners em tempo real ao sair das seções
+    if (window._monitorUnsubscribe) { window._monitorUnsubscribe(); window._monitorUnsubscribe = null; }
+    if (window._logUnsubscribe) { window._logUnsubscribe(); window._logUnsubscribe = null; }
     document.querySelectorAll('.adm-nav-item').forEach(i => i.classList.remove('active'));
     const navEl = document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1));
     if (navEl) navEl.classList.add('active');
@@ -2672,24 +2723,143 @@ window.APP = {
   },
 
   salvarVideos() {
-    dadosGerais.unidade.videoUrls = document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='');
+    dadosGerais.unidade.videoUrls = document.getElementById('vUrls')
+      ? document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='')
+      : [...document.querySelectorAll('.video-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
     registrarLog('salvar','URLs de vídeos globais atualizadas ('+dadosGerais.unidade.videoUrls.length+' vídeos)');
     this.salvarDados();
   },
 
+  // Métodos para campos individuais de vídeo
+  adicionarVideo() {
+    const lista = document.getElementById('listaVideos');
+    if (!lista) return;
+    const i = lista.querySelectorAll('.falto-row').length;
+    const div = document.createElement('div');
+    div.className = 'falto-row';
+    div.style.cssText = 'grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center';
+    div.innerHTML = `
+      <div style="width:64px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-video" style="color:#cbd5e1;font-size:16px"></i></div>
+      <input type="text" class="adm-input video-url-input" placeholder="URL do YouTube (youtube.com/watch?v=...)" onchange="APP._videoAutoSave()" style="font-family:monospace;font-size:13px">
+      <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
+      <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerVideo(this)" title="Remover"><i class="fas fa-trash"></i></button>`;
+    lista.appendChild(div);
+  },
+  removerVideo(btnOrIdx) {
+    if (typeof btnOrIdx === 'number') {
+      const lista = document.getElementById('listaVideos');
+      if (lista) { const rows = lista.querySelectorAll('.falto-row'); if (rows[btnOrIdx]) rows[btnOrIdx].remove(); }
+    } else {
+      btnOrIdx.closest('.falto-row').remove();
+    }
+    this._videoAutoSave();
+  },
+  _coletarUrlsVideo() {
+    return [...document.querySelectorAll('.video-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
+  },
+  _videoAutoSave: (function() {
+    let t = null;
+    return function() {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => {
+        const urls = APP._coletarUrlsVideo();
+        dadosGerais.unidade.videoUrls = urls;
+        const agora = Date.now();
+        dadosGerais.ultima_atualizacao = agora;
+        db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
+          registrarLog('salvar','Vídeos atualizados automaticamente ('+urls.length+')');
+          const s = document.getElementById('videoSaveStatus');
+          if (s) { s.style.display='block'; setTimeout(()=>s.style.display='none',3000); }
+        });
+      }, 1200);
+    };
+  })(),
+  _videoSalvarManual() {
+    const urls = this._coletarUrlsVideo();
+    dadosGerais.unidade.videoUrls = urls;
+    const agora = Date.now();
+    dadosGerais.ultima_atualizacao = agora;
+    db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
+      registrarLog('salvar','Vídeos salvos manualmente ('+urls.length+')');
+      notif(urls.length+' vídeo(s) salvos!','success');
+    });
+  },
+
   salvarFlayers() {
-    const urls = document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='');
+    const urls = document.getElementById('flayerUrls')
+      ? document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='')
+      : [...document.querySelectorAll('.flayer-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
     flayerSys.salvar(urls).then(() => {
       registrarLog('salvar','Encartes atualizados ('+urls.length+' encarte(s))');
       notif(`${urls.length} encarte(s) salvos!`,'success');
       sections.flayers();
     });
   },
-  removerFlayer(i) {
-    const urls = [...flayerSys.flayers]; urls.splice(i,1);
+
+  // Métodos para campos individuais de flayer
+  adicionarFlayer() {
+    const lista = document.getElementById('listaFlayers');
+    if (!lista) return;
+    // Remover placeholder se existir
+    const placeholder = lista.querySelector('div[style*="dashed"]');
+    if (placeholder) placeholder.remove();
+    const i = lista.querySelectorAll('.falto-row').length;
+    const div = document.createElement('div');
+    div.className = 'falto-row';
+    div.style.cssText = 'grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center';
+    div.innerHTML = `
+      <div style="width:54px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="color:#cbd5e1;font-size:16px"></i></div>
+      <input type="text" class="adm-input flayer-url-input" placeholder="URL da imagem (JPG/PNG hospedada)" onchange="APP._flayerAutoSave()" oninput="APP._flayerPreviewThumb(this)" style="font-family:monospace;font-size:13px">
+      <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
+      <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerFlayer(this)" title="Remover"><i class="fas fa-trash"></i></button>`;
+    lista.appendChild(div);
+  },
+  _flayerPreviewThumb(input) {
+    const thumb = input.closest('.falto-row').querySelector('img');
+    if (!thumb) {
+      const div = input.closest('.falto-row').querySelector('div[style*="54px"]');
+      if (div) {
+        div.innerHTML = `<img src="${sanitize(input.value)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+      }
+    } else {
+      thumb.src = input.value;
+    }
+  },
+  removerFlayer(btnOrIdx) {
+    if (typeof btnOrIdx === 'number') {
+      const urls = [...flayerSys.flayers]; urls.splice(btnOrIdx,1);
+      flayerSys.salvar(urls).then(() => {
+        registrarLog('excluir','Encarte #'+(btnOrIdx+1)+' removido');
+        notif('Removido!','success');
+        sections.flayers();
+      });
+    } else {
+      btnOrIdx.closest('.falto-row').remove();
+      this._flayerAutoSave();
+    }
+  },
+  _coletarUrlsFlayer() {
+    return [...document.querySelectorAll('.flayer-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
+  },
+  _flayerAutoSave: (function() {
+    let t = null;
+    return function() {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => {
+        const urls = APP._coletarUrlsFlayer();
+        flayerSys.salvar(urls).then(() => {
+          registrarLog('salvar','Encartes salvos automaticamente ('+urls.length+')');
+          const s = document.getElementById('flayerSaveStatus');
+          if (s) { s.style.display='block'; setTimeout(()=>s.style.display='none',3000); }
+        });
+      }, 1200);
+    };
+  })(),
+  _flayerSalvarManual() {
+    const urls = this._coletarUrlsFlayer();
     flayerSys.salvar(urls).then(() => {
-      registrarLog('excluir','Encarte #'+(i+1)+' removido');
-      notif('Removido!','success');
+      registrarLog('salvar','Encartes salvos manualmente ('+urls.length+')');
+      notif(urls.length+' encarte(s) salvos!','success');
       sections.flayers();
     });
   },
@@ -3121,3 +3291,4 @@ document.addEventListener('DOMContentLoaded', iniciar);
 </script>
 </body>
 </html>
+
