@@ -1025,7 +1025,11 @@ const syncMgr = {
       });
     }
     db.ref('paineis/geral/avisos').on('value', s => { dadosGerais.avisos = s.val()||[]; atualizarAvisos(); });
-    db.ref('paineis/geral/unidade/videoUrls').on('value', s => { dadosGerais.unidade.videoUrls = s.val()||[]; carregarVideo(); });
+    db.ref('paineis/geral/unidade/videoUrls').on('value', s => {
+      dadosGerais.unidade.videoUrls = s.val()||[];
+      if (IS_MATRIZ && dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls;
+      carregarVideo();
+    });
   },
   async loadCache() {
     const c = await cache.get(UNIDADE_ID);
@@ -2011,8 +2015,13 @@ const sections = {
       const logs = [];
       s.forEach(entry => logs.unshift({id:entry.key,...entry.val()}));
       window._logsTodos = logs;
-      renderizarLog(logs);
-      APP.filtrarLog();
+      // Aplicar filtros ativos (se não tiver filtro, renderiza tudo)
+      const unidadeFiltro = document.getElementById('logFiltroUnidade')?.value||'';
+      const acaoFiltro    = document.getElementById('logFiltroAcao')?.value||'';
+      let filtrados = logs;
+      if (unidadeFiltro) filtrados = filtrados.filter(l => l.unidade === unidadeFiltro);
+      if (acaoFiltro)    filtrados = filtrados.filter(l => (l.acao||'').toLowerCase().includes(acaoFiltro));
+      renderizarLog(filtrados);
     });
     window._logUnsubscribe = () => refLogs.off('value', cbLogs);
   },
@@ -2418,14 +2427,19 @@ function salvarFirebase() {
   const agora = Date.now();
   dadosUnidade.ultima_atualizacao = agora;
   dadosUnidade.ultima_sincronizacao = agora;
-  cache.set(UNIDADE_ID, dadosUnidade);
-  const p1 = db.ref('paineis/'+UNIDADE_ID).set(dadosUnidade);
+
   if (IS_MATRIZ) {
+    // Garantir que videoUrls do dadosGerais esteja dentro do dadosUnidade
+    // (evita o bug de dois writes no mesmo path que destruía nome/especialidades)
+    if (!dadosUnidade.unidade) dadosUnidade.unidade = {};
+    dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls || dadosUnidade.unidade.videoUrls || [];
     dadosGerais.ultima_atualizacao = agora;
-    cache.set('geral', dadosGerais);
-    return p1.then(() => db.ref('paineis/geral').set(dadosGerais));
+    cache.set('geral', dadosUnidade);
   }
-  return p1;
+
+  cache.set(UNIDADE_ID, dadosUnidade);
+  // Write único — não sobrescreve mais com dadosGerais
+  return db.ref('paineis/'+UNIDADE_ID).set(dadosUnidade);
 }
 
 function renderizarGridUnidades() {
@@ -2726,8 +2740,12 @@ window.APP = {
     dadosGerais.unidade.videoUrls = document.getElementById('vUrls')
       ? document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='')
       : [...document.querySelectorAll('.video-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
+    if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls;
     registrarLog('salvar','URLs de vídeos globais atualizadas ('+dadosGerais.unidade.videoUrls.length+' vídeos)');
-    this.salvarDados();
+    // Salva o campo específico de videoUrls e o dadosUnidade completo (sem duplo write destrutivo)
+    db.ref('paineis/geral/unidade/videoUrls').set(dadosGerais.unidade.videoUrls)
+      .then(() => notif(dadosGerais.unidade.videoUrls.length+' vídeo(s) salvos!','success'))
+      .catch(() => notif('Erro ao salvar vídeos!','error'));
   },
 
   // Métodos para campos individuais de vídeo
@@ -2764,8 +2782,7 @@ window.APP = {
       t = setTimeout(() => {
         const urls = APP._coletarUrlsVideo();
         dadosGerais.unidade.videoUrls = urls;
-        const agora = Date.now();
-        dadosGerais.ultima_atualizacao = agora;
+        if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = urls;
         db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
           registrarLog('salvar','Vídeos atualizados automaticamente ('+urls.length+')');
           const s = document.getElementById('videoSaveStatus');
@@ -2777,8 +2794,7 @@ window.APP = {
   _videoSalvarManual() {
     const urls = this._coletarUrlsVideo();
     dadosGerais.unidade.videoUrls = urls;
-    const agora = Date.now();
-    dadosGerais.ultima_atualizacao = agora;
+    if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = urls;
     db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
       registrarLog('salvar','Vídeos salvos manualmente ('+urls.length+')');
       notif(urls.length+' vídeo(s) salvos!','success');
@@ -3291,4 +3307,3 @@ document.addEventListener('DOMContentLoaded', iniciar);
 </script>
 </body>
 </html>
-
