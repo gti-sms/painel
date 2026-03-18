@@ -786,7 +786,7 @@ const flayerSys = {
 };
 
 // ─────────────────────────────────────────────
-// APRESENTAÇÃO — MODIFICADO: duração configurável, padrão 1 min
+// APRESENTAÇÃO COMUNITÁRIA
 // ─────────────────────────────────────────────
 const apresentSys = {
   isPlaying: false,
@@ -796,6 +796,7 @@ const apresentSys = {
 
   defaultConfig: {
     enabled: true,
+    duracao: 90,
     titulo: 'Sua Consulta\nFaz a Diferença!',
     mensagemPrincipal: 'As faltas às consultas afetam você, sua família e toda a comunidade. Cada vaga não utilizada é um recurso desperdiçado que poderia ajudar outra pessoa.',
     textosAdicionais: [
@@ -823,6 +824,8 @@ const apresentSys = {
       if (onConcluido) onConcluido();
       return;
     }
+    // Duração configurável: 30s, 1min (60s) ou 2min (120s)
+    this.duration = (this.config.duracao || 90) * 1000;
     this.isPlaying = true;
     this.renderizar();
   },
@@ -851,6 +854,11 @@ const apresentSys = {
       </div>`;
     }).join('');
 
+    const durSec = Math.floor(this.duration / 1000);
+    const durLabel = durSec >= 60
+      ? `${Math.floor(durSec/60)}:${(durSec%60).toString().padStart(2,'0')}`
+      : `${durSec}s`;
+
     const tituloHtml = sanitize(cfg.titulo).replace(/\n/g,'<br>');
     const el = document.createElement('div');
     el.id = 'apresentacaoFullscreen';
@@ -871,7 +879,7 @@ const apresentSys = {
           <div class="apres-header-tag"><i class="fas fa-info-circle"></i> Informação à Comunidade</div>
           <div class="apres-timer-wrap">
             <div class="apres-timer-bar-outer"><div id="apresBar" class="apres-timer-bar-inner"></div></div>
-            <div id="apresCount" class="apres-timer-count"></div>
+            <div id="apresCount" class="apres-timer-count">${durLabel}</div>
           </div>
         </div>
       </div>
@@ -935,9 +943,13 @@ const apresentSys = {
   },
 
   iniciarTimer() {
-    const bar = document.getElementById('apresBar');
+    const bar   = document.getElementById('apresBar');
     const count = document.getElementById('apresCount');
     const totalSec = Math.floor(this.duration / 1000);
+    const fmt = s => s >= 60
+      ? `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`
+      : `${s}s`;
+
     if (bar) {
       bar.style.transition = 'none';
       bar.style.width = '100%';
@@ -947,11 +959,11 @@ const apresentSys = {
       }, 100);
     }
     let rem = totalSec;
-    if (count) count.textContent = rem + 's';
+    if (count) count.textContent = fmt(totalSec);
     if (this.progressInterval) clearInterval(this.progressInterval);
     this.progressInterval = setInterval(() => {
       rem--;
-      if (count) count.textContent = Math.max(0, rem) + 's';
+      if (count) count.textContent = fmt(Math.max(0, rem));
       if (rem <= 0) clearInterval(this.progressInterval);
     }, 1000);
   },
@@ -1155,37 +1167,66 @@ function carregarVideo() {
 function criarPlayer(ids) {
   if (!ids) { ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean); }
   if (ids.length === 0) return;
+
+  // Se o player já existe e está funcional, apenas reinicia a playlist
   if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
     try {
-      ytPlayer.cuePlaylist({ listType:'playlist', list: ids.join(',') });
-      ytPlayer.loadVideoById(ids[0]);
+      ytPlayer.cuePlaylist(ids);
+      ytPlayer.playVideo();
       if (!isMuted) ytPlayer.unMute();
       return;
-    } catch(e) { ytPlayer = null; }
+    } catch(e) {
+      // player morreu — recria abaixo
+      ytPlayer = null;
+    }
   }
+
   const container = document.getElementById('videoContainer');
   if (!container) return;
   container.style.display = 'block';
   try { if (ytPlayer) ytPlayer.destroy(); } catch(e) {}
   ytPlayer = null;
   container.innerHTML = '<div id="ytPlayerEl" style="width:100%;height:100%"></div>';
+
   ytPlayer = new YT.Player('ytPlayerEl', {
-    width: '100%', height: '100%', videoId: ids[0],
-    playerVars: { autoplay:1, mute:isMuted?1:0, controls:0, rel:0, loop:0, playlist:ids.join(','), playsinline:1, modestbranding:1, iv_load_policy:3 },
+    width: '100%',
+    height: '100%',
+    videoId: ids[0],
+    playerVars: {
+      autoplay: 1,
+      mute: isMuted ? 1 : 0,
+      controls: 0,
+      rel: 0,
+      loop: 0,
+      playlist: ids.join(','),
+      playsinline: 1,
+      modestbranding: 1,
+      iv_load_policy: 3
+    },
     events: {
-      onReady(e) { e.target.playVideo(); },
+      onReady(e) {
+        e.target.playVideo();
+      },
       onStateChange(e) {
         if (rotacao.emCiclo) return;
+        // Estado 0 = ENDED, -1 = não iniciado
         if (e.data === 0 || e.data === -1) {
           const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
           const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
           const total = lista ? lista.length : 1;
           const ultimo = !lista || idx < 0 || idx >= total - 1;
-          if (ultimo && e.data === 0) rotacao.playlistTerminou();
+          if (ultimo && e.data === 0) {
+            rotacao.playlistTerminou();
+          }
         }
       },
       onError(e) {
-        setTimeout(() => { if (ytPlayer && typeof ytPlayer.nextVideo === 'function') ytPlayer.nextVideo(); }, 2000);
+        // Tentar próximo vídeo em caso de erro
+        setTimeout(() => {
+          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
+            ytPlayer.nextVideo();
+          }
+        }, 2000);
       }
     }
   });
@@ -1367,6 +1408,10 @@ const auth = {
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
+    // Suspender rotação enquanto o painel está aberto
+    rotacao.emCiclo = true;
+    apresentSys.parar(false);
+    flayerSys.parar(false);
   },
   iniciarSessionTimer() {},
   resetSessionTimer() {
@@ -1571,6 +1616,13 @@ const sections = {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const textos = (cfg.textosAdicionais||[]);
     while (textos.length < 3) textos.push('');
+    const duracaoAtual = cfg.duracao || 90;
+    const durOpts = [
+      {val:30,  label:'30 seg'},
+      {val:60,  label:'1 min'},
+      {val:90,  label:'1:30 min'},
+      {val:120, label:'2 min'}
+    ];
 
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
@@ -1588,7 +1640,22 @@ const sections = {
 
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ciclo de rotação:</strong> Vídeos → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos</div>
+          <div><strong>Ciclo de rotação:</strong> Todos os Vídeos → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos (loop infinito)</div>
+        </div>
+
+        <!-- Seletor de duração -->
+        <div style="margin-bottom:20px">
+          <label class="adm-label"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            ${durOpts.map(op=>`
+              <label style="cursor:pointer;flex:1">
+                <input type="radio" name="apres_duracao" value="${op.val}" ${duracaoAtual===op.val?'checked':''} style="display:none">
+                <div onclick="document.querySelectorAll('[name=apres_duracao]').forEach(r=>r.closest('label').querySelector('.dur-opt').style.cssText='border:2px solid #e2e8f0;background:#fff;color:#1e293b');this.style.cssText='border:2px solid #1565c0;background:#eff6ff;color:#1565c0';this.previousElementSibling.checked=true"
+                  class="dur-opt" style="border:2px solid ${duracaoAtual===op.val?'#1565c0':'#e2e8f0'};background:${duracaoAtual===op.val?'#eff6ff':'#fff'};color:${duracaoAtual===op.val?'#1565c0':'#1e293b'};border-radius:10px;padding:12px;text-align:center;font-size:18px;font-weight:800;transition:all .2s">
+                  ${op.label}
+                </div>
+              </label>`).join('')}
+          </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -1628,7 +1695,7 @@ const sections = {
         <div style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
           <div style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
             <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b19"></i></div>
-            <span style="font-size:13px;color:rgba(255,255,255,.65)">Apresentação de 90s — aparece após flayers no ciclo</span>
+            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'1:30 min'} — aparece após todos os flayers no ciclo</span>
             <div style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
           </div>
           <div style="display:grid;grid-template-columns:1.5fr 1fr;min-height:200px">
@@ -2431,6 +2498,9 @@ window.APP = {
     if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
     document.getElementById('adminPanel').style.display = 'none';
     notif('Sessão encerrada.','info');
+    // Retomar ciclo de rotação
+    rotacao.emCiclo = false;
+    setTimeout(() => carregarVideo(), 300);
   },
 
   showSection(id) {
@@ -2623,9 +2693,11 @@ window.APP = {
     const mensagem = document.getElementById('apresMensagem')?.value||'';
     const enabled  = document.getElementById('apresEnabled')?.checked !== false;
     const textos   = [...document.querySelectorAll('.texto-adicional-input')].map(i=>i.value.trim()).filter(t=>t!=='');
-    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos})
+    const duracaoEl = document.querySelector('[name="apres_duracao"]:checked');
+    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 90;
+    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos,duracao})
       .then(() => {
-        registrarLog('config','Apresentação configurada — ativa: '+(enabled?'sim':'não'));
+        registrarLog('config','Apresentação configurada — duração: '+duracao+'s, ativa: '+(enabled?'sim':'não'));
         this.salvarDados();
         notif('Apresentação salva!','success');
       }).catch(() => notif('Erro!','error'));
