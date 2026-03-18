@@ -613,12 +613,6 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .notif-info{background:linear-gradient(135deg,var(--blue-900),var(--blue-700))}
 
 .version-tag{font-size:11px;color:rgba(255,255,255,.25);padding:8px 20px;text-align:right;background:rgba(0,0,0,.15)}
-.dur-card{background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
-.dur-card:hover{background:#eff6ff;border-color:#93c5fd;transform:translateY(-2px)}
-.dur-card.dur-sel{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:var(--blue-700);box-shadow:0 4px 12px rgba(21,101,192,.18)}
-.dur-num{font-family:'Bebas Neue',monospace;font-size:28px;color:#1e40af;line-height:1;margin-bottom:4px}
-.dur-card.dur-sel .dur-num{color:var(--blue-700)}
-.dur-label{font-size:11px;color:#64748b;font-weight:600;letter-spacing:.3px}
 @media(max-width:1920px){html,body{width:100%;height:100%}}
 </style>
 </head>
@@ -839,14 +833,12 @@ const cache = {
 };
 
 // ─────────────────────────────────────────────
-// ROTAÇÃO: vídeos → flayers → apresentação → loop
+// ROTAÇÃO: YouTube IFrame API detecta fim da
+// playlist → flayers → apresentação → reinicia
 // ─────────────────────────────────────────────
-let ytPlayer      = null;
-let ytApiPronto   = false;
-let ytPendente    = false;
-let ytIds         = [];     // IDs da playlist atual
-let ytTotalVideos = 0;      // quantos vídeos há na fila
-let ytVideosVisto = 0;      // quantos vídeos já terminaram
+let ytPlayer = null;
+let ytApiPronto = false;
+let ytPendente = false;
 
 // Callback global exigido pela YouTube IFrame API
 window.onYouTubeIframeAPIReady = function() {
@@ -857,12 +849,10 @@ window.onYouTubeIframeAPIReady = function() {
 const rotacao = {
   emCiclo: false,
 
-  // Chamado quando TODOS os vídeos da fila terminaram
   playlistTerminou() {
     if (this.emCiclo) return;
     if (flayerSys.isPlaying || apresentSys.isPlaying) return;
     this.emCiclo = true;
-    ytVideosVisto = 0;
     this.iniciarCiclo();
   },
 
@@ -877,20 +867,16 @@ const rotacao = {
 
   resetar() {
     this.emCiclo = false;
+    // Garantir que flayers e apresentação estejam limpos
     flayerSys.isPlaying = false;
     if (flayerSys.timer) { clearTimeout(flayerSys.timer); flayerSys.timer = null; }
-
-    // Restaurar visibilidade do container de vídeo
+    // Garantir visibilidade do container de vídeo
     const vc = document.getElementById('videoContainer');
     const fc = document.getElementById('flayerContainer');
-    const bs = document.getElementById('btnSom');
+    if (vc) vc.style.display = 'block';
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
-    if (vc) { vc.style.display = 'block'; }
-    if (bs) bs.style.display = isMuted ? 'block' : 'none';
-
-    // Reiniciar player do zero para garantir que tudo funciona
-    ytPlayer = null;
-    setTimeout(() => carregarVideo(), 600);
+    // Pequeno delay para o DOM se estabilizar antes de recriar o player
+    setTimeout(() => carregarVideo(), 400);
   }
 };
 
@@ -998,7 +984,7 @@ const flayerSys = {
 // ─────────────────────────────────────────────
 const apresentSys = {
   isPlaying: false,
-  duration: 90000,          // padrão 1:30 — sobrescrito pela config do Firebase
+  duration: 90000,
   progressInterval: null,
   onConcluido: null,
 
@@ -1018,13 +1004,9 @@ const apresentSys = {
     this.config = Object.assign({}, this.defaultConfig);
     if (dadosUnidade.apresentacaoConfig) {
       this.config = Object.assign({}, this.defaultConfig, dadosUnidade.apresentacaoConfig);
-      if (this.config.duracao) this.duration = parseInt(this.config.duracao) * 1000;
     }
     db.ref('paineis/'+UNIDADE_ID+'/apresentacaoConfig').on('value', s => {
-      if (s.val()) {
-        this.config = Object.assign({}, this.defaultConfig, s.val());
-        if (this.config.duracao) this.duration = parseInt(this.config.duracao) * 1000;
-      }
+      if (s.val()) this.config = Object.assign({}, this.defaultConfig, s.val());
     });
   },
 
@@ -1376,74 +1358,74 @@ function carregarVideo() {
 }
 
 function criarPlayer(ids) {
-  if (!ids) ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
+  if (!ids) {
+    ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
+  }
   if (ids.length === 0) return;
 
-  // Garantir container visível e limpo
+  // Se o player já existe e está funcional, apenas reinicia a playlist
+  if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
+    try {
+      ytPlayer.cuePlaylist({ listType:'playlist', list: ids.join(',') });
+      ytPlayer.loadVideoById(ids[0]);
+      if (!isMuted) ytPlayer.unMute();
+      return;
+    } catch(e) {
+      // player morreu — recria abaixo
+      ytPlayer = null;
+    }
+  }
+
+  // Criar novo player do zero
   const container = document.getElementById('videoContainer');
   if (!container) return;
   container.style.display = 'block';
 
-  // Destruir player anterior sempre (evita estado inconsistente)
-  try { if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy(); } catch(e) {}
+  // Remover iframe anterior se existir
+  try { if (ytPlayer) ytPlayer.destroy(); } catch(e) {}
   ytPlayer = null;
-  container.innerHTML = '';
-
-  // Criar elemento alvo
-  const el = document.createElement('div');
-  el.id = 'ytPlayerEl';
-  el.style.cssText = 'width:100%;height:100%';
-  container.appendChild(el);
-
-  // Registrar quantos vídeos há na fila
-  ytIds = ids;
-  ytTotalVideos = ids.length;
-  ytVideosVisto = 0;
+  container.innerHTML = '<div id="ytPlayerEl" style="width:100%;height:100%"></div>';
 
   ytPlayer = new YT.Player('ytPlayerEl', {
     width: '100%',
     height: '100%',
     videoId: ids[0],
     playerVars: {
-      autoplay:        1,
-      mute:            isMuted ? 1 : 0,
-      controls:        0,
-      rel:             0,
-      loop:            0,          // SEM loop — detectamos fim manualmente
-      playlist:        ids.join(','),
-      playsinline:     1,
-      modestbranding:  1,
-      iv_load_policy:  3,
-      disablekb:       1
+      autoplay: 1,
+      mute: isMuted ? 1 : 0,
+      controls: 0,
+      rel: 0,
+      loop: 0,
+      playlist: ids.join(','),
+      playsinline: 1,
+      modestbranding: 1,
+      iv_load_policy: 3
     },
     events: {
       onReady(e) {
-        e.target.setVolume(80);
         e.target.playVideo();
       },
       onStateChange(e) {
-        if (rotacao.emCiclo) return;
-
-        // Estado 0 = ENDED (vídeo atual terminou)
-        if (e.data === YT.PlayerState.ENDED) {
-          ytVideosVisto++;
-          if (ytVideosVisto >= ytTotalVideos) {
-            // Todos os vídeos da fila terminaram → iniciar ciclo
+        if (rotacao.emCiclo) return; // já em ciclo, ignorar
+        // Estado 0 = ENDED, -1 = não iniciado (fim da lista volta a -1 em alguns casos)
+        if (e.data === 0 || e.data === -1) {
+          const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
+          const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
+          const total = lista ? lista.length : 1;
+          const ultimo = !lista || idx < 0 || idx >= total - 1;
+          if (ultimo && e.data === 0) {
             rotacao.playlistTerminou();
           }
-          // Se ainda há vídeos, o YouTube avança automaticamente
         }
       },
-      onError() {
-        // Vídeo bloqueado/inválido: contar como visto e avançar
-        ytVideosVisto++;
-        if (ytVideosVisto >= ytTotalVideos) {
-          rotacao.playlistTerminou();
-        } else {
-          setTimeout(() => {
-            try { if (ytPlayer) ytPlayer.nextVideo(); } catch(e) {}
-          }, 1500);
-        }
+      onError(e) {
+        // Erros 2, 5, 100, 101, 150: vídeo inválido/bloqueado
+        // Tentar próximo vídeo
+        setTimeout(() => {
+          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
+            ytPlayer.nextVideo();
+          }
+        }, 2000);
       }
     }
   });
@@ -1890,27 +1872,7 @@ const sections = {
 
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ciclo de rotação:</strong> Vídeos (todos) → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos em loop</div>
-        </div>
-
-        <!-- Duração da apresentação -->
-        <div style="margin-bottom:22px">
-          <label class="adm-label"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-            <div class="dur-card ${(cfg.duracao||90)==60?'dur-sel':''}" onclick="APP.setDuracao(60)" id="dur60">
-              <div class="dur-num">1:00</div><div class="dur-label">1 minuto</div>
-            </div>
-            <div class="dur-card ${(cfg.duracao||90)==90?'dur-sel':''}" onclick="APP.setDuracao(90)" id="dur90">
-              <div class="dur-num">1:30</div><div class="dur-label">1 min 30 seg</div>
-            </div>
-            <div class="dur-card ${(cfg.duracao||90)==120?'dur-sel':''}" onclick="APP.setDuracao(120)" id="dur120">
-              <div class="dur-num">2:00</div><div class="dur-label">2 minutos</div>
-            </div>
-            <div class="dur-card ${(cfg.duracao||90)==180?'dur-sel':''}" onclick="APP.setDuracao(180)" id="dur180">
-              <div class="dur-num">3:00</div><div class="dur-label">3 minutos</div>
-            </div>
-          </div>
-          <input type="hidden" id="apresDuracao" value="${cfg.duracao||90}">
+          <div><strong>Ciclo de rotação:</strong> Vídeos (10 min) → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> (1:30 min) → Volta aos Vídeos</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -2423,23 +2385,12 @@ window.APP = {
     d.innerHTML = `<input type="text" class="adm-input texto-adicional-input" placeholder="Texto adicional ${idx}"><button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove()"><i class="fas fa-trash"></i></button>`;
     c.appendChild(d);
   },
-  setDuracao(seg) {
-    // Atualizar visual dos cards
-    [60,90,120,180].forEach(s => {
-      const el = document.getElementById('dur'+s);
-      if (el) el.className = 'dur-card' + (s===seg?' dur-sel':'');
-    });
-    const inp = document.getElementById('apresDuracao');
-    if (inp) inp.value = seg;
-  },
-
   salvarApresentacao() {
     const titulo   = document.getElementById('apresTitulo')?.value||'';
     const mensagem = document.getElementById('apresMensagem')?.value||'';
     const enabled  = document.getElementById('apresEnabled')?.checked !== false;
     const textos   = [...document.querySelectorAll('.texto-adicional-input')].map(i=>i.value.trim()).filter(t=>t!=='');
-    const duracao  = parseInt(document.getElementById('apresDuracao')?.value||'90');
-    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos,duracao})
+    apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos})
       .then(() => { this.salvarDados(); notif('Apresentação salva!','success'); })
       .catch(() => notif('Erro!','error'));
   },
