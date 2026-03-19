@@ -113,6 +113,49 @@ body::after{
 }
 .btn-som i{font-size:11px}
 .btn-som:hover{opacity:1;border-color:rgba(0,230,118,.65);background:rgba(6,20,12,.88);box-shadow:0 4px 18px rgba(0,230,118,.25)}
+.rotacao-status{
+  position:absolute;top:16px;left:16px;z-index:55;
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;border-radius:18px;
+  background:rgba(4,14,28,.72);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(14px);
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+}
+.rotacao-status-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px rgba(0,230,118,.55);
+}
+.rotacao-status-text{display:flex;flex-direction:column;gap:1px}
+.rotacao-status-label{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.rotacao-status-stage{font-size:13px;font-weight:700;color:#fff}
+.rotacao-status-detail{font-size:11px;color:rgba(255,255,255,.58)}
+.rotacao-status[data-stage="video"] .rotacao-status-dot{background:var(--green);box-shadow:0 0 12px rgba(0,230,118,.55)}
+.rotacao-status[data-stage="flayer"] .rotacao-status-dot{background:var(--gold);box-shadow:0 0 12px rgba(255,193,7,.55)}
+.rotacao-status[data-stage="apresentacao"] .rotacao-status-dot{background:var(--red);box-shadow:0 0 12px rgba(239,83,80,.55)}
+.rotacao-status[data-stage="recuperacao"] .rotacao-status-dot{background:var(--blue-300);box-shadow:0 0 12px rgba(144,202,249,.55)}
+.autoplay-overlay{
+  position:absolute;inset:0;z-index:54;display:none;
+  align-items:center;justify-content:center;
+  background:radial-gradient(circle at center,rgba(4,15,30,.2),rgba(0,0,0,.72));
+  backdrop-filter:blur(8px);
+}
+.autoplay-overlay-card{
+  width:min(420px,88%);padding:24px 26px;border-radius:20px;
+  background:rgba(3,12,24,.92);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 18px 44px rgba(0,0,0,.45);
+  text-align:center;
+}
+.autoplay-overlay-card h3{font-size:20px;color:#fff;margin-bottom:8px}
+.autoplay-overlay-card p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);margin-bottom:18px}
+.autoplay-retry-btn{
+  border:none;border-radius:999px;padding:12px 22px;cursor:pointer;
+  background:linear-gradient(135deg,var(--green),#00c853);
+  color:#04140a;font-weight:800;font-size:13px;letter-spacing:.5px;
+  box-shadow:0 8px 24px rgba(0,230,118,.25);
+}
 #flayerContainer{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#000;z-index:40}
 #flayerContainer img{width:100%;height:100%;object-fit:contain;position:absolute;inset:0}
 .flayer-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--green);z-index:41;box-shadow:0 0 8px var(--green)}
@@ -509,6 +552,21 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 <main class="main-container">
   <div class="left-column">
     <section class="video-section" id="videoSection">
+      <div class="rotacao-status" id="rotacaoStatus" data-stage="recuperacao">
+        <div class="rotacao-status-dot"></div>
+        <div class="rotacao-status-text">
+          <div class="rotacao-status-label">Exibição</div>
+          <div class="rotacao-status-stage" id="rotacaoStage">1/1</div>
+          <div class="rotacao-status-detail" id="rotacaoDetail"></div>
+        </div>
+      </div>
+      <div class="autoplay-overlay" id="autoplayOverlay">
+        <div class="autoplay-overlay-card">
+          <h3>Autoplay bloqueado</h3>
+          <p>O painel tentou iniciar sozinho. Se o navegador travar a mídia, use o botão abaixo para retomar a exibição.</p>
+          <button class="autoplay-retry-btn" onclick="APP.forcarPlayback()">INICIAR EXIBIÇÃO</button>
+        </div>
+      </div>
       <button id="btnSom" class="btn-som" onclick="APP.ativarSom()"><i class="fas fa-volume-up"></i> ATIVAR SOM</button>
       <div id="videoContainer" class="video-container"></div>
       <div id="flayerContainer">
@@ -582,14 +640,11 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div class="adm-nav-item" id="navUsuarios" onclick="APP.showSection('usuarios')" style="display:none"><i class="fas fa-users-cog"></i> Usuários</div>
       <div class="adm-nav-item" id="navUnidades" onclick="APP.showSection('unidades')" style="display:none"><i class="fas fa-building"></i> Unidades</div>
       <div class="adm-nav-item" id="navMonitor" onclick="APP.showSection('monitor')" style="display:none"><i class="fas fa-satellite-dish"></i> Monitor</div>
-      <!-- NOVO: Log do Sistema -->
-      <div class="adm-nav-item" id="navLog" onclick="APP.showSection('log')" style="display:none"><i class="fas fa-history"></i> Log do Sistema</div>
-      <!-- NOVO: Backup -->
       <div class="adm-nav-item" id="navBackup" onclick="APP.showSection('backup')" style="display:none"><i class="fas fa-database"></i> Backup / Restaurar</div>
     </nav>
     <div class="adm-content" id="admContent"></div>
   </div>
-  <div class="version-tag">Sistema de Saúde PMPF v4.0 · Seguro · Profissional</div>
+  <div class="version-tag">Sistema de Saúde PMPF v5.0 · Seguro · Profissional</div>
 </div>
 
 <script>
@@ -643,7 +698,7 @@ const syncConfig = {
     30:{label:'30 minutos',cost:'Mínimo',costClass:'cost-minimo'}
   },
   load() {
-    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||10; } catch(e) {}
+    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||30; } catch(e) {}
   },
   save() { localStorage.setItem('syncCfg_'+UNIDADE_ID, JSON.stringify({interval:this.interval})); }
 };
@@ -686,18 +741,57 @@ const cache = {
 let ytPlayer = null;
 let ytApiPronto = false;
 let ytPendente = false;
+let ytEndFallbackTimer = null;
+let playbackWatchdog = null;
+let playbackRecoveryCount = 0;
+let ytIds = [];
+let ytTotalVideos = 0;
+let ytVideosVisto = 0;
 
 window.onYouTubeIframeAPIReady = function() {
   ytApiPronto = true;
   if (ytPendente) { ytPendente = false; criarPlayer(); }
 };
 
+function atualizarStatusRotacao(stage, detail) {
+  const root = document.getElementById('rotacaoStatus');
+  const stageEl = document.getElementById('rotacaoStage');
+  const detailEl = document.getElementById('rotacaoDetail');
+  const nomes = {
+    video: 'Vídeos',
+    flayer: 'Flayers',
+    apresentacao: 'Apresentação',
+    recuperacao: 'Recuperação'
+  };
+  if (root) root.dataset.stage = stage || 'recuperacao';
+  if (stageEl) stageEl.textContent = nomes[stage] || 'Recuperação';
+  if (detailEl) detailEl.textContent = detail || 'Aguardando';
+}
+
+function toggleAutoplayOverlay(show) {
+  const overlay = document.getElementById('autoplayOverlay');
+  if (overlay) overlay.style.display = show ? 'flex' : 'none';
+}
+
+function tentarTocarVideo(target, delay) {
+  setTimeout(() => {
+    try {
+      const state = target && typeof target.getPlayerState === 'function' ? target.getPlayerState() : null;
+      if (state !== 1 && state !== 3) target.playVideo();
+    } catch (err) {}
+  }, delay);
+}
+
+// ════════════════════════════════════════════════════════════
+// ROTAÇÃO: VÍDEOS → FLAYERS → APRESENTAÇÃO → LOOP
+// ════════════════════════════════════════════════════════════
 const rotacao = {
   emCiclo: false,
   playlistTerminou() {
     if (this.emCiclo) return;
     if (flayerSys.isPlaying || apresentSys.isPlaying) return;
     this.emCiclo = true;
+    atualizarStatusRotacao('recuperacao', 'Preparando próxima etapa');
     this.iniciarCiclo();
   },
   iniciarCiclo() {
@@ -716,6 +810,7 @@ const rotacao = {
     const fc = document.getElementById('flayerContainer');
     if (vc) vc.style.display = 'block';
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
+    atualizarStatusRotacao('video', 'Reiniciando playlist');
     setTimeout(() => carregarVideo(), 400);
   }
 };
@@ -723,7 +818,7 @@ const rotacao = {
 const flayerSys = {
   flayers: [], isPlaying: false, currentIndex: 0, timer: null, onConcluido: null,
   init() {
-    db.ref('paineis/'+UNIDADE_ID+'/flayers').on('value', s => { this.flayers = s.val() || []; });
+    this.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
   },
   iniciarCiclo(onConcluido) {
     this.onConcluido = onConcluido; this.currentIndex = 0; this.isPlaying = true; this.proxFlayer();
@@ -741,6 +836,7 @@ const flayerSys = {
     const fc = document.getElementById('flayerContainer');
     const bs = document.getElementById('btnSom');
     if (!fc) return;
+    atualizarStatusRotacao('flayer', 'Exibindo encarte');
     if (bs) bs.style.display = 'none';
     if (vc) vc.style.display = 'none';
     fc.innerHTML = '<div class="flayer-progress" id="flayerProgress"></div>';
@@ -767,6 +863,7 @@ const flayerSys = {
     if (vc) vc.style.display = 'block';
     const bs = document.getElementById('btnSom');
     if (bs) bs.style.display = isMuted ? 'block' : 'none';
+    atualizarStatusRotacao('recuperacao', 'Abrindo apresentação');
     if (this.onConcluido) this.onConcluido();
   },
   parar(reiniciar = true) {
@@ -785,19 +882,19 @@ const flayerSys = {
   }
 };
 
-// ─────────────────────────────────────────────
-// APRESENTAÇÃO COMUNITÁRIA
-// ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+// APRESENTAÇÃO COMUNITÁRIA - PADRÃO 30 SEGUNDOS
+// ════════════════════════════════════════════════════════════
 const apresentSys = {
   isPlaying: false,
-  duration: 90000,
+  duration: 30000, // Padrão: 30 segundos
   progressInterval: null,
   onConcluido: null,
   _encerrarTimer: null,
 
   defaultConfig: {
     enabled: true,
-    duracao: 90,
+    duracao: 30, // Padrão 30 segundos
     titulo: 'Sua Consulta\nFaz a Diferença!',
     mensagemPrincipal: 'As faltas às consultas afetam você, sua família e toda a comunidade. Cada vaga não utilizada é um recurso desperdiçado que poderia ajudar outra pessoa.',
     textosAdicionais: [
@@ -813,9 +910,7 @@ const apresentSys = {
     if (dadosUnidade.apresentacaoConfig) {
       this.config = Object.assign({}, this.defaultConfig, dadosUnidade.apresentacaoConfig);
     }
-    db.ref('paineis/'+UNIDADE_ID+'/apresentacaoConfig').on('value', s => {
-      if (s.val()) this.config = Object.assign({}, this.defaultConfig, s.val());
-    });
+    this.duration = (this.config.duracao || 30) * 1000;
   },
 
   iniciar(onConcluido) {
@@ -825,9 +920,9 @@ const apresentSys = {
       if (onConcluido) onConcluido();
       return;
     }
-    // Duração configurável: 30s, 1min (60s) ou 2min (120s)
-    this.duration = (this.config.duracao || 90) * 1000;
+    this.duration = (this.config.duracao || 30) * 1000;
     this.isPlaying = true;
+    atualizarStatusRotacao('apresentacao', 'Exibindo mensagem principal');
     this.renderizar();
   },
 
@@ -971,7 +1066,7 @@ const apresentSys = {
   },
 
   encerrar() {
-    if (!this.isPlaying) return; // guard contra dupla chamada
+    if (!this.isPlaying) return;
     this.isPlaying = false;
     if (this._encerrarTimer) { clearTimeout(this._encerrarTimer); this._encerrarTimer = null; }
     if (this.progressInterval) { clearInterval(this.progressInterval); this.progressInterval = null; }
@@ -981,9 +1076,11 @@ const apresentSys = {
       el.classList.add('apres-saida');
       setTimeout(() => {
         if (el.parentNode) el.parentNode.removeChild(el);
+        atualizarStatusRotacao('video', 'Retornando aos vÃ­deos');
         if (this.onConcluido) this.onConcluido();
       }, 700);
     } else {
+      atualizarStatusRotacao('video', 'Retornando aos vÃ­deos');
       if (this.onConcluido) this.onConcluido();
     }
   },
@@ -1009,26 +1106,15 @@ const apresentSys = {
 // SYNC MANAGER
 // ─────────────────────────────────────────────
 const syncMgr = {
-  timer: null, syncing: false, done: false,
+  timer: null, syncing: false, done: false, started: false,
   init() {
+    if (this.started) return;
+    this.started = true;
     this.loadCache();
     this.startAuto();
-    db.ref('paineis/'+UNIDADE_ID+'/avisos').on('value', s => {
-      const a = s.val()||[];
-      dadosUnidade.avisos = a;
-      atualizarAvisos();
-    });
-    if (!IS_MATRIZ) {
-      db.ref('paineis/'+UNIDADE_ID+'/ultima_atualizacao').on('value', s => {
-        const v = s.val();
-        if (v && (Date.now()-v) < 300000) this.sync();
-      });
-    }
-    db.ref('paineis/geral/avisos').on('value', s => { dadosGerais.avisos = s.val()||[]; atualizarAvisos(); });
-    db.ref('paineis/geral/unidade/videoUrls').on('value', s => {
-      dadosGerais.unidade.videoUrls = s.val()||[];
-      if (IS_MATRIZ && dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls;
-      carregarVideo();
+    window.addEventListener('online', () => this.sync(true));
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) this.sync(true);
     });
   },
   async loadCache() {
@@ -1052,16 +1138,24 @@ const syncMgr = {
     if (this.syncing) return;
     this.syncing = true;
     try {
-      const s = await db.ref('paineis/'+UNIDADE_ID).once('value');
-      let d = s.val();
+      const [unitSnap, geralSnap] = await Promise.all([
+        db.ref('paineis/'+UNIDADE_ID).once('value'),
+        db.ref('paineis/geral').once('value')
+      ]);
+      let d = unitSnap.val();
+      const gerais = geralSnap.val();
       if (!d) d = {unidade:{nome:IS_MATRIZ?'Matriz':'Unidade '+UNIDADE_ID,especialidades:[]},avisos:[]};
+      if (gerais) {
+        dadosGerais = gerais;
+        await cache.set('geral', dadosGerais);
+      }
       const cached = await cache.get(UNIDADE_ID);
       const cachedTs = (cached && cached.data) ? (cached.data.ultima_atualizacao || 0) : 0;
       const novoTs   = d.ultima_atualizacao || 0;
       const mudou    = novoTs > cachedTs || !this.done;
       d.ultima_sincronizacao = Date.now();
       await cache.set(UNIDADE_ID, d);
-      if (mudou || !this.done) { dadosUnidade = d; processarInterface(); }
+      if (mudou || !this.done || gerais) { dadosUnidade = d; processarInterface(); }
       this.done = true;
       ocultarLoading();
     } catch(e) {
@@ -1081,21 +1175,9 @@ const syncMgr = {
 };
 
 // ─────────────────────────────────────────────
-// NOVO: REGISTRO DE LOG
+// REGISTRO DE LOG
 // ─────────────────────────────────────────────
-function registrarLog(acao, detalhes) {
-  if (!usuarioAtual) return;
-  const entry = {
-    ts: Date.now(),
-    usuario: usuarioAtual.login,
-    nome: usuarioAtual.nome || usuarioAtual.login,
-    unidade: UNIDADE_ID,
-    unidadeNome: dadosUnidade.unidade.nome || UNIDADE_ID,
-    acao,
-    detalhes: detalhes || ''
-  };
-  db.ref('logs').push(entry).catch(() => {});
-}
+function registrarLog() {}
 
 // ─────────────────────────────────────────────
 // INICIALIZAÇÃO
@@ -1121,6 +1203,7 @@ async function iniciar() {
   await cache.init().catch(()=>{});
   atualizarRelogio();
   setInterval(atualizarRelogio, 1000);
+  iniciarWatchdogPlayback();
 
   const cgCache = await cache.get('geral');
   if (cgCache && cgCache.data) dadosGerais = cgCache.data;
@@ -1150,9 +1233,28 @@ function processarInterface() {
   if (dadosUnidade.apresentacaoConfig) {
     apresentSys.config = Object.assign({}, apresentSys.defaultConfig, dadosUnidade.apresentacaoConfig);
   }
+  flayerSys.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
+  carregarMsgsConscientizacao();
   atualizarFaltometro();
   carregarVideo();
   atualizarAvisos();
+}
+
+function iniciarWatchdogPlayback() {
+  if (playbackWatchdog) clearInterval(playbackWatchdog);
+  playbackWatchdog = setInterval(() => {
+    const adminAberto = document.getElementById('adminPanel')?.style.display === 'flex';
+    if (adminAberto || rotacao.emCiclo || flayerSys.isPlaying || apresentSys.isPlaying) return;
+    if (!(dadosGerais?.unidade?.videoUrls || []).length) return;
+    try {
+      const state = ytPlayer && typeof ytPlayer.getPlayerState === 'function'
+        ? ytPlayer.getPlayerState()
+        : null;
+      if (!ytPlayer || (state !== 1 && state !== 3 && state !== 5)) carregarVideo();
+    } catch (e) {
+      carregarVideo();
+    }
+  }, 10000);
 }
 
 function atualizarRelogio() {
@@ -1170,6 +1272,8 @@ function carregarVideo() {
   if (flayerSys.isPlaying || apresentSys.isPlaying) return;
   const ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean);
   if (ids.length === 0) return;
+  atualizarStatusRotacao('video', 'Preparando playlist');
+  toggleAutoplayOverlay(false);
   if (!ytApiPronto) { ytPendente = true; return; }
   criarPlayer(ids);
 }
@@ -1177,15 +1281,24 @@ function carregarVideo() {
 function criarPlayer(ids) {
   if (!ids) { ids = (dadosGerais.unidade.videoUrls || []).map(extrairYtId).filter(Boolean); }
   if (ids.length === 0) return;
+  ytIds = [...ids];
+  ytTotalVideos = ids.length;
+  ytVideosVisto = 0;
 
-  // Se o player já existe e está funcional, reinicia a playlist do primeiro vídeo
-  if (ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
+  if (ytPlayer && typeof ytPlayer.cuePlaylist === 'function') {
     try {
-      ytPlayer.loadPlaylist(ids);   // carrega E inicia automaticamente do índice 0
-      if (!isMuted) ytPlayer.unMute();
+      ytPlayer.loadPlaylist({
+        playlist: ytIds,
+        index: 0,
+        startSeconds: 0,
+        suggestedQuality: 'large'
+      });
+      if (isMuted) ytPlayer.mute(); else ytPlayer.unMute();
+      ytPlayer.setVolume(80);
+      tentarTocarVideo(ytPlayer, 200);
+      tentarTocarVideo(ytPlayer, 1200);
       return;
     } catch(e) {
-      // player morreu — recria abaixo
       ytPlayer = null;
     }
   }
@@ -1200,42 +1313,83 @@ function criarPlayer(ids) {
   ytPlayer = new YT.Player('ytPlayerEl', {
     width: '100%',
     height: '100%',
-    videoId: ids[0],
     playerVars: {
       autoplay: 1,
-      mute: isMuted ? 1 : 0,
+      mute: 1,
       controls: 0,
       rel: 0,
       loop: 0,
-      playlist: ids.join(','),
       playsinline: 1,
       modestbranding: 1,
-      iv_load_policy: 3
+      iv_load_policy: 3,
+      disablekb: 1
     },
     events: {
       onReady(e) {
-        e.target.playVideo();
+        toggleAutoplayOverlay(false);
+        atualizarStatusRotacao('video', `Playlist com ${ytTotalVideos} vÃ­deo(s)`);
+        e.target.loadPlaylist({
+          playlist: ytIds,
+          index: 0,
+          startSeconds: 0,
+          suggestedQuality: 'large'
+        });
+        e.target.mute();
+        e.target.setVolume(80);
+        tentarTocarVideo(e.target, 150);
+        tentarTocarVideo(e.target, 1200);
+        tentarTocarVideo(e.target, 3000);
       },
       onStateChange(e) {
-        if (rotacao.emCiclo) return;
-        // Estado 0 = ENDED, -1 = não iniciado
-        if (e.data === 0 || e.data === -1) {
-          const lista = ytPlayer ? ytPlayer.getPlaylist() : null;
-          const idx   = ytPlayer ? ytPlayer.getPlaylistIndex() : 0;
-          const total = lista ? lista.length : 1;
-          const ultimo = !lista || idx < 0 || idx >= total - 1;
-          if (ultimo && e.data === 0) {
-            rotacao.playlistTerminou();
+        const state = e.data;
+        if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+          playbackRecoveryCount = 0;
+          toggleAutoplayOverlay(false);
+          atualizarStatusRotacao('video', `Reproduzindo ${Math.min(ytVideosVisto + 1, ytTotalVideos || 1)}/${ytTotalVideos || 1}`);
+        }
+        if (e.data === 1 || e.data === 3) {
+          if (ytEndFallbackTimer) {
+            clearTimeout(ytEndFallbackTimer);
+            ytEndFallbackTimer = null;
           }
+        }
+        if (rotacao.emCiclo) return;
+        if (state === YT.PlayerState.ENDED) {
+          ytVideosVisto = Math.min(ytVideosVisto + 1, ytTotalVideos || 1);
+          if (ytEndFallbackTimer) clearTimeout(ytEndFallbackTimer);
+          ytEndFallbackTimer = setTimeout(() => {
+            if (rotacao.emCiclo || flayerSys.isPlaying || apresentSys.isPlaying) return;
+            try {
+              const currentState = ytPlayer && typeof ytPlayer.getPlayerState === 'function'
+                ? ytPlayer.getPlayerState()
+                : null;
+              const idx = ytPlayer && typeof ytPlayer.getPlaylistIndex === 'function'
+                ? ytPlayer.getPlaylistIndex()
+                : -1;
+              const acabou = idx < 0 || ytVideosVisto >= ytTotalVideos;
+              if (acabou && currentState !== 1 && currentState !== 3) rotacao.playlistTerminou();
+            } catch(err) {
+              rotacao.playlistTerminou();
+            }
+          }, 1500);
+        }
+        if (state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
+          playbackRecoveryCount++;
+          atualizarStatusRotacao('recuperacao', 'Tentando iniciar autoplay');
+          if (playbackRecoveryCount >= 3) toggleAutoplayOverlay(true);
+          tentarTocarVideo(e.target, 300);
         }
       },
       onError(e) {
-        // Tentar próximo vídeo em caso de erro
+        ytVideosVisto = Math.min(ytVideosVisto + 1, ytTotalVideos || 1);
+        atualizarStatusRotacao('recuperacao', 'Pulando vÃ­deo indisponÃ­vel');
+        if (ytVideosVisto >= ytTotalVideos) {
+          rotacao.playlistTerminou();
+          return;
+        }
         setTimeout(() => {
-          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') {
-            ytPlayer.nextVideo();
-          }
-        }, 2000);
+          if (ytPlayer && typeof ytPlayer.nextVideo === 'function') ytPlayer.nextVideo();
+        }, 1200);
       }
     }
   });
@@ -1253,15 +1407,13 @@ let faltoMsgIdx = 0;
 let faltoMsgTimer = null;
 
 function carregarMsgsConscientizacao() {
-  db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').on('value', s => {
-    const saved = s.val();
-    if (saved && Array.isArray(saved) && saved.length > 0) {
-      FALTO_MSGS = saved;
-    } else {
-      FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
-    }
-    faltoMsgIdx = 0;
-  });
+  const saved = dadosUnidade.faltoMsgs;
+  if (saved && Array.isArray(saved) && saved.length > 0) {
+    FALTO_MSGS = saved;
+  } else {
+    FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
+  }
+  faltoMsgIdx = 0;
 }
 
 function atualizarFaltometro() {
@@ -1417,7 +1569,6 @@ const auth = {
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
-    // Suspender rotação enquanto o painel está aberto
     rotacao.emCiclo = true;
     apresentSys.parar(false);
     flayerSys.parar(false);
@@ -1426,7 +1577,6 @@ const auth = {
   resetSessionTimer() {
     if (sessionTimer) clearTimeout(sessionTimer);
     sessionTimer = setTimeout(() => { notif('Sessão expirada por inatividade.','warning'); APP.logout(); }, SESSION_TIMEOUT);
-    // AbortController evita acumular listeners a cada chamada
     if (this._sessionAbort) this._sessionAbort.abort();
     this._sessionAbort = new AbortController();
     document.getElementById('adminPanel').addEventListener('click', () => {
@@ -1464,9 +1614,6 @@ function configurarMenus() {
   show('navUsuarios', IS_MATRIZ && isSA);
   show('navUnidades', IS_MATRIZ && isSA);
   show('navMonitor', IS_MATRIZ && isSA);
-  // NOVO: navLog apenas super_admin matriz
-  show('navLog', IS_MATRIZ && isSA);
-  // NOVO: navBackup apenas super_admin matriz
   show('navBackup', IS_MATRIZ && isSA);
 
   const showAdminSection = IS_MATRIZ && isSA;
@@ -1503,7 +1650,6 @@ const sections = {
       </div>`;
   },
 
-  // MODIFICADO: remove bloco de mensagens para não-matriz
   faltometro() {
     const itens = dadosUnidade.unidade.especialidades || [];
     if (permissoesUsuario?.nivel === 'visualizador') {
@@ -1539,7 +1685,6 @@ const sections = {
         + '<button class="adm-btn-green" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar Alterações</button>'
       + '</div>'
     + '</div>'
-    // MODIFICADO: bloco de mensagens de conscientização somente para matriz
     + (IS_MATRIZ ? (() => {
         const msgRows = FALTO_MSGS.map((m, i) => {
           const plain = (m.txt||'').replace(/<strong>/g,'*').replace(/<\/strong>/g,'*');
@@ -1628,12 +1773,12 @@ const sections = {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const textos = (cfg.textosAdicionais||[]);
     while (textos.length < 3) textos.push('');
-    const duracaoAtual = cfg.duracao || 90;
+    const duracaoAtual = cfg.duracao || 30;
     const durOpts = [
-      {val:30,  label:'30s',      desc:'Rápida'},
-      {val:60,  label:'1 min',    desc:'Curta'},
-      {val:90,  label:'1:30',     desc:'Padrão'},
-      {val:120, label:'2 min',    desc:'Completa'}
+      {val:30,  label:'30 seg (padrão)'},
+      {val:60,  label:'1 min'},
+      {val:90,  label:'1:30 min'},
+      {val:120, label:'2 min'}
     ];
 
     document.getElementById('admContent').innerHTML = `
@@ -1655,43 +1800,17 @@ const sections = {
           <div><strong>Ciclo de rotação:</strong> Todos os Vídeos → <strong>Encartes/Flayers</strong> (30s cada) → <strong>Apresentação Comunitária</strong> → Volta aos Vídeos (loop infinito)</div>
         </div>
 
-        <!-- Seletor de duração -->
-        <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px 20px;margin-bottom:20px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-            <div style="width:32px;height:32px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center"><i class="fas fa-clock" style="color:var(--blue-700);font-size:14px"></i></div>
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#1e293b">Duração da Apresentação</div>
-              <div style="font-size:11px;color:#9ca3af">Tempo de exibição a cada ciclo</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-            ${durOpts.map(op => {
-              const sel = duracaoAtual === op.val;
-              return `<label style="cursor:pointer">
-                <input type="radio" name="apres_duracao" value="${op.val}" ${sel?'checked':''} style="display:none">
-                <div class="dur-opt" onclick="
-                  document.querySelectorAll('.dur-opt').forEach(d=>{
-                    d.style.background='#fff';
-                    d.style.borderColor='#e2e8f0';
-                    d.style.boxShadow='none';
-                    d.querySelector('.dur-label').style.color='#64748b';
-                    d.querySelector('.dur-value').style.color='#1e293b';
-                    d.querySelector('.dur-check').style.display='none';
-                  });
-                  this.style.background='linear-gradient(135deg,#eff6ff,#dbeafe)';
-                  this.style.borderColor='#1565c0';
-                  this.style.boxShadow='0 4px 14px rgba(21,101,192,.18)';
-                  this.querySelector('.dur-label').style.color='#1565c0';
-                  this.querySelector('.dur-value').style.color='#1565c0';
-                  this.querySelector('.dur-check').style.display='flex';
-                  this.previousElementSibling.checked=true;"
-                  style="border:2px solid ${sel?'#1565c0':'#e2e8f0'};background:${sel?'linear-gradient(135deg,#eff6ff,#dbeafe)':'#fff'};border-radius:12px;padding:16px 10px 14px;text-align:center;transition:all .2s;position:relative;box-shadow:${sel?'0 4px 14px rgba(21,101,192,.18)':'none'}">
-                  <div class="dur-check" style="display:${sel?'flex':'none'};position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:#1565c0;align-items:center;justify-content:center"><i class="fas fa-check" style="color:#fff;font-size:9px"></i></div>
-                  <div class="dur-value" style="font-family:'Bebas Neue',monospace;font-size:26px;line-height:1;color:${sel?'#1565c0':'#1e293b'};margin-bottom:4px">${op.label}</div>
-                  <div class="dur-label" style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${sel?'#1565c0':'#64748b'}">${op.desc}</div>
+        <div style="margin-bottom:20px">
+          <label class="adm-label"><i class="fas fa-clock" style="color:var(--blue-700);margin-right:6px"></i> Duração da Apresentação</label>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            ${durOpts.map(op=>`
+              <label style="cursor:pointer;flex:1">
+                <input type="radio" name="apres_duracao" value="${op.val}" ${duracaoAtual===op.val?'checked':''} style="display:none">
+                <div onclick="document.querySelectorAll('[name=apres_duracao]').forEach(r=>r.closest('label').querySelector('.dur-opt').style.cssText='border:2px solid #e2e8f0;background:#fff;color:#1e293b');this.style.cssText='border:2px solid #1565c0;background:#eff6ff;color:#1565c0';this.previousElementSibling.checked=true"
+                  class="dur-opt" style="border:2px solid ${duracaoAtual===op.val?'#1565c0':'#e2e8f0'};background:${duracaoAtual===op.val?'#eff6ff':'#fff'};color:${duracaoAtual===op.val?'#1565c0':'#1e293b'};border-radius:10px;padding:12px;text-align:center;font-size:18px;font-weight:800;transition:all .2s">
+                  ${op.label}
                 </div>
-              </label>`;
-            }).join('')}
+              </label>`).join('')}
           </div>
         </div>
 
@@ -1732,7 +1851,7 @@ const sections = {
         <div style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
           <div style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
             <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b19"></i></div>
-            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'1:30 min'} — aparece após todos os flayers no ciclo</span>
+            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'30 seg'} — aparece após todos os flayers no ciclo</span>
             <div style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
           </div>
           <div style="display:grid;grid-template-columns:1.5fr 1fr;min-height:200px">
@@ -1756,86 +1875,58 @@ const sections = {
 
   flayers() {
     const urls = flayerSys.flayers || [];
-    const rows = urls.map((u,i) => `
-      <div class="falto-row" id="flayerRow${i}" style="grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center">
-        <div style="width:54px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center">
-          <img src="${sanitize(u)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextSibling.style.display='block'">
-          <i class="fas fa-image" style="display:none;color:#cbd5e1;font-size:16px"></i>
-        </div>
-        <input type="text" class="adm-input flayer-url-input" value="${sanitize(u)}" placeholder="URL da imagem (JPG/PNG)"
-          onchange="APP._flayerAutoSave()"
-          style="font-family:monospace;font-size:13px">
-        <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
-        <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerFlayer(${i})" title="Remover"><i class="fas fa-trash"></i></button>
-      </div>`).join('');
-
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div>
-            <div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div>
-            <div class="adm-card-desc">Exibidos 30 segundos cada, após os vídeos — alterações salvas automaticamente</div>
-          </div>
-          <button class="adm-btn-green" onclick="APP.adicionarFlayer()"><i class="fas fa-plus"></i> Adicionar</button>
+          <div><div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div><div class="adm-card-desc">Exibidos 30 segundos cada, após os vídeos</div></div>
         </div>
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ordem:</strong> Vídeos → <strong>Encartes</strong> (30s cada) → Apresentação Comunitária → Vídeos</div>
+          <div><strong>Ordem de exibição:</strong> Vídeos → <strong>Encartes aqui</strong> (30s/un.) → Apresentação Comunitária → Vídeos novamente</div>
         </div>
-        <div id="listaFlayers">
-          ${rows.length > 0 ? rows : `<div style="text-align:center;padding:32px;color:#9ca3af;border:2px dashed #e2e8f0;border-radius:12px">
-            <i class="fas fa-images" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:10px"></i>
-            Nenhum encarte cadastrado. Clique em <strong>Adicionar</strong>.
-          </div>`}
+        <div style="margin-bottom:20px">
+          <label class="adm-label">URLs das Imagens <span class="adm-label-sub">Uma por linha • JPG/PNG hospedados publicamente</span></label>
+          <textarea id="flayerUrls" class="adm-input" style="min-height:150px;font-family:monospace;font-size:13px">${urls.join('\n')}</textarea>
         </div>
-        <div id="flayerSaveStatus" style="margin-top:10px;font-size:12px;color:#16a34a;display:none"><i class="fas fa-check-circle"></i> Salvo automaticamente</div>
-        <div class="adm-action-bar" style="margin-top:16px">
-          <button class="adm-btn-green" onclick="APP._flayerSalvarManual()"><i class="fas fa-save"></i> Salvar Agora</button>
-          <button class="adm-btn-primary" onclick="APP.testarFlayers()"><i class="fas fa-play"></i> Testar</button>
-          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar</button>
+        <div class="adm-action-bar">
+          <button class="adm-btn-green" onclick="APP.salvarFlayers()"><i class="fas fa-save"></i> Salvar Encartes</button>
+          <button class="adm-btn-primary" onclick="APP.testarFlayers()"><i class="fas fa-play"></i> Testar Agora</button>
+          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Voltar ao Vídeo</button>
           <button class="adm-btn-danger" onclick="APP.limparFlayers()" style="margin-left:auto"><i class="fas fa-trash"></i> Limpar Todos</button>
+        </div>
+      </div>
+      <div class="adm-card">
+        <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-th-large"></i> Preview (${urls.length} encarte${urls.length!==1?'s':''})</div></div>
+        <div class="flayer-grid">
+          ${urls.length===0?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-images" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>Nenhum encarte configurado</div>`:
+          urls.map((u,i)=>`
+            <div class="flayer-card">
+              <div class="flayer-thumb">
+                <img src="${sanitize(u)}" alt="Encarte ${i+1}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+                <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:12px;color:#9ca3af"><i class="fas fa-image" style="font-size:24px"></i></div>
+              </div>
+              <div class="flayer-card-info">
+                <div style="font-size:10px;color:#6b7280;word-break:break-all;margin-bottom:8px">${sanitize(u.length>35?u.substring(0,35)+'…':u)}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:10px;background:#1565c0;color:#fff;padding:2px 8px;border-radius:12px;font-weight:700">${i+1}</span>
+                  <button class="adm-btn-icon adm-btn-icon-danger" style="width:28px;height:28px;font-size:11px" onclick="APP.removerFlayer(${i})"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>`).join('')}
         </div>
       </div>`;
   },
 
   video() {
     if (!IS_MATRIZ) { document.getElementById('admContent').innerHTML = `<div class="adm-card"><div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-lock"></i> Acesso Restrito</div></div><p style="color:#6b7280">Configuração de vídeos disponível apenas na Matriz.</p></div>`; return; }
-    const urls = dadosGerais.unidade.videoUrls || [];
-    const rows = urls.map((u,i) => {
-      const ytId = u.match(/(?:youtu\.be\/|v\/|watch\?v=|embed\/)([^#&?]{11})/)?.[1];
-      const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/default.jpg` : '';
-      return `<div class="falto-row" style="grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center">
-        <div style="width:64px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center">
-          ${thumb ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextSibling.style.display='block'"><i class="fas fa-video" style="display:none;color:#cbd5e1;font-size:16px"></i>` : '<i class="fas fa-video" style="color:#cbd5e1;font-size:16px"></i>'}
-        </div>
-        <input type="text" class="adm-input video-url-input" value="${sanitize(u)}" placeholder="URL do YouTube (youtube.com/watch?v=...)"
-          onchange="APP._videoAutoSave()"
-          style="font-family:monospace;font-size:13px">
-        <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
-        <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerVideo(${i})" title="Remover"><i class="fas fa-trash"></i></button>
-      </div>`;
-    }).join('');
-
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header">
-          <div>
-            <div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div>
-            <div class="adm-card-desc">YouTube — exibidos em todas as unidades — alterações salvas automaticamente</div>
-          </div>
-          <button class="adm-btn-green" onclick="APP.adicionarVideo()"><i class="fas fa-plus"></i> Adicionar</button>
-        </div>
-        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Os vídeos são reproduzidos em sequência, em loop, sem controles visíveis. Cole a URL completa do YouTube.</div>
-        <div id="listaVideos">
-          ${rows.length > 0 ? rows : `<div style="text-align:center;padding:32px;color:#9ca3af;border:2px dashed #e2e8f0;border-radius:12px">
-            <i class="fas fa-video" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:10px"></i>
-            Nenhum vídeo cadastrado. Clique em <strong>Adicionar</strong>.
-          </div>`}
-        </div>
-        <div id="videoSaveStatus" style="margin-top:10px;font-size:12px;color:#16a34a;display:none"><i class="fas fa-check-circle"></i> Salvo automaticamente</div>
-        <div class="adm-action-bar" style="margin-top:16px">
-          <button class="adm-btn-green" onclick="APP._videoSalvarManual()"><i class="fas fa-save"></i> Salvar Agora</button>
-          <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Recarregar Vídeo</button>
+        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div><div class="adm-card-desc">URLs do YouTube — exibidos em todas as unidades</div></div></div>
+        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole uma URL por linha. Os vídeos ficam em loop e sem controles visíveis.</div>
+        <label class="adm-label">URLs do YouTube</label>
+        <textarea id="vUrls" class="adm-input" style="min-height:180px;font-family:monospace;font-size:14px">${(dadosGerais.unidade.videoUrls||[]).join('\n')}</textarea>
+        <div class="adm-action-bar">
+          <button class="adm-btn-green" onclick="APP.salvarVideos()"><i class="fas fa-save"></i> Salvar Vídeos</button>
         </div>
       </div>`;
   },
@@ -1844,11 +1935,11 @@ const sections = {
     const ci = syncConfig.interval;
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Frequência com que as TVs buscam dados atualizados — padrão: 30 min</div></div></div>
+        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Frequência com que as TVs buscam dados atualizados</div></div></div>
         <div class="adm-info-box warning"><i class="fas fa-exclamation-triangle"></i> Intervalos menores consomem mais leituras do Firebase. Intervalos maiores economizam custo mas atrasam atualizações.</div>
         <div class="sync-grid">
           ${Object.entries(syncConfig.intervalMap).map(([min,cfg])=>`
-            <div class="sync-card ${parseInt(min)===ci?'selected':''}" onclick="syncMgr.setInterval(${min});sections.sincronizacao()">
+            <div class="sync-card ${parseInt(min)===ci?'selected':''}" onclick="syncMgr.setInterval(${min})">
               <div class="sync-card-time">${min} min</div>
               <div class="sync-card-desc">${cfg.label}</div>
               <span class="sync-cost-badge ${cfg.costClass}">${cfg.cost}</span>
@@ -1908,125 +1999,26 @@ const sections = {
     carregarTodasUnidades(() => renderizarGridUnidades());
   },
 
-  // NOVO: Monitor estilo Grafana
   monitor() {
     const c = document.getElementById('admContent');
     c.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div>
           <h2 style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:2px"><i class="fas fa-satellite-dish" style="color:#1565c0;margin-right:8px"></i>Monitor de Atividades</h2>
-          <div style="font-size:13px;color:#6b7280">Atualização em tempo real <span id="monitorLastUpdate" style="color:#16a34a;font-weight:600"></span></div>
+          <div style="font-size:13px;color:#6b7280">Visão em tempo real das unidades do sistema</div>
         </div>
         <div style="display:flex;gap:8px">
+          <button class="adm-btn-muted" onclick="APP.recarregarUnidades();sections.monitor()"><i class="fas fa-sync-alt"></i> Atualizar</button>
           <button class="adm-btn-primary" onclick="APP.forceSyncAll()"><i class="fas fa-broadcast-tower"></i> Sync Todas</button>
         </div>
       </div>
-      <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando...</div></div>`;
+      <div id="monitorContent"><div style="text-align:center;padding:60px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:36px;display:block;margin-bottom:16px"></i>Carregando dados...</div></div>`;
 
-    // Cancelar listener anterior se existir
-    if (window._monitorUnsubscribe) { window._monitorUnsubscribe(); window._monitorUnsubscribe = null; }
-
-    const atualizar = () => {
-      carregarTodasUnidades(() => {
-        db.ref('logs').orderByChild('ts').limitToLast(50).once('value').then(s => {
-          const logs = [];
-          s.forEach(c => logs.unshift({id:c.key,...c.val()}));
-          renderMonitorGrafana(logs);
-          const el = document.getElementById('monitorLastUpdate');
-          if (el) el.textContent = '· ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        }).catch(() => renderMonitorGrafana([]));
-      });
-    };
-
-    atualizar();
-
-    // Listener em tempo real: qualquer mudança nos paineis ou logs re-renderiza
-    const refPaineis = db.ref('paineis');
-    const refLogs = db.ref('logs').orderByChild('ts').limitToLast(1);
-    const cbPaineis = refPaineis.on('value', atualizar);
-    const cbLogs = refLogs.on('value', atualizar);
-    window._monitorUnsubscribe = () => {
-      refPaineis.off('value', cbPaineis);
-      refLogs.off('value', cbLogs);
-    };
-  },
-
-  // NOVO: Log do sistema
-  log() {
-    const c = document.getElementById('admContent');
-    c.innerHTML = `
-      <div class="adm-card">
-        <div class="adm-card-header">
-          <div>
-            <div class="adm-card-title"><i class="fas fa-history"></i> Log do Sistema</div>
-            <div class="adm-card-desc">Registro completo de todas as alterações realizadas no sistema</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select id="logFiltroUnidade" class="adm-input" style="width:200px;padding:9px 12px;font-size:13px" onchange="APP.filtrarLog()">
-              <option value="">Todas as unidades</option>
-            </select>
-            <select id="logFiltroAcao" class="adm-input" style="width:160px;padding:9px 12px;font-size:13px" onchange="APP.filtrarLog()">
-              <option value="">Todas as ações</option>
-              <option value="salvar">Salvar</option>
-              <option value="criar">Criar</option>
-              <option value="excluir">Excluir</option>
-              <option value="login">Login</option>
-              <option value="config">Configuração</option>
-            </select>
-            <button class="adm-btn-muted adm-btn-sm" onclick="APP.showSection('log')"><i class="fas fa-sync-alt"></i> Atualizar</button>
-            <button class="adm-btn-danger adm-btn-sm" onclick="APP.limparLog()"><i class="fas fa-trash"></i> Limpar</button>
-          </div>
-        </div>
-        <div id="logStats" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px"></div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
-          <div style="display:grid;grid-template-columns:160px 130px 150px 1fr;background:linear-gradient(135deg,#1565c0,#1e88e5);padding:10px 14px;gap:0">
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">DATA/HORA</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">USUÁRIO</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">AÇÃO</div>
-            <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px">DETALHES</div>
-          </div>
-          <div id="logContainer" style="max-height:480px;overflow-y:auto">
-            <div style="text-align:center;padding:40px;color:#9ca3af">
-              <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:12px"></i>Carregando registros...
-            </div>
-          </div>
-        </div>
-        <div id="logFooter" style="margin-top:12px;font-size:12px;color:#9ca3af;text-align:right"></div>
-      </div>`;
-
-    // Cancelar listener anterior se existir
-    if (window._logUnsubscribe) { window._logUnsubscribe(); window._logUnsubscribe = null; }
-
-    // Preencher filtro de unidades
     carregarTodasUnidades(() => {
-      const sel = document.getElementById('logFiltroUnidade');
-      if (sel) {
-        listaUnidades.forEach(u => {
-          const opt = document.createElement('option');
-          opt.value = u.id; opt.textContent = u.nome;
-          sel.appendChild(opt);
-        });
-      }
+      renderMonitorGrafana([]);
     });
-
-    // Listener em tempo real para novos logs
-    const refLogs = db.ref('logs').orderByChild('ts').limitToLast(500);
-    const cbLogs = refLogs.on('value', s => {
-      const logs = [];
-      s.forEach(entry => logs.unshift({id:entry.key,...entry.val()}));
-      window._logsTodos = logs;
-      // Aplicar filtros ativos (se não tiver filtro, renderiza tudo)
-      const unidadeFiltro = document.getElementById('logFiltroUnidade')?.value||'';
-      const acaoFiltro    = document.getElementById('logFiltroAcao')?.value||'';
-      let filtrados = logs;
-      if (unidadeFiltro) filtrados = filtrados.filter(l => l.unidade === unidadeFiltro);
-      if (acaoFiltro)    filtrados = filtrados.filter(l => (l.acao||'').toLowerCase().includes(acaoFiltro));
-      renderizarLog(filtrados);
-    });
-    window._logUnsubscribe = () => refLogs.off('value', cbLogs);
   },
 
-  // NOVO: Backup / Restaurar
   backup() {
     const c = document.getElementById('admContent');
     c.innerHTML = `
@@ -2045,8 +2037,6 @@ const sections = {
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-
-          <!-- Download -->
           <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:26px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <div style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center"><i class="fas fa-file-download" style="color:#16a34a;font-size:18px"></i></div>
@@ -2058,7 +2048,6 @@ const sections = {
             </button>
           </div>
 
-          <!-- Upload / Restaurar -->
           <div style="background:#fff0f0;border:1.5px solid #fca5a5;border-radius:14px;padding:26px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <div style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center"><i class="fas fa-file-upload" style="color:#dc2626;font-size:18px"></i></div>
@@ -2074,7 +2063,6 @@ const sections = {
           </div>
         </div>
 
-        <!-- Progress -->
         <div id="bkpProgress" style="display:none;border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #86efac;background:#f0fdf4">
           <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#166534">
             <i class="fas fa-spinner fa-spin"></i>
@@ -2082,7 +2070,6 @@ const sections = {
           </div>
         </div>
 
-        <!-- Preview do arquivo selecionado -->
         <div id="bkpPreviewCard" style="display:none;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px">
           <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px">
             <i class="fas fa-file-code" style="color:#1565c0"></i> Arquivo selecionado: <span id="bkpArquivoNome" style="color:#1565c0;font-weight:600"></span>
@@ -2102,77 +2089,7 @@ const sections = {
 };
 
 // ─────────────────────────────────────────────
-// NOVO: Renderizar Log
-// ─────────────────────────────────────────────
-function renderizarLog(logs) {
-  const container = document.getElementById('logContainer');
-  const footer    = document.getElementById('logFooter');
-  const stats     = document.getElementById('logStats');
-  if (!container) return;
-
-  // Stats
-  const contadores = {salvar:0,criar:0,excluir:0,login:0,config:0,outros:0};
-  logs.forEach(l => {
-    const a = (l.acao||'').toLowerCase();
-    if (a.includes('salv')) contadores.salvar++;
-    else if (a.includes('cri')) contadores.criar++;
-    else if (a.includes('excl')||a.includes('remov')||a.includes('delet')) contadores.excluir++;
-    else if (a.includes('login')) contadores.login++;
-    else if (a.includes('config')||a.includes('apres')) contadores.config++;
-    else contadores.outros++;
-  });
-  if (stats) {
-    const items = [
-      {label:'Total',val:logs.length,color:'#1565c0',bg:'#eff6ff',icon:'fa-list'},
-      {label:'Salvamentos',val:contadores.salvar,color:'#166534',bg:'#dcfce7',icon:'fa-save'},
-      {label:'Criações',val:contadores.criar,color:'#1e40af',bg:'#dbeafe',icon:'fa-plus-circle'},
-      {label:'Exclusões',val:contadores.excluir,color:'#991b1b',bg:'#fee2e2',icon:'fa-trash'},
-      {label:'Logins',val:contadores.login,color:'#15803d',bg:'#f0fdf4',icon:'fa-sign-in-alt'},
-    ];
-    stats.innerHTML = items.map(it=>`
-      <div style="background:${it.bg};border-radius:10px;padding:14px 16px;border:1px solid ${it.color}22">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <i class="fas ${it.icon}" style="color:${it.color};font-size:13px"></i>
-          <span style="font-size:11px;color:${it.color};font-weight:700;text-transform:uppercase;letter-spacing:.5px">${it.label}</span>
-        </div>
-        <div style="font-size:28px;font-weight:800;color:${it.color}">${it.val}</div>
-      </div>`).join('');
-  }
-
-  if (logs.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><i class="fas fa-clipboard-list" style="font-size:36px;display:block;margin-bottom:12px;opacity:.4"></i>Nenhum registro encontrado</div>';
-    if (footer) footer.textContent = '';
-    return;
-  }
-
-  const badgeMap = (acao) => {
-    const a = (acao||'').toLowerCase();
-    if (a.includes('salv')||a.includes('save')) return ['log-badge-save','Salvo'];
-    if (a.includes('cri')||a.includes('novo')) return ['log-badge-create','Criado'];
-    if (a.includes('excl')||a.includes('remov')||a.includes('delet')) return ['log-badge-delete','Excluído'];
-    if (a.includes('login')) return ['log-badge-login','Login'];
-    if (a.includes('config')||a.includes('apres')) return ['log-badge-config','Config'];
-    return ['log-badge-update','Update'];
-  };
-
-  container.innerHTML = logs.map(l => {
-    const dt = new Date(l.ts||0);
-    const dtStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const [bc,bl] = badgeMap(l.acao);
-    const unidStr = l.unidadeNome ? ` <span style="font-size:10px;color:#9ca3af">(${sanitize(l.unidadeNome)})</span>` : '';
-    return `<div class="log-entry">
-      <div class="log-cell log-cell-ts">${dtStr}</div>
-      <div class="log-cell log-cell-user"><i class="fas fa-user" style="color:#94a3b8;font-size:11px;margin-right:5px"></i>${sanitize(l.nome||l.usuario||'—')}</div>
-      <div class="log-cell log-cell-acao"><span class="log-badge ${bc}">${bl}</span></div>
-      <div class="log-cell log-cell-det">${sanitize(l.detalhes||l.acao||'—')}${unidStr}</div>
-    </div>`;
-  }).join('');
-
-  if (footer) footer.textContent = `Exibindo ${logs.length} de até 500 registros mais recentes`;
-}
-
-// ─────────────────────────────────────────────
-// NOVO: Monitor Grafana-style
+// Renderizar Monitor Grafana
 // ─────────────────────────────────────────────
 function renderMonitorGrafana(logs) {
   const mc = document.getElementById('monitorContent');
@@ -2198,7 +2115,6 @@ function renderMonitorGrafana(logs) {
     const barColor = {ativo:'#16a34a',atencao:'#d97706',alerta:'#ea580c',critico:'#dc2626'}[status];
     const logsUnit = logs.filter(l => l.unidade === u.id);
     const ultimaAcao = logsUnit[0];
-    // Faltômetro mensal: verificar se atualizou no mês atual
     const atualizouEsteMes = u.ultima_atualizacao >= inicioDomes;
     const totalFaltas = (u.espDados||[]).reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
     return { ...u, horas, status, statusLabel, tempoStr, barPct, barColor, logsUnit, ultimaAcao, atualizouEsteMes, totalFaltas };
@@ -2208,14 +2124,12 @@ function renderMonitorGrafana(logs) {
   unidades.forEach(u => cnt[u.status]++);
   const recenteLogs = logs.slice(0,15);
 
-  // Faltômetro: stats mensais
   const updatedThisMonth = unidades.filter(u => u.atualizouEsteMes).length;
   const pendentes = unidades.length - updatedThisMonth;
   const totalSistema = unidades.reduce((a,u) => a + u.totalFaltas, 0);
   const maxFaltasUnit = Math.max(...unidades.map(u => u.totalFaltas), 1);
 
   mc.innerHTML = `
-    <!-- KPIs conectividade -->
     <div class="grafana-grid">
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#16a34a,#22c55e)"></div>
@@ -2243,9 +2157,7 @@ function renderMonitorGrafana(logs) {
       </div>
     </div>
 
-    <!-- ═══ FALTÔMETRO MENSAL ═══ -->
     <div style="background:#fff;border-radius:14px;border:1.5px solid #e2e8f0;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)">
-      <!-- Header da seção -->
       <div style="background:linear-gradient(135deg,#1e293b,#334155);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:12px">
           <div style="width:36px;height:36px;border-radius:9px;background:rgba(239,83,80,.2);border:1px solid rgba(239,83,80,.4);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-times" style="color:#ff8a80;font-size:15px"></i></div>
@@ -2267,7 +2179,6 @@ function renderMonitorGrafana(logs) {
           </div>
         </div>
       </div>
-      <!-- KPIs faltômetro -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f1f5f9">
         <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
           <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-check-circle" style="color:#16a34a;margin-right:4px"></i>Atualizaram este mês</div>
@@ -2287,7 +2198,6 @@ function renderMonitorGrafana(logs) {
           <div style="font-size:11px;color:#9ca3af;margin-top:4px">Dados referentes às consultas não realizadas</div>
         </div>
       </div>
-      <!-- Grid por unidade -->
       <div style="padding:18px 22px">
         <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px"><i class="fas fa-chart-bar" style="margin-right:6px;color:#1565c0"></i>Detalhamento por Unidade — Mês anterior (${mesAnterior})</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
@@ -2305,7 +2215,6 @@ function renderMonitorGrafana(logs) {
                     <div style="font-size:14px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px" title="${sanitize(u.nome)}">${sanitize(u.nome)}</div>
                     <span style="background:${sfBg};color:${sfColor};border:1px solid ${sfBorder};font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:4px"><i class="fas ${sfIcon}" style="font-size:9px"></i>${sfLabel}</span>
                   </div>
-                  <!-- Total faltas -->
                   <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:12px">
                     <div style="font-family:'Bebas Neue',monospace;font-size:42px;color:#ef5350;line-height:1">${u.totalFaltas}</div>
                     <div style="font-size:11px;color:#9ca3af;line-height:1.3">consultas<br>perdidas</div>
@@ -2315,14 +2224,12 @@ function renderMonitorGrafana(logs) {
                       </div>
                     </div>
                   </div>
-                  <!-- Barra relativa ao sistema -->
                   <div style="margin-bottom:10px">
                     <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:3px"><span>Participação no total</span><span>${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%</span></div>
                     <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
                       <div style="height:100%;width:${totalSistema?Math.round(u.totalFaltas/totalSistema*100):0}%;background:linear-gradient(90deg,#ef5350,#ff1744);border-radius:3px"></div>
                     </div>
                   </div>
-                  <!-- Mini especialidades -->
                   ${espList.length > 0 ? `<div style="border-top:1px solid #e2e8f0;padding-top:10px">${espList.map(e=>`
                     <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:5px">
                       <div>
@@ -2333,7 +2240,6 @@ function renderMonitorGrafana(logs) {
                       </div>
                       <div style="font-weight:800;color:#dc2626;font-size:14px;min-width:28px;text-align:right">${parseInt(e.faltas)||0}</div>
                     </div>`).join('')}</div>` : '<div style="font-size:11px;color:#9ca3af;margin-top:8px">Sem especialidades cadastradas</div>'}
-                  <!-- Última atualização -->
                   <div style="margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:5px">
                     <i class="fas fa-history" style="font-size:9px"></i>
                     ${u.ultima_atualizacao ? `Atualizado em ${new Date(u.ultima_atualizacao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}` : 'Nunca atualizado'}
@@ -2344,7 +2250,6 @@ function renderMonitorGrafana(logs) {
       </div>
     </div>
 
-    <!-- Timeline de conectividade -->
     <div class="grafana-timeline">
       <div class="grafana-timeline-title">
         <i class="fas fa-chart-bar" style="color:#1565c0"></i>
@@ -2368,12 +2273,10 @@ function renderMonitorGrafana(logs) {
         </div>`).join('')}
     </div>
 
-    <!-- Atividade recente + tabela detalhada -->
     <div class="grafana-two-col">
       <div class="grafana-activity-feed">
         <div class="grafana-timeline-title" style="margin-bottom:14px">
           <i class="fas fa-bolt" style="color:#f59e0b"></i> Atividade Recente
-          <button class="adm-btn-muted adm-btn-sm" style="margin-left:auto;font-size:11px" onclick="APP.showSection('log')"><i class="fas fa-history"></i> Ver Log Completo</button>
         </div>
         ${recenteLogs.length === 0
           ? '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">Nenhuma atividade registrada ainda</div>'
@@ -2427,19 +2330,17 @@ function salvarFirebase() {
   const agora = Date.now();
   dadosUnidade.ultima_atualizacao = agora;
   dadosUnidade.ultima_sincronizacao = agora;
-
-  if (IS_MATRIZ) {
-    // Garantir que videoUrls do dadosGerais esteja dentro do dadosUnidade
-    // (evita o bug de dois writes no mesmo path que destruía nome/especialidades)
-    if (!dadosUnidade.unidade) dadosUnidade.unidade = {};
-    dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls || dadosUnidade.unidade.videoUrls || [];
-    dadosGerais.ultima_atualizacao = agora;
-    cache.set('geral', dadosUnidade);
-  }
-
+  dadosUnidade.flayers = Array.isArray(flayerSys.flayers) ? [...flayerSys.flayers] : [];
+  dadosUnidade.apresentacaoConfig = Object.assign({}, apresentSys.config || apresentSys.defaultConfig);
+  dadosUnidade.faltoMsgs = Array.isArray(FALTO_MSGS) ? [...FALTO_MSGS] : [];
   cache.set(UNIDADE_ID, dadosUnidade);
-  // Write único — não sobrescreve mais com dadosGerais
-  return db.ref('paineis/'+UNIDADE_ID).set(dadosUnidade);
+  const p1 = db.ref('paineis/'+UNIDADE_ID).set(dadosUnidade);
+  if (IS_MATRIZ) {
+    dadosGerais.ultima_atualizacao = agora;
+    cache.set('geral', dadosGerais);
+    return p1.then(() => db.ref('paineis/geral').set(dadosGerais));
+  }
+  return p1;
 }
 
 function renderizarGridUnidades() {
@@ -2510,7 +2411,6 @@ window.APP = {
   entrarPainel() { auth.entrarPainel(); },
   trocarUsuario() { auth.trocarUsuario(); },
 
-  // NOVO: Preview ampliado da Apresentação
   expandirPreview() {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
     const esp = dadosUnidade.unidade.especialidades || [];
@@ -2585,7 +2485,25 @@ window.APP = {
     if (ytPlayer && typeof ytPlayer.unMute === 'function') {
       ytPlayer.unMute(); ytPlayer.setVolume(80);
     } else { criarPlayer(); }
+    toggleAutoplayOverlay(false);
     document.getElementById('btnSom').style.display = 'none';
+  },
+  forcarPlayback() {
+    toggleAutoplayOverlay(false);
+    atualizarStatusRotacao('recuperacao', 'ForÃ§ando reinÃ­cio da exibiÃ§Ã£o');
+    playbackRecoveryCount = 0;
+    try {
+      if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+        ytPlayer.mute();
+        ytPlayer.playVideo();
+        tentarTocarVideo(ytPlayer, 200);
+        tentarTocarVideo(ytPlayer, 1200);
+      } else {
+        carregarVideo();
+      }
+    } catch (e) {
+      carregarVideo();
+    }
   },
   logout() {
     registrarLog('logout','Sessão encerrada');
@@ -2594,8 +2512,8 @@ window.APP = {
     if (auth._sessionAbort) { auth._sessionAbort.abort(); auth._sessionAbort = null; }
     document.getElementById('adminPanel').style.display = 'none';
     notif('Sessão encerrada.','info');
-    // Retomar ciclo de rotação
     rotacao.emCiclo = false;
+    toggleAutoplayOverlay(false);
     setTimeout(() => carregarVideo(), 300);
   },
 
@@ -2607,9 +2525,6 @@ window.APP = {
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
-    // Cancelar listeners em tempo real ao sair das seções
-    if (window._monitorUnsubscribe) { window._monitorUnsubscribe(); window._monitorUnsubscribe = null; }
-    if (window._logUnsubscribe) { window._logUnsubscribe(); window._logUnsubscribe = null; }
     document.querySelectorAll('.adm-nav-item').forEach(i => i.classList.remove('active'));
     const navEl = document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1));
     if (navEl) navEl.classList.add('active');
@@ -2635,7 +2550,6 @@ window.APP = {
     this.salvarDados();
   },
 
-  // Mensagens de conscientização (apenas matriz)
   adicionarMsg() {
     const lista = document.getElementById('listaMsgs');
     if (!lista) return;
@@ -2677,15 +2591,12 @@ window.APP = {
     if (!dadosUnidade.unidade.especialidades) dadosUnidade.unidade.especialidades = [];
     dadosUnidade.unidade.especialidades.push({nome:'Nova Especialidade',faltas:0});
     sections.faltometro();
-    registrarLog('criar','Nova especialidade adicionada');
-    this.salvarDados();
+    atualizarFaltometro();
   },
   removerEsp(i) {
-    const nome = dadosUnidade.unidade.especialidades[i]?.nome || '';
     dadosUnidade.unidade.especialidades.splice(i,1);
     sections.faltometro();
-    registrarLog('excluir','Especialidade "'+nome+'" removida');
-    this.salvarDados();
+    atualizarFaltometro();
   },
   atualizarEsp(i,campo,valor) {
     if (!dadosUnidade.unidade.especialidades[i]) return;
@@ -2737,145 +2648,24 @@ window.APP = {
   },
 
   salvarVideos() {
-    dadosGerais.unidade.videoUrls = document.getElementById('vUrls')
-      ? document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='')
-      : [...document.querySelectorAll('.video-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
-    if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = dadosGerais.unidade.videoUrls;
+    dadosGerais.unidade.videoUrls = document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='');
     registrarLog('salvar','URLs de vídeos globais atualizadas ('+dadosGerais.unidade.videoUrls.length+' vídeos)');
-    // Salva o campo específico de videoUrls e o dadosUnidade completo (sem duplo write destrutivo)
-    db.ref('paineis/geral/unidade/videoUrls').set(dadosGerais.unidade.videoUrls)
-      .then(() => notif(dadosGerais.unidade.videoUrls.length+' vídeo(s) salvos!','success'))
-      .catch(() => notif('Erro ao salvar vídeos!','error'));
-  },
-
-  // Métodos para campos individuais de vídeo
-  adicionarVideo() {
-    const lista = document.getElementById('listaVideos');
-    if (!lista) return;
-    const i = lista.querySelectorAll('.falto-row').length;
-    const div = document.createElement('div');
-    div.className = 'falto-row';
-    div.style.cssText = 'grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center';
-    div.innerHTML = `
-      <div style="width:64px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-video" style="color:#cbd5e1;font-size:16px"></i></div>
-      <input type="text" class="adm-input video-url-input" placeholder="URL do YouTube (youtube.com/watch?v=...)" onchange="APP._videoAutoSave()" style="font-family:monospace;font-size:13px">
-      <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
-      <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerVideo(this)" title="Remover"><i class="fas fa-trash"></i></button>`;
-    lista.appendChild(div);
-  },
-  removerVideo(btnOrIdx) {
-    if (typeof btnOrIdx === 'number') {
-      const lista = document.getElementById('listaVideos');
-      if (lista) { const rows = lista.querySelectorAll('.falto-row'); if (rows[btnOrIdx]) rows[btnOrIdx].remove(); }
-    } else {
-      btnOrIdx.closest('.falto-row').remove();
-    }
-    this._videoAutoSave();
-  },
-  _coletarUrlsVideo() {
-    return [...document.querySelectorAll('.video-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
-  },
-  _videoAutoSave: (function() {
-    let t = null;
-    return function() {
-      if (t) clearTimeout(t);
-      t = setTimeout(() => {
-        const urls = APP._coletarUrlsVideo();
-        dadosGerais.unidade.videoUrls = urls;
-        if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = urls;
-        db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
-          registrarLog('salvar','Vídeos atualizados automaticamente ('+urls.length+')');
-          const s = document.getElementById('videoSaveStatus');
-          if (s) { s.style.display='block'; setTimeout(()=>s.style.display='none',3000); }
-        });
-      }, 1200);
-    };
-  })(),
-  _videoSalvarManual() {
-    const urls = this._coletarUrlsVideo();
-    dadosGerais.unidade.videoUrls = urls;
-    if (dadosUnidade.unidade) dadosUnidade.unidade.videoUrls = urls;
-    db.ref('paineis/geral/unidade/videoUrls').set(urls).then(() => {
-      registrarLog('salvar','Vídeos salvos manualmente ('+urls.length+')');
-      notif(urls.length+' vídeo(s) salvos!','success');
-    });
+    this.salvarDados();
   },
 
   salvarFlayers() {
-    const urls = document.getElementById('flayerUrls')
-      ? document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='')
-      : [...document.querySelectorAll('.flayer-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
+    const urls = document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='');
     flayerSys.salvar(urls).then(() => {
       registrarLog('salvar','Encartes atualizados ('+urls.length+' encarte(s))');
       notif(`${urls.length} encarte(s) salvos!`,'success');
       sections.flayers();
     });
   },
-
-  // Métodos para campos individuais de flayer
-  adicionarFlayer() {
-    const lista = document.getElementById('listaFlayers');
-    if (!lista) return;
-    // Remover placeholder se existir
-    const placeholder = lista.querySelector('div[style*="dashed"]');
-    if (placeholder) placeholder.remove();
-    const i = lista.querySelectorAll('.falto-row').length;
-    const div = document.createElement('div');
-    div.className = 'falto-row';
-    div.style.cssText = 'grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center';
-    div.innerHTML = `
-      <div style="width:54px;height:42px;border-radius:8px;overflow:hidden;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="color:#cbd5e1;font-size:16px"></i></div>
-      <input type="text" class="adm-input flayer-url-input" placeholder="URL da imagem (JPG/PNG hospedada)" onchange="APP._flayerAutoSave()" oninput="APP._flayerPreviewThumb(this)" style="font-family:monospace;font-size:13px">
-      <div style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;flex-shrink:0">${i+1}</div>
-      <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerFlayer(this)" title="Remover"><i class="fas fa-trash"></i></button>`;
-    lista.appendChild(div);
-  },
-  _flayerPreviewThumb(input) {
-    const thumb = input.closest('.falto-row').querySelector('img');
-    if (!thumb) {
-      const div = input.closest('.falto-row').querySelector('div[style*="54px"]');
-      if (div) {
-        div.innerHTML = `<img src="${sanitize(input.value)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
-      }
-    } else {
-      thumb.src = input.value;
-    }
-  },
-  removerFlayer(btnOrIdx) {
-    if (typeof btnOrIdx === 'number') {
-      const urls = [...flayerSys.flayers]; urls.splice(btnOrIdx,1);
-      flayerSys.salvar(urls).then(() => {
-        registrarLog('excluir','Encarte #'+(btnOrIdx+1)+' removido');
-        notif('Removido!','success');
-        sections.flayers();
-      });
-    } else {
-      btnOrIdx.closest('.falto-row').remove();
-      this._flayerAutoSave();
-    }
-  },
-  _coletarUrlsFlayer() {
-    return [...document.querySelectorAll('.flayer-url-input')].map(i=>i.value.trim()).filter(u=>u!=='');
-  },
-  _flayerAutoSave: (function() {
-    let t = null;
-    return function() {
-      if (t) clearTimeout(t);
-      t = setTimeout(() => {
-        const urls = APP._coletarUrlsFlayer();
-        flayerSys.salvar(urls).then(() => {
-          registrarLog('salvar','Encartes salvos automaticamente ('+urls.length+')');
-          const s = document.getElementById('flayerSaveStatus');
-          if (s) { s.style.display='block'; setTimeout(()=>s.style.display='none',3000); }
-        });
-      }, 1200);
-    };
-  })(),
-  _flayerSalvarManual() {
-    const urls = this._coletarUrlsFlayer();
+  removerFlayer(i) {
+    const urls = [...flayerSys.flayers]; urls.splice(i,1);
     flayerSys.salvar(urls).then(() => {
-      registrarLog('salvar','Encartes salvos manualmente ('+urls.length+')');
-      notif(urls.length+' encarte(s) salvos!','success');
+      registrarLog('excluir','Encarte #'+(i+1)+' removido');
+      notif('Removido!','success');
       sections.flayers();
     });
   },
@@ -2907,14 +2697,13 @@ window.APP = {
     c.appendChild(d);
   },
 
-  // MODIFICADO: salva duração junto com a config
   salvarApresentacao() {
     const titulo   = document.getElementById('apresTitulo')?.value||'';
     const mensagem = document.getElementById('apresMensagem')?.value||'';
     const enabled  = document.getElementById('apresEnabled')?.checked !== false;
     const textos   = [...document.querySelectorAll('.texto-adicional-input')].map(i=>i.value.trim()).filter(t=>t!=='');
     const duracaoEl = document.querySelector('[name="apres_duracao"]:checked');
-    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 90;
+    const duracao   = duracaoEl ? parseInt(duracaoEl.value) : 30;
     apresentSys.salvarConfig({enabled,titulo,mensagemPrincipal:mensagem,textosAdicionais:textos,duracao})
       .then(() => {
         registrarLog('config','Apresentação configurada — duração: '+duracao+'s, ativa: '+(enabled?'sim':'não'));
@@ -2934,29 +2723,6 @@ window.APP = {
     notif('Voltando ao vídeo...','info');
   },
 
-  // NOVO: filtrar log
-  filtrarLog() {
-    if (!window._logsTodos) return;
-    const unidade = document.getElementById('logFiltroUnidade')?.value||'';
-    const acao    = document.getElementById('logFiltroAcao')?.value||'';
-    let filtrados = window._logsTodos;
-    if (unidade) filtrados = filtrados.filter(l => l.unidade === unidade);
-    if (acao) filtrados = filtrados.filter(l => (l.acao||'').toLowerCase().includes(acao));
-    renderizarLog(filtrados);
-  },
-
-  // NOVO: limpar log
-  limparLog() {
-    if (!confirm('Limpar TODOS os logs? Esta ação não pode ser desfeita.')) return;
-    db.ref('logs').remove()
-      .then(() => {
-        window._logsTodos = [];
-        notif('Log limpo!','success');
-        sections.log();
-      }).catch(() => notif('Erro!','error'));
-  },
-
-  // Usuários
   novoUsuario() {
     carregarTodasUnidades(() => {
       document.getElementById('admContent').innerHTML = `
@@ -3141,7 +2907,6 @@ window.APP = {
     }
   },
 
-  // ── BACKUP / RESTAURAR ───────────────────────
   async _coletarDados() {
     const [paineis, usuarios] = await Promise.all([
       db.ref('paineis').once('value'),
@@ -3270,9 +3035,6 @@ window.APP = {
   }
 };
 
-// ─────────────────────────────────────────────
-// NOTIFICAÇÕES
-// ─────────────────────────────────────────────
 function notif(msg, tipo='info') {
   const el = document.createElement('div');
   el.className = `notif notif-${tipo}`;
@@ -3285,9 +3047,29 @@ function notif(msg, tipo='info') {
   }, 4500);
 }
 
-// ─────────────────────────────────────────────
-// START
-// ─────────────────────────────────────────────
+function garantirAdminInicial() {
+  if (localStorage.getItem('admin_init_ok')) return;
+  db.ref('usuarios').once('value').then(snap => {
+    const us = snap.val() || {};
+    if (Object.keys(us).length > 0) { localStorage.setItem('admin_init_ok','1'); return; }
+    db.ref('usuarios/admin_gti').set({
+      nome: 'Administrador GTI', login: 'gti', senha: 'Itatilac2009',
+      nivel: 'super_admin', unidades_permitidas: ['todas'], status: 'ativo',
+      criado_em: new Date().toISOString()
+    }).then(() => localStorage.setItem('admin_init_ok','1'));
+  }).catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', iniciar);
+
+})();
+</script>
+</body>
+</html>
+oveChild(el), 300);
+  }, 4500);
+}
+
 function garantirAdminInicial() {
   if (localStorage.getItem('admin_init_ok')) return;
   db.ref('usuarios').once('value').then(snap => {
