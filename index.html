@@ -11,9 +11,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <style>
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SISTEMA DE SAÚDE PMPF — Design System v5.0
-   ═══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --blue-900:#0d1b6e;--blue-700:#1565c0;--blue-500:#1e88e5;--blue-300:#90caf9;
@@ -50,7 +50,7 @@ body::after{
   background:linear-gradient(90deg,transparent 0%,var(--blue-700) 15%,var(--green) 40%,var(--blue-500) 65%,var(--green) 85%,transparent 100%);
   filter:blur(.4px)}
 
-/* ── HEADER ─────────────────────────────────────────────── */
+/* â”€â”€ HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .main-header{
   position:fixed;top:0;left:0;width:100%;height:78px;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
@@ -80,7 +80,7 @@ body::after{
 #currentDate{font-size:12px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.5px;text-transform:capitalize}
 #currentTime{font-size:44px;font-weight:700;color:var(--green);font-family:'Bebas Neue',monospace;line-height:1;letter-spacing:3px;text-shadow:0 0 30px rgba(0,230,118,.5)}
 
-/* ── LAYOUT PRINCIPAL ────────────────────────────────────── */
+/* â”€â”€ LAYOUT PRINCIPAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .main-container{
   position:fixed;top:78px;left:0;width:100%;height:calc(100% - 82px);
   display:grid;grid-template-columns:74% 26%;gap:14px;padding:14px;
@@ -114,23 +114,23 @@ body::after{
 .btn-som i{font-size:11px}
 .btn-som:hover{opacity:1;border-color:rgba(0,230,118,.65);background:rgba(6,20,12,.88);box-shadow:0 4px 18px rgba(0,230,118,.25)}
 .rotacao-status{
-  position:absolute;top:16px;left:16px;z-index:55;
-  display:flex;align-items:center;gap:10px;
-  padding:9px 14px;border-radius:18px;
-  background:rgba(4,14,28,.72);
-  border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(14px);
-  box-shadow:0 8px 24px rgba(0,0,0,.28);
+  position:absolute;top:12px;left:12px;z-index:55;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border-radius:999px;
+  background:rgba(4,14,28,.14);
+  border:1px solid rgba(255,255,255,.04);
+  backdrop-filter:blur(2px);
+  box-shadow:none;
 }
 .rotacao-status-dot{
-  width:10px;height:10px;border-radius:50%;
+  width:7px;height:7px;border-radius:50%;
   background:var(--green);
   box-shadow:0 0 12px rgba(0,230,118,.55);
 }
-.rotacao-status-text{display:flex;flex-direction:column;gap:1px}
-.rotacao-status-label{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:rgba(255,255,255,.45)}
-.rotacao-status-stage{font-size:13px;font-weight:700;color:#fff}
-.rotacao-status-detail{font-size:11px;color:rgba(255,255,255,.58)}
+.rotacao-status-text{display:flex;align-items:center;gap:6px;line-height:1}
+.rotacao-status-label{font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.78)}
+.rotacao-status-stage{font-size:10px;font-weight:800;color:#fff}
+.rotacao-status-detail{display:none}
 .rotacao-status[data-stage="video"] .rotacao-status-dot{background:var(--green);box-shadow:0 0 12px rgba(0,230,118,.55)}
 .rotacao-status[data-stage="flayer"] .rotacao-status-dot{background:var(--gold);box-shadow:0 0 12px rgba(255,193,7,.55)}
 .rotacao-status[data-stage="apresentacao"] .rotacao-status-dot{background:var(--red);box-shadow:0 0 12px rgba(239,83,80,.55)}
@@ -186,7 +186,7 @@ body::after{
   border:1px solid rgba(255,193,7,.3);flex-shrink:0;
 }
 
-/* ── FALTÔMETRO ─────────────────────────────────────────── */
+/* â”€â”€ FALTÃ”METRO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .right-column{
   position:relative;z-index:1;
   border-radius:var(--radius-lg);overflow:hidden;
@@ -225,7 +225,7 @@ body::after{
 .item-nome{font-size:19px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.88);padding-left:14px;letter-spacing:.1px}
 .item-valor{font-size:28px;font-weight:900;font-family:var(--font-mono);color:var(--red);letter-spacing:1px;line-height:1;min-width:58px;text-align:right;text-shadow:0 0 16px rgba(239,83,80,.35)}
 
-/* ── APRESENTAÇÃO FULLSCREEN ─────────────────────────────── */
+/* â”€â”€ APRESENTAÃ‡ÃƒO FULLSCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #apresentacaoFullscreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:none;flex-direction:column;background:#030c18;overflow:hidden;font-family:var(--font)}
 #apresentacaoFullscreen.apres-entrada{animation:apresEntrar .9s cubic-bezier(.22,1,.36,1) forwards}
 #apresentacaoFullscreen.apres-saida{animation:apresSair .7s ease-in forwards}
@@ -295,7 +295,7 @@ body::after{
 @keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 .apres-footer-brand{font-size:16px;color:rgba(255,255,255,.25);letter-spacing:.5px}
 
-/* ── LOADING ─────────────────────────────────────────────── */
+/* â”€â”€ LOADING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .loading-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#020c1a 0%,#041428 50%,#030e1e 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .7s ease;overflow:hidden}
 .loading-overlay::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,118,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.025) 1px,transparent 1px);background-size:60px 60px;animation:loadGridDrift 8s linear infinite;pointer-events:none}
 @keyframes loadGridDrift{from{transform:translate(0,0)}to{transform:translate(60px,60px)}}
@@ -320,8 +320,8 @@ body::after{
 @keyframes loadTextFade{from{opacity:.5}to{opacity:1}}
 .loading-details{color:rgba(255,255,255,.3);font-size:11px;margin-top:5px;letter-spacing:.5px}
 
-/* ── ADMIN PANEL ─────────────────────────────────────────── */
-#loginScreen,#adminPanel{display:none;position:fixed;inset:0;z-index:3000;justify-content:center;align-items:center}
+/* â”€â”€ ADMIN PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+#loginScreen,#adminPanel{display:none;position:fixed;inset:0;z-index:3000;justify-content:center;align-items:center;width:100vw;height:100vh}
 #loginScreen{background:radial-gradient(ellipse at 30% 50%,rgba(21,101,192,.25),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(0,230,118,.1),transparent 60%),#040c18;backdrop-filter:blur(20px)}
 #adminPanel{background:#eef1f6;color:#1a1a2e;flex-direction:column}
 .login-box{background:rgba(8,18,34,.96);border-radius:24px;width:460px;padding:52px 48px;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.08);position:relative;overflow:hidden}
@@ -460,7 +460,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .monitor-status-alerta{color:#7c2d12;background:#ffedd5;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #fdba74}
 .monitor-status-critico{color:#991b1b;background:#fee2e2;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #fca5a5}
 
-/* ── NOVO: LOG DO SISTEMA ────────────────────────────────── */
+/* â”€â”€ NOVO: LOG DO SISTEMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .log-entry{display:grid;grid-template-columns:160px 120px 140px 1fr;gap:0;align-items:stretch;border-bottom:1px solid #f1f5f9;transition:background .15s}
 .log-entry:hover{background:#f8fafc}
 .log-entry:last-child{border-bottom:none}
@@ -477,7 +477,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .log-badge-update{background:#fef9c3;color:#713f12}
 .log-badge-config{background:#f3e8ff;color:#6b21a8}
 
-/* ── NOVO: MONITOR GRAFANA STYLE ─────────────────────────── */
+/* â”€â”€ NOVO: MONITOR GRAFANA STYLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .grafana-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .grafana-kpi{background:#fff;border-radius:14px;padding:20px 22px;border:1.5px solid #e2e8f0;position:relative;overflow:hidden;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .grafana-kpi:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
@@ -515,6 +515,222 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 .notif-info{background:linear-gradient(135deg,var(--blue-900),var(--blue-700))}
 .version-tag{font-size:11px;color:rgba(255,255,255,.25);padding:8px 20px;text-align:right;background:rgba(0,0,0,.15)}
 @media(max-width:1920px){html,body{width:100%;height:100%}}
+/* ADMIN REFRESH v6 */
+#adminPanel{
+  background:
+    radial-gradient(circle at top left, rgba(21,101,192,.16), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(0,230,118,.10), transparent 22%),
+    linear-gradient(180deg,#eef4fb 0%,#e7eef8 48%,#dfe8f4 100%);
+  position:relative;
+  width:100vw;
+  height:100vh;
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:0;
+  justify-content:flex-start;
+  align-items:stretch;
+  overflow:hidden;
+}
+#adminPanel::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(15,23,42,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,23,42,.025) 1px, transparent 1px);
+  background-size:24px 24px;
+  opacity:.45;
+}
+.adm-header{
+  height:76px;
+  padding:0 28px 0 24px;
+  background:linear-gradient(90deg,rgba(10,22,58,.96) 0%,rgba(18,57,146,.94) 58%,rgba(18,108,124,.9) 100%);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  box-shadow:0 16px 40px rgba(15,23,42,.18);
+  backdrop-filter:blur(18px);
+}
+.adm-header-logo{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.08));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 22px rgba(0,0,0,.18);
+}
+.adm-header-title{font-size:18px;font-weight:800;letter-spacing:.2px}
+.adm-header-sub{font-size:12px;opacity:.62}
+.adm-info-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.adm-btn{border-radius:14px;padding:11px 18px;font-size:13px;font-weight:700;box-shadow:0 10px 24px rgba(15,23,42,.12)}
+.adm-btn-save{box-shadow:0 14px 28px rgba(0,200,83,.22)}
+.adm-btn-logout{background:rgba(255,255,255,.08);backdrop-filter:blur(12px)}
+.adm-header{flex:0 0 76px;width:100%}
+.adm-body{grid-template-columns:286px 1fr;height:auto;flex:1 1 auto;min-height:0;gap:18px;padding:18px;position:relative;z-index:1;width:100%}
+.adm-sidebar{background:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(247,250,255,.9) 100%);border:1px solid rgba(148,163,184,.22);border-radius:26px;box-shadow:0 18px 40px rgba(15,23,42,.08);padding:10px 0}
+.adm-sidebar-section{padding:18px 22px 10px;font-size:10px;letter-spacing:2.4px;color:#64748b}
+.adm-sidebar-divider{margin:12px 18px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.4),transparent)}
+.adm-nav-item{margin:4px 12px;padding:13px 16px;border-radius:16px;border-left:none;color:#334155;font-weight:600}
+.adm-nav-item i{color:#64748b}
+.adm-nav-item:hover{background:linear-gradient(135deg,rgba(219,234,254,.95),rgba(240,249,255,.95));color:#0f3d91;transform:translateX(2px)}
+.adm-nav-item:hover i{color:#1565c0}
+.adm-nav-item.active{background:linear-gradient(135deg,#123992,#1e88e5 58%,#16a34a 140%);color:#fff;box-shadow:0 14px 28px rgba(21,101,192,.24)}
+.adm-nav-item.active i{color:#fff}
+.adm-content{background:transparent;padding:4px 4px 18px;height:100%;min-height:0;overflow-y:auto;overflow-x:hidden}
+.adm-card{background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border:1px solid rgba(148,163,184,.18);border-radius:24px;box-shadow:0 18px 42px rgba(15,23,42,.08);padding:28px 30px;position:relative;overflow:hidden}
+.adm-card::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#1565c0,#38bdf8,#22c55e);opacity:.95}
+.adm-card:hover{box-shadow:0 24px 48px rgba(15,23,42,.1)}
+.adm-card-header{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(226,232,240,.9)}
+.adm-card-title{font-size:18px;font-weight:800;color:#0f172a}
+.adm-card-desc{font-size:12px;color:#64748b;margin-top:5px}
+.adm-info-box{border-radius:16px;padding:14px 16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.adm-label{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:#475569}
+.adm-input{border-radius:14px;border:1.5px solid #d8e1ec;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:inset 0 1px 2px rgba(15,23,42,.04)}
+.adm-input:focus{border-color:#1e88e5;box-shadow:0 0 0 4px rgba(30,136,229,.12), inset 0 1px 2px rgba(15,23,42,.04)}
+.falto-row,.texto-row,.aviso-item,.adm-unit-card,.sync-card,.flayer-card,.grafana-kpi,.grafana-timeline,.grafana-activity-feed,.grafana-heatmap{border-radius:18px}
+.falto-row,.texto-row,.aviso-item{background:linear-gradient(180deg,#fbfdff 0%,#f4f8fd 100%);border-color:#dbe5f0}
+.adm-btn-primary,.adm-btn-green,.adm-btn-danger,.adm-btn-muted,.adm-btn-add{border-radius:14px}
+.adm-btn-primary{box-shadow:0 14px 28px rgba(21,101,192,.2)}
+.adm-btn-green{box-shadow:0 14px 28px rgba(0,200,83,.18)}
+.adm-btn-danger{box-shadow:0 14px 28px rgba(220,38,38,.14)}
+.adm-btn-muted{background:rgba(255,255,255,.86);border-color:#d8e1ec;color:#334155}
+.adm-btn-muted:hover{background:#f8fbff;border-color:#bfd1e4}
+.adm-btn-icon{border-radius:12px;box-shadow:0 8px 18px rgba(15,23,42,.08)}
+.adm-table{border-radius:18px;overflow:hidden;box-shadow:0 16px 34px rgba(15,23,42,.08)}
+.adm-table th{background:linear-gradient(135deg,#123992,#1565c0 58%,#0ea5e9 100%)}
+.adm-table tr:hover td{background:#f8fbff}
+.adm-unit-card{background:rgba(255,255,255,.92);border-color:#dbe5f0;box-shadow:0 16px 34px rgba(15,23,42,.07)}
+.adm-unit-card:hover{border-color:#93c5fd;transform:translateY(-5px)}
+.sync-grid{grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:16px}
+.sync-card{background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);border:1.5px solid #dbe5f0;padding:22px 18px;box-shadow:0 14px 30px rgba(15,23,42,.06);position:relative;overflow:hidden}
+.sync-card::before{content:'';position:absolute;inset:auto 0 0 0;height:4px;background:linear-gradient(90deg,#1565c0,#22c55e);opacity:0;transition:opacity .2s ease}
+.sync-card:hover{transform:translateY(-5px);border-color:#93c5fd}
+.sync-card.selected{background:linear-gradient(180deg,#f3fbf6 0%,#ecfdf5 100%);border-color:#22c55e;box-shadow:0 18px 34px rgba(34,197,94,.16)}
+.sync-card.selected::before{opacity:1}
+.sync-card-time{font-size:34px;letter-spacing:-1px}
+.sync-card-desc{font-size:12px;line-height:1.45}
+.version-tag{color:rgba(15,23,42,.42);background:transparent;padding:10px 24px 14px}
+
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;margin-top:18px}
+.theme-card{position:relative;overflow:hidden;border-radius:22px;border:1px solid #d8e1ec;background:rgba(255,255,255,.92);box-shadow:0 18px 36px rgba(15,23,42,.08);padding:18px;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.theme-card:hover{transform:translateY(-4px);box-shadow:0 24px 44px rgba(15,23,42,.12)}
+.theme-card.selected{border-color:#22c55e;box-shadow:0 24px 44px rgba(34,197,94,.18)}
+.theme-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.theme-card-name{font-size:16px;font-weight:800;color:#0f172a}
+.theme-card-desc{font-size:12px;line-height:1.5;color:#64748b;margin-top:4px}
+.theme-card-tag{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:rgba(15,23,42,.04);color:#475569}
+.theme-preview{height:148px;border-radius:18px;padding:12px;display:grid;grid-template-columns:68px 1fr;gap:10px;border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.theme-preview-sidebar{border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;gap:7px}
+.theme-preview-dot{height:10px;border-radius:999px;opacity:.95}
+.theme-preview-main{border-radius:14px;padding:12px;display:flex;flex-direction:column;justify-content:space-between}
+.theme-preview-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.theme-preview-brand{height:10px;width:78px;border-radius:999px}
+.theme-preview-chip{height:22px;width:52px;border-radius:999px}
+.theme-preview-cardline{height:10px;border-radius:999px;margin-top:8px}
+.theme-preview-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.theme-preview-metric{height:40px;border-radius:12px}
+
+body[data-theme]{transition:background .3s ease,color .3s ease}
+body[data-theme="current"]{
+  --theme-screen-bg:var(--bg);--theme-display-text:var(--text1);--theme-header-bg:linear-gradient(90deg,var(--blue-900) 0%,var(--blue-700) 55%,#1a5eb8 100%);
+  --theme-chip-bg:rgba(255,255,255,.12);--theme-chip-border:rgba(255,255,255,.18);--theme-accent:#1565c0;--theme-accent2:#00e676;--theme-accent3:#90caf9;
+  --theme-panel-bg:radial-gradient(circle at top left, rgba(21,101,192,.16), transparent 28%),radial-gradient(circle at bottom right, rgba(0,230,118,.10), transparent 22%),linear-gradient(180deg,#eef4fb 0%,#e7eef8 48%,#dfe8f4 100%);
+  --theme-panel-text:#0f172a;--theme-panel-muted:#64748b;--theme-admin-header-bg:linear-gradient(90deg,rgba(10,22,58,.96) 0%,rgba(18,57,146,.94) 58%,rgba(18,108,124,.9) 100%);
+  --theme-sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(247,250,255,.9) 100%);--theme-nav-active-bg:linear-gradient(135deg,#123992,#1e88e5 58%,#16a34a 140%);--theme-nav-active-text:#fff;
+  --theme-card-bg:rgba(255,255,255,.9);--theme-card-border:rgba(148,163,184,.18);--theme-card-text:#0f172a;--theme-input-bg:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);--theme-muted-bg:rgba(255,255,255,.86);
+  --theme-banner-bg:linear-gradient(90deg,rgba(21,101,192,.2),rgba(30,136,229,.08));--theme-side-bg:linear-gradient(170deg,#0c0505 0%,#130a0a 40%,#0a0f1a 100%);--theme-panel-border:rgba(0,230,118,.22);
+  --theme-button-text:#041a0a;--theme-preview-bg:#020b16;--theme-preview-topbar:rgba(0,0,0,.5);--theme-preview-badge-bg:rgba(255,82,82,.15);--theme-preview-badge-border:rgba(255,82,82,.3);--theme-preview-badge-text:#ff8a80;
+}
+body[data-theme="streaming"]{
+  --theme-screen-bg:#09070a;--theme-display-text:#f5f5f7;--theme-header-bg:linear-gradient(90deg,#120102 0%,#290507 38%,#640d13 100%);
+  --theme-chip-bg:rgba(255,255,255,.08);--theme-chip-border:rgba(255,255,255,.12);--theme-accent:#b20710;--theme-accent2:#e50914;--theme-accent3:#ff6b3d;
+  --theme-panel-bg:radial-gradient(circle at top left, rgba(229,9,20,.14), transparent 24%),linear-gradient(180deg,#121214 0%,#0f0f11 58%,#09090a 100%);
+  --theme-panel-text:#f8fafc;--theme-panel-muted:#cbd5e1;--theme-admin-header-bg:linear-gradient(90deg,#120102 0%,#39070b 55%,#b20710 100%);
+  --theme-sidebar-bg:linear-gradient(180deg,rgba(18,18,20,.96) 0%,rgba(10,10,12,.94) 100%);--theme-nav-active-bg:linear-gradient(135deg,#7f1d1d,#b20710 55%,#ef4444 100%);--theme-nav-active-text:#fff;
+  --theme-card-bg:linear-gradient(180deg,rgba(27,27,31,.94) 0%,rgba(17,17,20,.92) 100%);--theme-card-border:rgba(255,255,255,.08);--theme-card-text:#f8fafc;--theme-input-bg:linear-gradient(180deg,rgba(30,30,35,.96) 0%,rgba(18,18,22,.96) 100%);--theme-muted-bg:rgba(255,255,255,.06);
+  --theme-banner-bg:linear-gradient(90deg,rgba(178,7,16,.28),rgba(85,10,15,.12));--theme-side-bg:linear-gradient(170deg,#160607 0%,#120708 45%,#09090a 100%);--theme-panel-border:rgba(229,9,20,.28);
+  --theme-button-text:#fff;--theme-preview-bg:#09090a;--theme-preview-topbar:rgba(17,17,20,.92);--theme-preview-badge-bg:rgba(229,9,20,.2);--theme-preview-badge-border:rgba(239,68,68,.32);--theme-preview-badge-text:#fecaca;
+}
+body[data-theme="glass"]{
+  --theme-screen-bg:#ecf7ff;--theme-display-text:#0f172a;--theme-header-bg:linear-gradient(90deg,rgba(255,255,255,.42) 0%,rgba(200,234,255,.48) 45%,rgba(244,221,255,.48) 100%);
+  --theme-chip-bg:rgba(255,255,255,.42);--theme-chip-border:rgba(255,255,255,.55);--theme-accent:#38bdf8;--theme-accent2:#14b8a6;--theme-accent3:#f472b6;
+  --theme-panel-bg:radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 28%),radial-gradient(circle at bottom right, rgba(244,114,182,.12), transparent 24%),linear-gradient(180deg,#f3fbff 0%,#eef7ff 50%,#f9f4ff 100%);
+  --theme-panel-text:#123047;--theme-panel-muted:#527089;--theme-admin-header-bg:linear-gradient(90deg,rgba(255,255,255,.36) 0%,rgba(186,230,253,.42) 55%,rgba(232,213,255,.46) 100%);
+  --theme-sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.58) 0%,rgba(255,255,255,.42) 100%);--theme-nav-active-bg:linear-gradient(135deg,rgba(56,189,248,.88),rgba(20,184,166,.86) 58%,rgba(244,114,182,.78) 100%);--theme-nav-active-text:#fff;
+  --theme-card-bg:linear-gradient(180deg,rgba(255,255,255,.82) 0%,rgba(242,248,255,.72) 100%);--theme-card-border:rgba(190,214,232,.86);--theme-card-text:#123047;--theme-input-bg:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(245,250,255,.84) 100%);--theme-muted-bg:rgba(255,255,255,.76);
+  --theme-banner-bg:linear-gradient(90deg,rgba(56,189,248,.18),rgba(244,114,182,.12));--theme-side-bg:linear-gradient(170deg,rgba(255,255,255,.5) 0%,rgba(223,244,255,.32) 45%,rgba(238,230,255,.34) 100%);--theme-panel-border:rgba(56,189,248,.22);
+  --theme-button-text:#032838;--theme-preview-bg:rgba(255,255,255,.24);--theme-preview-topbar:rgba(255,255,255,.18);--theme-preview-badge-bg:rgba(244,114,182,.16);--theme-preview-badge-border:rgba(244,114,182,.24);--theme-preview-badge-text:#9d174d;
+}
+body[data-theme="minimal"]{
+  --theme-screen-bg:#f6f7fb;--theme-display-text:#111827;--theme-header-bg:linear-gradient(90deg,#ffffff 0%,#f3f4f6 100%);
+  --theme-chip-bg:#ffffff;--theme-chip-border:rgba(15,23,42,.08);--theme-accent:#111827;--theme-accent2:#475569;--theme-accent3:#94a3b8;
+  --theme-panel-bg:linear-gradient(180deg,#f8fafc 0%,#f3f4f6 100%);--theme-panel-text:#111827;--theme-panel-muted:#6b7280;--theme-admin-header-bg:linear-gradient(90deg,#ffffff 0%,#f3f4f6 100%);
+  --theme-sidebar-bg:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);--theme-nav-active-bg:linear-gradient(135deg,#111827,#374151 100%);--theme-nav-active-text:#fff;
+  --theme-card-bg:#ffffff;--theme-card-border:rgba(15,23,42,.08);--theme-card-text:#111827;--theme-input-bg:#ffffff;--theme-muted-bg:#f3f4f6;
+  --theme-banner-bg:linear-gradient(90deg,rgba(17,24,39,.08),rgba(148,163,184,.08));--theme-side-bg:linear-gradient(170deg,#ffffff 0%,#f4f4f5 100%);--theme-panel-border:rgba(15,23,42,.12);
+  --theme-button-text:#ffffff;--theme-preview-bg:#ffffff;--theme-preview-topbar:#f3f4f6;--theme-preview-badge-bg:rgba(17,24,39,.06);--theme-preview-badge-border:rgba(17,24,39,.1);--theme-preview-badge-text:#111827;
+}
+body[data-theme="neon"]{
+  --theme-screen-bg:#040816;--theme-display-text:#ecfeff;--theme-header-bg:linear-gradient(90deg,#040816 0%,#12123a 48%,#051b2c 100%);
+  --theme-chip-bg:rgba(8,15,34,.72);--theme-chip-border:rgba(34,211,238,.22);--theme-accent:#8b5cf6;--theme-accent2:#22d3ee;--theme-accent3:#22c55e;
+  --theme-panel-bg:radial-gradient(circle at top left, rgba(34,211,238,.16), transparent 24%),radial-gradient(circle at bottom right, rgba(139,92,246,.18), transparent 26%),linear-gradient(180deg,#07111f 0%,#050b18 60%,#02060f 100%);
+  --theme-panel-text:#ecfeff;--theme-panel-muted:#93c5fd;--theme-admin-header-bg:linear-gradient(90deg,#07111f 0%,#19194a 58%,#06263b 100%);
+  --theme-sidebar-bg:linear-gradient(180deg,rgba(8,15,34,.94) 0%,rgba(4,8,22,.94) 100%);--theme-nav-active-bg:linear-gradient(135deg,#7c3aed,#22d3ee 60%,#22c55e 100%);--theme-nav-active-text:#f8fafc;
+  --theme-card-bg:linear-gradient(180deg,rgba(9,18,38,.9) 0%,rgba(4,9,22,.92) 100%);--theme-card-border:rgba(34,211,238,.18);--theme-card-text:#ecfeff;--theme-input-bg:linear-gradient(180deg,rgba(10,20,42,.92) 0%,rgba(5,11,25,.92) 100%);--theme-muted-bg:rgba(255,255,255,.05);
+  --theme-banner-bg:linear-gradient(90deg,rgba(34,211,238,.18),rgba(124,58,237,.12));--theme-side-bg:linear-gradient(170deg,#050b18 0%,#0a1126 45%,#04111f 100%);--theme-panel-border:rgba(34,211,238,.24);
+  --theme-button-text:#04131f;--theme-preview-bg:#050b18;--theme-preview-topbar:rgba(4,9,22,.82);--theme-preview-badge-bg:rgba(139,92,246,.18);--theme-preview-badge-border:rgba(34,211,238,.24);--theme-preview-badge-text:#c4b5fd;
+}
+
+body[data-theme] .main-header{background:var(--theme-header-bg)!important}
+body[data-theme] .header-brand-icon{background:var(--theme-chip-bg)!important;border-color:var(--theme-chip-border)!important}
+body[data-theme] .header-brand-icon i,body[data-theme] #currentTime{color:var(--theme-accent2)!important}
+body[data-theme] .footer-line{background:linear-gradient(90deg,transparent 0%,var(--theme-accent) 20%,var(--theme-accent2) 55%,var(--theme-accent3) 82%,transparent 100%)!important}
+body[data-theme] .video-section{border-color:var(--theme-panel-border)!important}
+body[data-theme] .announcements-section{background:var(--theme-banner-bg)!important;border-color:var(--theme-panel-border)!important}
+body[data-theme] .right-column{background:var(--theme-side-bg)!important;border-color:var(--theme-panel-border)!important}
+body[data-theme] #adminPanel{background:var(--theme-panel-bg)!important;color:var(--theme-panel-text)!important}
+body[data-theme] .adm-header{background:var(--theme-admin-header-bg)!important}
+body[data-theme] .adm-sidebar{background:var(--theme-sidebar-bg)!important;border-color:var(--theme-card-border)!important}
+body[data-theme] .adm-nav-item,body[data-theme] .adm-nav-item i{color:var(--theme-panel-muted)!important}
+body[data-theme] .adm-nav-item.active{background:var(--theme-nav-active-bg)!important;color:var(--theme-nav-active-text)!important}
+body[data-theme] .adm-nav-item.active i{color:var(--theme-nav-active-text)!important}
+body[data-theme] .adm-card,body[data-theme] .grafana-kpi,body[data-theme] .grafana-timeline,body[data-theme] .grafana-activity-feed,body[data-theme] .grafana-heatmap,body[data-theme] .adm-unit-card,body[data-theme] .sync-card,body[data-theme] .flayer-card{background:var(--theme-card-bg)!important;border-color:var(--theme-card-border)!important;color:var(--theme-card-text)!important}
+body[data-theme] .adm-card::before{background:linear-gradient(90deg,var(--theme-accent),var(--theme-accent2),var(--theme-accent3))!important}
+body[data-theme] .adm-card-title,body[data-theme] .grafana-timeline-title,body[data-theme] .adm-unit-stat-val,body[data-theme] .sync-card-time{color:var(--theme-card-text)!important}
+body[data-theme] .adm-card-desc,body[data-theme] .adm-label-sub,body[data-theme] .adm-sidebar-section,body[data-theme] .grafana-kpi-label,body[data-theme] .grafana-kpi-sub,body[data-theme] .grafana-bar-meta,body[data-theme] .version-tag{color:var(--theme-panel-muted)!important}
+body[data-theme] .adm-input{background:var(--theme-input-bg)!important;color:var(--theme-card-text)!important;border-color:var(--theme-card-border)!important}
+body[data-theme] .adm-input::placeholder{color:var(--theme-panel-muted)!important}
+body[data-theme] .adm-btn-primary{background:linear-gradient(135deg,var(--theme-accent),var(--theme-accent2))!important;color:#fff!important}
+body[data-theme] .adm-btn-green{background:linear-gradient(135deg,var(--theme-accent2),var(--theme-accent3))!important;color:var(--theme-button-text)!important}
+body[data-theme] .adm-btn-muted{background:var(--theme-muted-bg)!important;border-color:var(--theme-card-border)!important;color:var(--theme-card-text)!important}
+body[data-theme] .sync-card.selected,body[data-theme] .theme-card.selected{border-color:var(--theme-accent2)!important}
+body[data-theme] .sync-card.selected .sync-card-time{color:var(--theme-accent2)!important}
+
+body[data-theme] .apres-preview-shell,body[data-theme] .apres-preview-modal-inner{background:var(--theme-preview-bg)!important;border-color:var(--theme-panel-border)!important}
+body[data-theme] .apres-preview-topbar{background:var(--theme-preview-topbar)!important;border-bottom-color:var(--theme-panel-border)!important}
+body[data-theme] .apres-preview-badge{background:var(--theme-preview-badge-bg)!important;border-color:var(--theme-preview-badge-border)!important;color:var(--theme-preview-badge-text)!important}
+body[data-theme] .apres-preview-eyebrow{color:var(--theme-accent2)!important}
+body[data-theme] .apres-preview-title,body[data-theme] .apres-preview-modal-title{color:var(--theme-card-text)!important}
+body[data-theme] .apres-preview-message{color:var(--theme-panel-muted)!important;border-left-color:var(--theme-accent2)!important}
+body[data-theme] .apres-preview-falto-title{color:var(--theme-accent3)!important}
+body[data-theme] .apres-preview-total-box{background:rgba(255,255,255,.06)!important;border-color:var(--theme-panel-border)!important}
+body[data-theme="glass"] .apres-preview-total-box{background:rgba(15,23,42,.04)!important}
+body[data-theme="glass"] .theme-card-desc,body[data-theme="glass"] .adm-card-desc,body[data-theme="glass"] .adm-label-sub,body[data-theme="glass"] .adm-sidebar-section,body[data-theme="glass"] .grafana-kpi-label,body[data-theme="glass"] .grafana-kpi-sub{color:#35566f!important}
+body[data-theme="glass"] .theme-card-tag{background:rgba(255,255,255,.82)!important;color:#35566f!important;border-color:rgba(148,163,184,.24)!important}
+body[data-theme="glass"] .adm-input,body[data-theme="glass"] .adm-btn-muted{color:#123047!important}
+
+.adm-content,.adm-sidebar{scrollbar-width:thin;scrollbar-color:rgba(100,116,139,.5) transparent}
+.adm-content::-webkit-scrollbar,.adm-sidebar::-webkit-scrollbar{width:10px}
+.adm-content::-webkit-scrollbar-thumb,.adm-sidebar::-webkit-scrollbar-thumb{background:rgba(100,116,139,.45);border-radius:999px}
+.adm-content::-webkit-scrollbar-track,.adm-sidebar::-webkit-scrollbar-track{background:transparent}
+.adm-content{min-height:0;padding-right:12px!important;padding-bottom:42px!important}
+#monitorContent{padding-bottom:80px;min-height:max-content}
+
+.link-editor{display:flex;flex-direction:column;gap:10px}
+.link-editor-row{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#fbfdff 0%,#f4f8fd 100%);border:1.5px solid #dbe5f0}
+.link-editor-row-flayer{grid-template-columns:minmax(0,1fr) 220px 44px}
+.link-editor-row .adm-input{font-family:monospace;font-size:13px}
+.flayer-duration-group{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;border-radius:14px;background:linear-gradient(180deg,#edf4fb 0%,#e6eef7 100%);border:1px solid #cfdae7;box-shadow:inset 0 1px 0 rgba(255,255,255,.75)}
+.flayer-duration-btn{border:none;border-radius:10px;padding:10px 6px;background:transparent;color:#5b6b7f;font-size:11px;font-weight:800;letter-spacing:.2px;cursor:pointer;transition:all .18s ease}
+.flayer-duration-btn:hover{background:rgba(21,101,192,.08);color:#11418d}
+.flayer-duration-btn.active{background:linear-gradient(135deg,#1565c0,#1e88e5 60%,#22c55e 130%);color:#fff;box-shadow:0 10px 18px rgba(21,101,192,.22);transform:translateY(-1px)}
 </style>
 </head>
 <body>
@@ -618,6 +834,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
     <div class="adm-header-info">
       <div class="adm-info-pill"><i class="fas fa-map-marker-alt"></i> <span id="admUnitLabel">—</span></div>
       <div class="adm-info-pill"><i class="fas fa-user"></i> <span id="admUserLabel">—</span></div>
+      <div class="adm-info-pill"><i class="fas fa-palette"></i> <span id="themeStatusPill">Atual PMPF</span></div>
     </div>
     <div class="adm-header-actions">
       <button class="adm-btn adm-btn-save" onclick="APP.salvarDados()"><i class="fas fa-cloud-upload-alt"></i> Salvar</button>
@@ -640,6 +857,7 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
       <div class="adm-nav-item" id="navUsuarios" onclick="APP.showSection('usuarios')" style="display:none"><i class="fas fa-users-cog"></i> Usuários</div>
       <div class="adm-nav-item" id="navUnidades" onclick="APP.showSection('unidades')" style="display:none"><i class="fas fa-building"></i> Unidades</div>
       <div class="adm-nav-item" id="navMonitor" onclick="APP.showSection('monitor')" style="display:none"><i class="fas fa-satellite-dish"></i> Monitor</div>
+      <div class="adm-nav-item" id="navTemas" onclick="APP.showSection('temas')" style="display:none"><i class="fas fa-palette"></i> Temas</div>
       <div class="adm-nav-item" id="navBackup" onclick="APP.showSection('backup')" style="display:none"><i class="fas fa-database"></i> Backup / Restaurar</div>
     </nav>
     <div class="adm-content" id="admContent"></div>
@@ -650,9 +868,9 @@ textarea.adm-input{min-height:130px;resize:vertical;line-height:1.6}
 <script>
 (function() {
 'use strict';
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // FIREBASE
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FB_CONFIG = {
   apiKey:"AIzaSyCEyebuGCoD8NYQJrIR1KpRRpkWijveN3A",
   authDomain:"gti-painel.firebaseapp.com",
@@ -687,6 +905,7 @@ let listaUsuarios = [], listaUnidades = [];
 let usuarioAtual = null, permissoesUsuario = null, sessionTimer = null;
 let isMuted = true, tickerInterval = null;
 let loginAttempts = 0, loginBloqueado = false, loginBloqueioTimer = null;
+let secaoAtual = '';
 
 const syncConfig = {
   interval: 30,
@@ -698,11 +917,104 @@ const syncConfig = {
     30:{label:'30 minutos',cost:'Mínimo',costClass:'cost-minimo'}
   },
   load() {
-    try { const s = localStorage.getItem('syncCfg_'+UNIDADE_ID); if (s) this.interval = parseInt(JSON.parse(s).interval)||30; } catch(e) {}
+    this.interval = 30;
+    try { localStorage.removeItem('syncCfg_'+UNIDADE_ID); } catch(e) {}
   },
-  save() { localStorage.setItem('syncCfg_'+UNIDADE_ID, JSON.stringify({interval:this.interval})); }
+  save() {
+    this.interval = 30;
+    try { localStorage.removeItem('syncCfg_'+UNIDADE_ID); } catch(e) {}
+  }
 };
 syncConfig.load();
+
+const themeMgr = {
+  key: 'uiTheme_v1',
+  current: 'current',
+  themes: {
+    current: { name: 'Atual PMPF', tag: 'Padrao', desc: 'Identidade institucional atual do sistema.' },
+    streaming: { name: 'Streaming Dark', tag: 'Red', desc: 'Escuro, cinematografico e com foco em destaque visual.' },
+    neon: { name: 'Futurista Neon', tag: 'Neon', desc: 'Escuro, vibrante e com contraste forte para monitoramento.' }
+  },
+  load() {
+    try {
+      const saved = localStorage.getItem(this.key);
+      if (saved === 'glass' || saved === 'minimal') {
+        this.current = 'current';
+        return;
+      }
+      if (saved && this.themes[saved]) this.current = saved;
+    } catch (e) {}
+  },
+  init() {
+    this.load();
+    this.apply(this.current, false);
+  },
+  apply(id, notify = true) {
+    const next = this.themes[id] ? id : 'current';
+    this.current = next;
+    document.body.dataset.theme = next;
+    try { localStorage.setItem(this.key, next); } catch (e) {}
+    const pill = document.getElementById('themeStatusPill');
+    if (pill) pill.textContent = this.themes[next].name;
+    if (notify) notif('Tema aplicado: ' + this.themes[next].name, 'success');
+    if (secaoAtual === 'temas' && sections.temas) sections.temas();
+  },
+  previewPalette(id = this.current) {
+    const palette = {
+      current:   { shell:'linear-gradient(180deg,#081223 0%,#10243d 100%)', side:'linear-gradient(180deg,#0d1b6e 0%,#163fa8 100%)', main:'rgba(255,255,255,.06)', brand:'#90caf9', chip:'#00e676', line:'#f0f4ff', card:'#1e88e5' },
+      streaming: { shell:'linear-gradient(180deg,#0c0c0f 0%,#141418 100%)', side:'linear-gradient(180deg,#2b0709 0%,#6f0d13 100%)', main:'rgba(255,255,255,.04)', brand:'#fca5a5', chip:'#e50914', line:'#f8fafc', card:'#7f1d1d' },
+      neon:      { shell:'linear-gradient(180deg,#040816 0%,#091227 100%)', side:'linear-gradient(180deg,#28115b 0%,#0f9ec2 100%)', main:'rgba(255,255,255,.04)', brand:'#22d3ee', chip:'#8b5cf6', line:'#ecfeff', card:'#0b1631' }
+    };
+    return palette[id] || palette.current;
+  },
+  cardHtml(id, cfg) {
+    const p = this.previewPalette(id);
+    const selected = this.current === id;
+    return `<div class="theme-card ${selected?'selected':''}" onclick="APP.aplicarTema('${id}')">
+      <div class="theme-card-head">
+        <div>
+          <div class="theme-card-name">${cfg.name}</div>
+          <div class="theme-card-desc">${cfg.desc}</div>
+        </div>
+        <span class="theme-card-tag">${cfg.tag}</span>
+      </div>
+      <div class="theme-preview" style="background:${p.shell}">
+        <div class="theme-preview-sidebar" style="background:${p.side}">
+          <div class="theme-preview-dot" style="background:${p.brand};width:36px"></div>
+          <div class="theme-preview-dot" style="background:${p.line};width:44px;opacity:.35"></div>
+          <div class="theme-preview-dot" style="background:${p.line};width:30px;opacity:.22"></div>
+          <div class="theme-preview-dot" style="background:${p.line};width:38px;opacity:.18"></div>
+        </div>
+        <div class="theme-preview-main" style="background:${p.main}">
+          <div class="theme-preview-top">
+            <div class="theme-preview-brand" style="background:${p.brand}"></div>
+            <div class="theme-preview-chip" style="background:${p.chip}"></div>
+          </div>
+          <div>
+            <div class="theme-preview-cardline" style="background:${p.line};width:88%;opacity:.9"></div>
+            <div class="theme-preview-cardline" style="background:${p.line};width:62%;opacity:.55"></div>
+          </div>
+          <div class="theme-preview-metrics">
+            <div class="theme-preview-metric" style="background:${p.card}"></div>
+            <div class="theme-preview-metric" style="background:${p.card};opacity:.82"></div>
+            <div class="theme-preview-metric" style="background:${p.card};opacity:.68"></div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-action-bar" style="margin-top:16px">
+        <button class="${selected?'adm-btn-green':'adm-btn-muted'} adm-btn-sm" style="width:100%;justify-content:center" onclick="event.stopPropagation();APP.aplicarTema('${id}')">
+          <i class="fas ${selected?'fa-check-circle':'fa-palette'}"></i> ${selected?'Tema Ativo':'Aplicar Tema'}
+        </button>
+      </div>
+    </div>`;
+  }
+};
+
+function obterPrimeiroDiaUtilMes(ref = new Date()) {
+  const base = new Date(ref.getFullYear(), ref.getMonth(), 1, 0, 0, 0, 0);
+  while (base.getDay() === 0 || base.getDay() === 6) base.setDate(base.getDate() + 1);
+  return base;
+}
 
 const cache = {
   db: null,
@@ -757,15 +1069,26 @@ function atualizarStatusRotacao(stage, detail) {
   const root = document.getElementById('rotacaoStatus');
   const stageEl = document.getElementById('rotacaoStage');
   const detailEl = document.getElementById('rotacaoDetail');
-  const nomes = {
-    video: 'Vídeos',
-    flayer: 'Flayers',
-    apresentacao: 'Apresentação',
-    recuperacao: 'Recuperação'
-  };
+  const detalhe = String(detail || '');
+  const contador = detalhe.match(/(\d+)\s*\/\s*(\d+)/);
+  let statusCompacto = '1/1';
+
+  if (contador) {
+    statusCompacto = `${contador[1]}/${contador[2]}`;
+  } else if (stage === 'video') {
+    const totalPlaylist = detalhe.match(/(\d+)/);
+    statusCompacto = totalPlaylist ? `1/${totalPlaylist[1]}` : '1/1';
+  } else if (stage === 'flayer') {
+    statusCompacto = 'encarte';
+  } else if (stage === 'apresentacao') {
+    statusCompacto = 'aviso';
+  } else if (stage === 'recuperacao') {
+    statusCompacto = 'aguarde';
+  }
+
   if (root) root.dataset.stage = stage || 'recuperacao';
-  if (stageEl) stageEl.textContent = nomes[stage] || 'Recuperação';
-  if (detailEl) detailEl.textContent = detail || 'Aguardando';
+  if (stageEl) stageEl.textContent = statusCompacto;
+  if (detailEl) detailEl.textContent = '';
 }
 
 function toggleAutoplayOverlay(show) {
@@ -782,11 +1105,12 @@ function tentarTocarVideo(target, delay) {
   }, delay);
 }
 
-// ════════════════════════════════════════════════════════════
-// ROTAÇÃO: VÍDEOS → FLAYERS → APRESENTAÇÃO → LOOP
-// ════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ROTAÇÃO: APRESENTAÇÃO → FLAYERS → VÍDEOS → LOOP
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const rotacao = {
   emCiclo: false,
+  bootstrapped: false,
   playlistTerminou() {
     if (this.emCiclo) return;
     if (flayerSys.isPlaying || apresentSys.isPlaying) return;
@@ -795,11 +1119,19 @@ const rotacao = {
     this.iniciarCiclo();
   },
   iniciarCiclo() {
-    const temFlayers = (flayerSys.flayers || []).length > 0;
-    if (temFlayers) {
-      flayerSys.iniciarCiclo(() => apresentSys.iniciar(() => this.resetar()));
+    const iniciarFlayersOuVideos = () => {
+      const temFlayers = (flayerSys.flayers || []).length > 0;
+      if (temFlayers) {
+        flayerSys.iniciarCiclo(() => this.resetar());
+      } else {
+        this.resetar();
+      }
+    };
+    const apresentacaoAtiva = (apresentSys.config || apresentSys.defaultConfig || {}).enabled !== false;
+    if (apresentacaoAtiva) {
+      apresentSys.iniciar(() => iniciarFlayersOuVideos());
     } else {
-      apresentSys.iniciar(() => this.resetar());
+      iniciarFlayersOuVideos();
     }
   },
   resetar() {
@@ -810,15 +1142,27 @@ const rotacao = {
     const fc = document.getElementById('flayerContainer');
     if (vc) vc.style.display = 'block';
     if (fc) { fc.style.display = 'none'; fc.innerHTML = ''; }
-    atualizarStatusRotacao('video', 'Reiniciando playlist');
-    setTimeout(() => carregarVideo(), 400);
+    const temVideos = ((dadosGerais?.unidade?.videoUrls) || []).map(extrairYtId).filter(Boolean).length > 0;
+    if (temVideos) {
+      atualizarStatusRotacao('video', 'Reiniciando playlist');
+      setTimeout(() => carregarVideo(), 400);
+    } else {
+      atualizarStatusRotacao('recuperacao', 'Aguardando conteúdo');
+      setTimeout(() => this.playlistTerminou(), 1000);
+    }
   }
 };
 
 const flayerSys = {
   flayers: [], isPlaying: false, currentIndex: 0, timer: null, onConcluido: null,
+  normalizarItem(item) {
+    if (typeof item === 'string') return { url: item, duracao: 30 };
+    if (!item || typeof item !== 'object') return { url: '', duracao: 30 };
+    const duracao = [30, 60, 90].includes(parseInt(item.duracao)) ? parseInt(item.duracao) : 30;
+    return { url: item.url || '', duracao };
+  },
   init() {
-    this.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
+    this.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers.map(item => this.normalizarItem(item)) : [];
   },
   iniciarCiclo(onConcluido) {
     this.onConcluido = onConcluido; this.currentIndex = 0; this.isPlaying = true; this.proxFlayer();
@@ -826,12 +1170,20 @@ const flayerSys = {
   proxFlayer() {
     if (!this.isPlaying) return;
     if (this.currentIndex >= this.flayers.length) { this.concluir(); return; }
-    this.mostrarFlayer(this.flayers[this.currentIndex]);
+    const item = this.normalizarItem(this.flayers[this.currentIndex]);
+    if (!item.url.trim()) {
+      this.currentIndex++;
+      this.proxFlayer();
+      return;
+    }
+    this.mostrarFlayer(item);
     this.currentIndex++;
     if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => this.proxFlayer(), 30000);
+    this.timer = setTimeout(() => this.proxFlayer(), item.duracao * 1000);
   },
-  mostrarFlayer(url) {
+  mostrarFlayer(item) {
+    const url = item.url;
+    const duracao = item.duracao || 30;
     const vc = document.getElementById('videoContainer');
     const fc = document.getElementById('flayerContainer');
     const bs = document.getElementById('btnSom');
@@ -852,7 +1204,7 @@ const flayerSys = {
     const bar = document.getElementById('flayerProgress');
     if (bar) {
       bar.style.cssText = 'position:absolute;bottom:0;left:0;height:4px;background:#00e676;z-index:41;width:0;transition:none';
-      setTimeout(() => { bar.style.transition = 'width 30s linear'; bar.style.width = '100%'; }, 50);
+      setTimeout(() => { bar.style.transition = `width ${duracao}s linear`; bar.style.width = '100%'; }, 50);
     }
   },
   concluir() {
@@ -877,14 +1229,14 @@ const flayerSys = {
     if (reiniciar) rotacao.resetar();
   },
   salvar(urls) {
-    this.flayers = urls.filter(u => u.trim() !== '');
+    this.flayers = urls.map(item => this.normalizarItem(item)).filter(item => item.url.trim() !== '');
     return db.ref('paineis/'+UNIDADE_ID+'/flayers').set(this.flayers);
   }
 };
 
-// ════════════════════════════════════════════════════════════
-// APRESENTAÇÃO COMUNITÁRIA - PADRÃO 30 SEGUNDOS
-// ════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// APRESENTAÃ‡ÃƒO COMUNITÃRIA - PADRÃƒO 30 SEGUNDOS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const apresentSys = {
   isPlaying: false,
   duration: 30000, // Padrão: 30 segundos
@@ -1076,11 +1428,11 @@ const apresentSys = {
       el.classList.add('apres-saida');
       setTimeout(() => {
         if (el.parentNode) el.parentNode.removeChild(el);
-        atualizarStatusRotacao('video', 'Retornando aos vÃ­deos');
+        atualizarStatusRotacao('video', 'Retornando aos vídeos');
         if (this.onConcluido) this.onConcluido();
       }, 700);
     } else {
-      atualizarStatusRotacao('video', 'Retornando aos vÃ­deos');
+      atualizarStatusRotacao('video', 'Retornando aos vídeos');
       if (this.onConcluido) this.onConcluido();
     }
   },
@@ -1102,9 +1454,9 @@ const apresentSys = {
   }
 };
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // SYNC MANAGER
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const syncMgr = {
   timer: null, syncing: false, done: false, started: false,
   init() {
@@ -1125,10 +1477,11 @@ const syncMgr = {
   },
   startAuto() {
     if (this.timer) clearInterval(this.timer);
-    const ms = syncConfig.interval * 60000;
+    syncConfig.interval = 30;
+    const ms = 30 * 60000;
     let hash=0;
     for (let i=0;i<UNIDADE_ID.length;i++){hash=((hash<<5)-hash)+UNIDADE_ID.charCodeAt(i);hash=hash&hash;}
-    const offset = Math.abs(hash % syncConfig.interval);
+    const offset = Math.abs(hash % 30);
     setTimeout(() => {
       this.sync();
       this.timer = setInterval(() => this.sync(), ms);
@@ -1153,8 +1506,12 @@ const syncMgr = {
       const cachedTs = (cached && cached.data) ? (cached.data.ultima_atualizacao || 0) : 0;
       const novoTs   = d.ultima_atualizacao || 0;
       const mudou    = novoTs > cachedTs || !this.done;
-      d.ultima_sincronizacao = Date.now();
-      await cache.set(UNIDADE_ID, d);
+      const heartbeat = Date.now();
+      d.ultima_sincronizacao = heartbeat;
+      await Promise.all([
+        cache.set(UNIDADE_ID, d),
+        db.ref('paineis/'+UNIDADE_ID+'/ultima_sincronizacao').set(heartbeat)
+      ]);
       if (mudou || !this.done || gerais) { dadosUnidade = d; processarInterface(); }
       this.done = true;
       ocultarLoading();
@@ -1165,23 +1522,22 @@ const syncMgr = {
     }
   },
   setInterval(n) {
-    if (!syncConfig.intervalMap[n]) return;
-    syncConfig.interval = n;
+    syncConfig.interval = 30;
     syncConfig.save();
     this.startAuto();
-    notif('Intervalo: '+n+' minutos','success');
+    notif('Intervalo fixado em 30 minutos','success');
   },
   forceSync() { this.sync(); }
 };
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // REGISTRO DE LOG
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function registrarLog() {}
 
-// ─────────────────────────────────────────────
-// INICIALIZAÇÃO
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// INICIALIZAÃ‡ÃƒO
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ocultarLoading() {
   const o = document.getElementById('loadingOverlay');
   if (o) { o.style.opacity='0'; setTimeout(()=>o.style.display='none',350); }
@@ -1200,6 +1556,7 @@ async function iniciar() {
   document.getElementById('headerSubtitle').textContent = IS_MATRIZ
     ? 'Controle Central — PMPF' : 'PMPF — Sistema de Saúde';
 
+  themeMgr.init();
   await cache.init().catch(()=>{});
   atualizarRelogio();
   setInterval(atualizarRelogio, 1000);
@@ -1236,7 +1593,10 @@ function processarInterface() {
   flayerSys.flayers = Array.isArray(dadosUnidade.flayers) ? dadosUnidade.flayers : [];
   carregarMsgsConscientizacao();
   atualizarFaltometro();
-  carregarVideo();
+  if (!rotacao.bootstrapped) {
+    rotacao.bootstrapped = true;
+    setTimeout(() => rotacao.iniciarCiclo(), 300);
+  }
   atualizarAvisos();
 }
 
@@ -1327,7 +1687,7 @@ function criarPlayer(ids) {
     events: {
       onReady(e) {
         toggleAutoplayOverlay(false);
-        atualizarStatusRotacao('video', `Playlist com ${ytTotalVideos} vÃ­deo(s)`);
+        atualizarStatusRotacao('video', `Playlist com ${ytTotalVideos} vídeo(s)`);
         e.target.loadPlaylist({
           playlist: ytIds,
           index: 0,
@@ -1382,7 +1742,7 @@ function criarPlayer(ids) {
       },
       onError(e) {
         ytVideosVisto = Math.min(ytVideosVisto + 1, ytTotalVideos || 1);
-        atualizarStatusRotacao('recuperacao', 'Pulando vÃ­deo indisponÃ­vel');
+        atualizarStatusRotacao('recuperacao', 'Pulando vídeo indisponível');
         if (ytVideosVisto >= ytTotalVideos) {
           rotacao.playlistTerminou();
           return;
@@ -1492,9 +1852,9 @@ function atualizarAvisos() {
   if (items.length > 1) tickerInterval = setInterval(show, 30000);
 }
 
-// ─────────────────────────────────────────────
-// AUTENTICAÇÃO
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// AUTENTICAÃ‡ÃƒO
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const auth = {
   openLogin() {
     if (usuarioAtual) { this.showUserInfo(); return; }
@@ -1566,6 +1926,7 @@ const auth = {
     configurarMenus();
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'flex';
+    themeMgr.apply(themeMgr.current, false);
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
@@ -1614,6 +1975,7 @@ function configurarMenus() {
   show('navUsuarios', IS_MATRIZ && isSA);
   show('navUnidades', IS_MATRIZ && isSA);
   show('navMonitor', IS_MATRIZ && isSA);
+  show('navTemas', IS_MATRIZ && isSA);
   show('navBackup', IS_MATRIZ && isSA);
 
   const showAdminSection = IS_MATRIZ && isSA;
@@ -1627,9 +1989,9 @@ function configurarMenus() {
   }
 }
 
-// ─────────────────────────────────────────────
-// SEÇÕES DO PAINEL
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SEÃ‡Ã•ES DO PAINEL
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const sections = {
 
   unidade() {
@@ -1733,10 +2095,20 @@ const sections = {
           <div><div class="adm-card-title"><i class="fas fa-globe"></i> Avisos SMS</div><div class="adm-card-desc">Aparecem em <strong>todas</strong> as unidades</div></div>
           <span class="avisos-badge-central">SMS</span>
         </div>
-        <div id="listAvisoCentral">${avisosCentralHtml}</div>
+        <div id="listAvisoCentral">
+          ${avisosGlobal.length===0 ? '<div style="color:#9ca3af;font-size:14px;padding:12px 0">Nenhum aviso central no momento.</div>' :
+            avisosGlobal.map((a,i)=>`
+              <div class="aviso-item aviso-item-central">
+                <input type="text" class="adm-input" value="${sanitize(a)}" onchange="APP.editarAvisoCentral(${i},this.value)" style="border:none;background:transparent;font-size:15px;font-weight:500;color:#374151;padding:0">
+                <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerAvisoCentral(${i})"><i class="fas fa-trash"></i></button>
+              </div>`).join('')}
+        </div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px;align-items:center">
           <input type="text" id="novoAvisoCentral" class="adm-input" placeholder="Novo aviso central...">
           <button class="adm-btn-primary adm-btn-sm" onclick="APP.adicionarAvisoCentral()"><i class="fas fa-plus"></i> Adicionar</button>
+        </div>
+        <div class="adm-action-bar" style="margin-top:16px">
+          <button class="adm-btn-green" onclick="APP.salvarAvisosCentrais()"><i class="fas fa-save"></i> Salvar Avisos SMS</button>
         </div>
       </div>` : `
       <div class="adm-card">
@@ -1784,7 +2156,7 @@ const sections = {
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-play-circle"></i> Apresentação Comunitária</div><div class="adm-card-desc">Exibida após Encartes/Flayers no ciclo de rotação</div></div>
+          <div><div class="adm-card-title"><i class="fas fa-play-circle"></i> Apresentação Comunitária</div><div class="adm-card-desc">Primeira etapa do ciclo de rotação exibido na TV</div></div>
           <div class="toggle-row" style="margin:0">
             <span class="adm-label" style="margin:0">Ativa</span>
             <label class="toggle-switch" style="margin:0 8px">
@@ -1806,7 +2178,7 @@ const sections = {
             ${durOpts.map(op=>`
               <label style="cursor:pointer;flex:1">
                 <input type="radio" name="apres_duracao" value="${op.val}" ${duracaoAtual===op.val?'checked':''} style="display:none">
-                <div onclick="document.querySelectorAll('[name=apres_duracao]').forEach(r=>r.closest('label').querySelector('.dur-opt').style.cssText='border:2px solid #e2e8f0;background:#fff;color:#1e293b');this.style.cssText='border:2px solid #1565c0;background:#eff6ff;color:#1565c0';this.previousElementSibling.checked=true"
+                <div onclick="document.querySelectorAll('[name=apres_duracao]').forEach(r=>r.closest('label').querySelector('.dur-opt').style.cssText='border:2px solid #e2e8f0;background:#fff;color:#1e293b');this.style.cssText='border:2px solid #1565c0;background:#eff6ff;color:#1565c0';this.previousElementSibling.checked=true;APP.atualizarPreviewApresentacao()"
                   class="dur-opt" style="border:2px solid ${duracaoAtual===op.val?'#1565c0':'#e2e8f0'};background:${duracaoAtual===op.val?'#eff6ff':'#fff'};color:${duracaoAtual===op.val?'#1565c0':'#1e293b'};border-radius:10px;padding:12px;text-align:center;font-size:18px;font-weight:800;transition:all .2s">
                   ${op.label}
                 </div>
@@ -1817,11 +2189,11 @@ const sections = {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div>
             <label class="adm-label">Título Principal <span class="adm-label-sub">Fonte Bebas Neue grande</span></label>
-            <input id="apresTitulo" class="adm-input adm-input-lg" value="${sanitize((cfg.titulo||'').replace(/\n/g,' '))}" placeholder="Ex: Sua Consulta Faz a Diferença!">
+              <input id="apresTitulo" class="adm-input adm-input-lg" value="${sanitize((cfg.titulo||'').replace(/\n/g,' '))}" placeholder="Ex: Sua Consulta Faz a Diferença!" oninput="APP.atualizarPreviewApresentacao()">
           </div>
           <div>
             <label class="adm-label">Mensagem Principal</label>
-            <textarea id="apresMensagem" class="adm-input" style="min-height:90px">${sanitize(cfg.mensagemPrincipal||'')}</textarea>
+            <textarea id="apresMensagem" class="adm-input" style="min-height:90px" oninput="APP.atualizarPreviewApresentacao()">${sanitize(cfg.mensagemPrincipal||'')}</textarea>
           </div>
         </div>
 
@@ -1830,8 +2202,8 @@ const sections = {
           <div id="listaTI">
             ${textos.map((t,i)=>`
               <div class="texto-row">
-                <input type="text" class="adm-input texto-adicional-input" value="${sanitize(t)}" placeholder="Texto adicional ${i+1}">
-                <button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove()"><i class="fas fa-trash"></i></button>
+                <input type="text" class="adm-input texto-adicional-input" value="${sanitize(t)}" placeholder="Texto adicional ${i+1}" oninput="APP.atualizarPreviewApresentacao()">
+                <button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove();APP.atualizarPreviewApresentacao()"><i class="fas fa-trash"></i></button>
               </div>`).join('')}
           </div>
           <button class="adm-btn-add" onclick="APP.addTextoAdicional()"><i class="fas fa-plus"></i> Adicionar texto</button>
@@ -1839,7 +2211,6 @@ const sections = {
 
         <div class="adm-action-bar" style="margin-top:24px">
           <button class="adm-btn-green" onclick="APP.salvarApresentacao()"><i class="fas fa-save"></i> Salvar Configuração</button>
-          <button class="adm-btn-primary" onclick="APP.testarApresentacao()"><i class="fas fa-play"></i> Testar Agora</button>
           <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Voltar ao Vídeo</button>
         </div>
       </div>
@@ -1848,47 +2219,60 @@ const sections = {
         <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-eye"></i> Preview</div>
           <button class="adm-btn-primary adm-btn-sm" onclick="APP.expandirPreview()"><i class="fas fa-expand-alt"></i> Ampliar Tela</button>
         </div>
-        <div style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
-          <div style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
+        <div class="apres-preview-shell" style="background:#020b16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,118,.2)">
+          <div class="apres-preview-topbar" style="background:rgba(0,0,0,.5);padding:12px 20px;border-bottom:1px solid rgba(0,230,118,.15);display:flex;align-items:center;gap:12px">
             <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:11px;color:#020b19"></i></div>
-            <span style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'30 seg'} — aparece após todos os flayers no ciclo</span>
-            <div style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
+            <span id="apresPreviewDuracao" style="font-size:13px;color:rgba(255,255,255,.65)">Duração: ${durOpts.find(o=>o.val===duracaoAtual)?.label||'30 seg'} — aparece no início do ciclo</span>
+            <div class="apres-preview-badge" style="margin-left:auto;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:1px">INFORMAÇÃO À COMUNIDADE</div>
           </div>
           <div style="display:grid;grid-template-columns:1.5fr 1fr;min-height:200px">
             <div style="padding:22px 28px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,.05)">
-              <div style="font-size:10px;letter-spacing:2px;color:#00e676;margin-bottom:8px;text-transform:uppercase">Compromisso com a saúde</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#fff;line-height:1;margin-bottom:10px">${sanitize((cfg.titulo||'').replace(/\n/g,'<br>'))}</div>
-              <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;border-left:2px solid rgba(0,230,118,.4);padding-left:10px">${sanitize((cfg.mensagemPrincipal||'').substring(0,110))}…</div>
+              <div class="apres-preview-eyebrow" style="font-size:10px;letter-spacing:2px;color:#00e676;margin-bottom:8px;text-transform:uppercase">Compromisso com a saúde</div>
+              <div id="apresPreviewTitulo" class="apres-preview-title" style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#fff;line-height:1;margin-bottom:10px">${sanitize((cfg.titulo||'').replace(/\n/g,'<br>'))}</div>
+              <div id="apresPreviewMensagem" class="apres-preview-message" style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;border-left:2px solid rgba(0,230,118,.4);padding-left:10px">${sanitize((cfg.mensagemPrincipal||'').substring(0,110))}…</div>
             </div>
             <div style="padding:22px;display:flex;flex-direction:column;justify-content:center">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#ff5252;letter-spacing:2px;margin-bottom:10px">FALTÔMETRO</div>
-              <div style="background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.2);border-radius:8px;padding:12px;text-align:center">
+              <div class="apres-preview-falto-title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#ff5252;letter-spacing:2px;margin-bottom:10px">FALTÔMETRO</div>
+              <div class="apres-preview-total-box" style="background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.2);border-radius:8px;padding:12px;text-align:center">
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:#ff5252;line-height:1">${(dadosUnidade.unidade.especialidades||[]).reduce((a,b)=>a+(parseInt(b.faltas)||0),0)}</div>
                 <div style="font-size:10px;color:rgba(255,255,255,.4)">consultas não realizadas</div>
               </div>
             </div>
           </div>
         </div>
-        <p style="font-size:12px;color:#6b7280;margin-top:10px"><i class="fas fa-info-circle" style="color:#1565c0;margin-right:4px"></i>Use "Testar Agora" para a apresentação completa em fullscreen.</p>
+        <p style="font-size:12px;color:#6b7280;margin-top:10px"><i class="fas fa-info-circle" style="color:#1565c0;margin-right:4px"></i>As alterações digitadas acima aparecem neste preview administrativo.</p>
       </div>`;
   },
 
   flayers() {
-    const urls = flayerSys.flayers || [];
+    const urls = (flayerSys.flayers || []).map(item => flayerSys.normalizarItem(item));
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header">
-          <div><div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div><div class="adm-card-desc">Exibidos 30 segundos cada, após os vídeos</div></div>
+          <div><div class="adm-card-title"><i class="fas fa-images"></i> Encartes / Flayers</div><div class="adm-card-desc">Exibidos logo após a apresentação, com tempo individual por item</div></div>
         </div>
         <div class="adm-info-box">
           <i class="fas fa-rotate"></i>
-          <div><strong>Ordem de exibição:</strong> Vídeos → <strong>Encartes aqui</strong> (30s/un.) → Apresentação Comunitária → Vídeos novamente</div>
+          <div><strong>Ordem de exibição:</strong> Apresentação Comunitária → <strong>Encartes aqui</strong> (30s, 1 min ou 1 min e meio) → Vídeos → reinício do ciclo</div>
         </div>
         <div style="margin-bottom:20px">
-          <label class="adm-label">URLs das Imagens <span class="adm-label-sub">Uma por linha • JPG/PNG hospedados publicamente</span></label>
-          <textarea id="flayerUrls" class="adm-input" style="min-height:150px;font-family:monospace;font-size:13px">${urls.join('\n')}</textarea>
+          <label class="adm-label">Links das Imagens <span class="adm-label-sub">Um por campo • escolha o tempo de cada flayer • a ordem abaixo será a ordem de exibição</span></label>
+          <div id="flayerUrls" class="link-editor">
+            ${(urls.length?urls:[{url:'',duracao:30}]).map((u,i)=>`
+              <div class="link-editor-row link-editor-row-flayer">
+                <input type="text" class="adm-input flayer-url-input" value="${sanitize(u.url || '')}" placeholder="https://..." oninput="APP.atualizarPreviewFlayer(${i},this.value)" onchange="APP.editarFlayerUrl(${i},this.value)">
+                <div class="flayer-duration-group">
+                  <input type="hidden" class="flayer-duration-input" value="${parseInt(u.duracao)||30}">
+                  <button type="button" class="flayer-duration-btn ${parseInt(u.duracao)===30?'active':''}" onclick="APP.selecionarDuracaoFlayer(${i},30,this)">30 seg</button>
+                  <button type="button" class="flayer-duration-btn ${parseInt(u.duracao)===60?'active':''}" onclick="APP.selecionarDuracaoFlayer(${i},60,this)">1 min</button>
+                  <button type="button" class="flayer-duration-btn ${parseInt(u.duracao)===90?'active':''}" onclick="APP.selecionarDuracaoFlayer(${i},90,this)">1,5 min</button>
+                </div>
+                <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerCampoFlayer(${i})"><i class="fas fa-trash"></i></button>
+              </div>`).join('')}
+          </div>
         </div>
         <div class="adm-action-bar">
+          <button class="adm-btn-add" onclick="APP.adicionarCampoFlayer()"><i class="fas fa-plus"></i> Novo Link</button>
           <button class="adm-btn-green" onclick="APP.salvarFlayers()"><i class="fas fa-save"></i> Salvar Encartes</button>
           <button class="adm-btn-primary" onclick="APP.testarFlayers()"><i class="fas fa-play"></i> Testar Agora</button>
           <button class="adm-btn-muted" onclick="APP.pararTudo()"><i class="fas fa-stop"></i> Parar / Voltar ao Vídeo</button>
@@ -1902,13 +2286,13 @@ const sections = {
           urls.map((u,i)=>`
             <div class="flayer-card">
               <div class="flayer-thumb">
-                <img src="${sanitize(u)}" alt="Encarte ${i+1}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
-                <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:12px;color:#9ca3af"><i class="fas fa-image" style="font-size:24px"></i></div>
+                <img id="flayerPreviewImg${i}" src="${sanitize((u.url || '').trim())}" alt="Encarte ${i+1}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div id="flayerPreviewFallback${i}" style="display:${(u.url || '').trim()?'none':'flex'};align-items:center;justify-content:center;width:100%;height:100%;font-size:12px;color:#9ca3af"><i class="fas fa-image" style="font-size:24px"></i></div>
               </div>
               <div class="flayer-card-info">
-                <div style="font-size:10px;color:#6b7280;word-break:break-all;margin-bottom:8px">${sanitize(u.length>35?u.substring(0,35)+'…':u)}</div>
+                <div id="flayerPreviewUrl${i}" style="font-size:10px;color:#6b7280;word-break:break-all;margin-bottom:8px">${sanitize((u.url||'').length>35?(u.url||'').substring(0,35)+'…':(u.url||''))}</div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                  <span style="font-size:10px;background:#1565c0;color:#fff;padding:2px 8px;border-radius:12px;font-weight:700">${i+1}</span>
+                  <span style="font-size:10px;background:#1565c0;color:#fff;padding:2px 8px;border-radius:12px;font-weight:700">${i+1} · ${u.duracao===60?'1 min':u.duracao===90?'1 min e meio':'30 seg'}</span>
                   <button class="adm-btn-icon adm-btn-icon-danger" style="width:28px;height:28px;font-size:11px" onclick="APP.removerFlayer(${i})"><i class="fas fa-times"></i></button>
                 </div>
               </div>
@@ -1922,34 +2306,57 @@ const sections = {
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
         <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-video"></i> Vídeos Globais</div><div class="adm-card-desc">URLs do YouTube — exibidos em todas as unidades</div></div></div>
-        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole uma URL por linha. Os vídeos ficam em loop e sem controles visíveis.</div>
+        <div class="adm-info-box"><i class="fas fa-info-circle"></i> Cole um link por campo. A ordem abaixo será a ordem de reprodução dos vídeos.</div>
         <label class="adm-label">URLs do YouTube</label>
-        <textarea id="vUrls" class="adm-input" style="min-height:180px;font-family:monospace;font-size:14px">${(dadosGerais.unidade.videoUrls||[]).join('\n')}</textarea>
+        <div id="vUrls" class="link-editor">
+          ${((dadosGerais.unidade.videoUrls||[]).length?(dadosGerais.unidade.videoUrls||[]):['']).map((u,i)=>`
+            <div class="link-editor-row">
+              <input type="text" class="adm-input video-url-input" value="${sanitize(u)}" placeholder="https://www.youtube.com/watch?v=..." onchange="APP.editarVideoUrl(${i},this.value)">
+              <button class="adm-btn-icon adm-btn-icon-danger" onclick="APP.removerCampoVideo(${i})"><i class="fas fa-trash"></i></button>
+            </div>`).join('')}
+        </div>
         <div class="adm-action-bar">
+          <button class="adm-btn-add" onclick="APP.adicionarCampoVideo()"><i class="fas fa-plus"></i> Novo Link</button>
           <button class="adm-btn-green" onclick="APP.salvarVideos()"><i class="fas fa-save"></i> Salvar Vídeos</button>
         </div>
       </div>`;
   },
 
   sincronizacao() {
-    const ci = syncConfig.interval;
     document.getElementById('admContent').innerHTML = `
       <div class="adm-card">
-        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Frequência com que as TVs buscam dados atualizados</div></div></div>
-        <div class="adm-info-box warning"><i class="fas fa-exclamation-triangle"></i> Intervalos menores consomem mais leituras do Firebase. Intervalos maiores economizam custo mas atrasam atualizações.</div>
-        <div class="sync-grid">
-          ${Object.entries(syncConfig.intervalMap).map(([min,cfg])=>`
-            <div class="sync-card ${parseInt(min)===ci?'selected':''}" onclick="syncMgr.setInterval(${min})">
-              <div class="sync-card-time">${min} min</div>
-              <div class="sync-card-desc">${cfg.label}</div>
-              <span class="sync-cost-badge ${cfg.costClass}">${cfg.cost}</span>
-              ${parseInt(min)===ci?`<div style="margin-top:10px;font-size:12px;font-weight:700;color:#00c853"><i class="fas fa-check-circle"></i> Selecionado</div>`:''}
-            </div>`).join('')}
+        <div class="adm-card-header"><div><div class="adm-card-title"><i class="fas fa-sync-alt"></i> Sincronização</div><div class="adm-card-desc">Execução manual para validar atualização e disparar sincronização imediata</div></div></div>
+        <div class="adm-info-box">
+          <i class="fas fa-info-circle"></i>
+          <div>Os botões abaixo mantêm o teste manual da sincronização sem expor seleção fixa de intervalo nesta tela.</div>
         </div>
         <div class="adm-action-bar" style="margin-top:24px">
           <button class="adm-btn-primary" onclick="syncMgr.forceSync()"><i class="fas fa-sync-alt"></i> Sincronizar Agora</button>
           <button class="adm-btn-muted" onclick="APP.forceSyncAll()"><i class="fas fa-broadcast-tower"></i> Forçar Todas as Unidades</button>
         </div>
+      </div>`;
+  },
+
+  temas() {
+    const cards = Object.entries(themeMgr.themes).map(([id, cfg]) => themeMgr.cardHtml(id, cfg)).join('');
+    document.getElementById('admContent').innerHTML = `
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div>
+            <div class="adm-card-title"><i class="fas fa-palette"></i> Temas da Interface</div>
+            <div class="adm-card-desc">Seleção visual exclusiva para administrador, sem alterar funções, fluxos ou dados</div>
+          </div>
+          <span class="theme-card-tag">Tema atual: ${themeMgr.themes[themeMgr.current].name}</span>
+        </div>
+        <div class="adm-info-box">
+          <i class="fas fa-eye"></i>
+          <div>O sistema mantém a estrutura atual e aplica apenas mudanças visuais. A troca é imediata e o preview permanece ativo.</div>
+        </div>
+        <div class="adm-info-box success">
+          <i class="fas fa-shield-alt"></i>
+          <div>Escopo preservado: sem alteração de banco, integrações, regras de negócio, layout estrutural ou comportamento funcional.</div>
+        </div>
+        <div class="theme-grid">${cards}</div>
       </div>`;
   },
 
@@ -1961,7 +2368,7 @@ const sections = {
           <button class="adm-btn-primary" onclick="APP.novoUsuario()"><i class="fas fa-user-plus"></i> Novo Usuário</button>
         </div>
         <table class="adm-table">
-          <thead><tr><th>Nome</th><th>Login</th><th>Nível</th><th>Unidades</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Nome</th><th>Login</th><th>Nível</th><th>Unidades</th><th>Status</th><th>AçÃµes</th></tr></thead>
           <tbody>
             ${listaUsuarios.length===0?`<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:30px">Carregando usuários...</td></tr>`
             :listaUsuarios.map(u=>{
@@ -2088,22 +2495,24 @@ const sections = {
   }
 };
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Renderizar Monitor Grafana
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderMonitorGrafana(logs) {
   const mc = document.getElementById('monitorContent');
   if (!mc) return;
 
   const agora = Date.now();
   const hoje = new Date();
-  const mesAtualStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
-  const inicioDomes = new Date(hoje.getFullYear(), hoje.getMonth(), 1).getTime();
+  const primeiroDiaUtil = obterPrimeiroDiaUtilMes(hoje);
+  const inicioSla = primeiroDiaUtil.getTime();
+  const slaLiberado = agora >= inicioSla;
   const diasNoMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate();
   const diasDecorridos = hoje.getDate();
   const pctMes = Math.round((diasDecorridos / diasNoMes) * 100);
   const mesAnterior = new Date(hoje.getFullYear(), hoje.getMonth()-1, 1)
     .toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const prazoSlaLabel = primeiroDiaUtil.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
 
   const unidades = listaUnidades.map(u => {
     const ult  = u.ultima_sincronizacao || u.ultima_atualizacao || 0;
@@ -2115,17 +2524,22 @@ function renderMonitorGrafana(logs) {
     const barColor = {ativo:'#16a34a',atencao:'#d97706',alerta:'#ea580c',critico:'#dc2626'}[status];
     const logsUnit = logs.filter(l => l.unidade === u.id);
     const ultimaAcao = logsUnit[0];
-    const atualizouEsteMes = u.ultima_atualizacao >= inicioDomes;
+    const atualizouEsteMes = !!u.ultima_atualizacao && u.ultima_atualizacao >= inicioSla;
+    const tempoSla = !slaLiberado
+      ? `Prazo abre em ${prazoSlaLabel}`
+      : atualizouEsteMes
+        ? `OK após ajuste em ${new Date(u.ultima_atualizacao).toLocaleDateString('pt-BR')}`
+        : `Sem ajuste desde ${primeiroDiaUtil.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`;
     const totalFaltas = (u.espDados||[]).reduce((a,b) => a+(parseInt(b.faltas)||0), 0);
-    return { ...u, horas, status, statusLabel, tempoStr, barPct, barColor, logsUnit, ultimaAcao, atualizouEsteMes, totalFaltas };
+    return { ...u, horas, status, statusLabel, tempoStr, barPct, barColor, logsUnit, ultimaAcao, atualizouEsteMes, tempoSla, slaLiberado, totalFaltas };
   }).sort((a,b) => b.horas - a.horas);
 
   const cnt = {ativo:0,atencao:0,alerta:0,critico:0};
   unidades.forEach(u => cnt[u.status]++);
   const recenteLogs = logs.slice(0,15);
 
-  const updatedThisMonth = unidades.filter(u => u.atualizouEsteMes).length;
-  const pendentes = unidades.length - updatedThisMonth;
+  const updatedThisMonth = slaLiberado ? unidades.filter(u => u.atualizouEsteMes).length : 0;
+  const pendentes = slaLiberado ? (unidades.length - updatedThisMonth) : 0;
   const totalSistema = unidades.reduce((a,u) => a + u.totalFaltas, 0);
   const maxFaltasUnit = Math.max(...unidades.map(u => u.totalFaltas), 1);
 
@@ -2140,13 +2554,13 @@ function renderMonitorGrafana(logs) {
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#d97706,#f59e0b)"></div>
         <div class="grafana-kpi-val" style="color:#d97706">${cnt.atencao}</div>
-        <div class="grafana-kpi-label">Atenção (1–3 dias)</div>
+        <div class="grafana-kpi-label">Atenção (1â€“3 dias)</div>
         <div class="grafana-kpi-sub">Verificar conectividade</div>
       </div>
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#ea580c,#f97316)"></div>
         <div class="grafana-kpi-val" style="color:#ea580c">${cnt.alerta}</div>
-        <div class="grafana-kpi-label">Alerta (3–7 dias)</div>
+        <div class="grafana-kpi-label">Alerta (3â€“7 dias)</div>
         <div class="grafana-kpi-sub">Intervenção necessária</div>
       </div>
       <div class="grafana-kpi">
@@ -2163,7 +2577,7 @@ function renderMonitorGrafana(logs) {
           <div style="width:36px;height:36px;border-radius:9px;background:rgba(239,83,80,.2);border:1px solid rgba(239,83,80,.4);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-times" style="color:#ff8a80;font-size:15px"></i></div>
           <div>
             <div style="font-size:15px;font-weight:700;color:#fff">Faltômetro Mensal das Unidades</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5)">Referência: <strong style="color:rgba(255,255,255,.75)">${mesAnterior}</strong> · Atualização mensal a partir do início do mês</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Referência: <strong style="color:rgba(255,255,255,.75)">${mesAnterior}</strong> · SLA mensal a partir do 1Âº dia útil (${prazoSlaLabel})</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:16px">
@@ -2181,36 +2595,38 @@ function renderMonitorGrafana(logs) {
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f1f5f9">
         <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-check-circle" style="color:#16a34a;margin-right:4px"></i>Atualizaram este mês</div>
+          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-check-circle" style="color:#16a34a;margin-right:4px"></i>Atualizaram no prazo</div>
           <div style="font-size:32px;font-weight:800;color:#16a34a">${updatedThisMonth} <span style="font-size:14px;color:#6b7280;font-weight:400">de ${unidades.length}</span></div>
           <div style="margin-top:8px;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden">
             <div style="height:100%;width:${unidades.length?Math.round(updatedThisMonth/unidades.length*100):0}%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:2px"></div>
           </div>
         </div>
         <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-clock" style="color:#d97706;margin-right:4px"></i>Pendentes de atualização</div>
+          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-clock" style="color:#d97706;margin-right:4px"></i>Pendentes após 1Âº dia útil</div>
           <div style="font-size:32px;font-weight:800;color:${pendentes>0?'#d97706':'#16a34a'}">${pendentes}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px">${pendentes===0?'Todas as unidades atualizadas!':'Unidade(s) ainda não lançaram o mês'}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px">${!slaLiberado ? 'O prazo ainda não abriu neste mês.' : pendentes===0 ? 'Todas as unidades regularizadas no ciclo atual.' : 'Unidade(s) ainda sem ajuste após a abertura do SLA.'}</div>
         </div>
         <div style="padding:16px 22px">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-calendar-alt" style="color:#1565c0;margin-right:4px"></i>Mês de referência dos dados</div>
+          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-calendar-alt" style="color:#1565c0;margin-right:4px"></i>Marco do SLA mensal</div>
           <div style="font-size:18px;font-weight:700;color:#1e293b;text-transform:capitalize;margin-top:4px">${mesAnterior}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Dados referentes às consultas não realizadas</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Contagem iniciada no 1Âº dia útil do mes</div>
         </div>
       </div>
       <div style="padding:18px 22px">
-        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px"><i class="fas fa-chart-bar" style="margin-right:6px;color:#1565c0"></i>Detalhamento por Unidade — Mês anterior (${mesAnterior})</div>
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px"><i class="fas fa-chart-bar" style="margin-right:6px;color:#1565c0"></i>Detalhamento por Unidade — ciclo mensal (${mesAnterior})</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
           ${unidades.length === 0
             ? '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af">Nenhuma unidade cadastrada</div>'
             : unidades.map(u => {
                 const espList = (u.espDados||[]).slice(0,4);
                 const maxEsp = Math.max(...(u.espDados||[]).map(e=>parseInt(e.faltas)||0), 1);
-                const statusFalto = u.atualizouEsteMes ? 'atualizado' : 'pendente';
-                const [sfBg,sfColor,sfBorder,sfIcon,sfLabel] = u.atualizouEsteMes
-                  ? ['#dcfce7','#166534','#86efac','fa-check-circle','Atualizado']
-                  : ['#fef9c3','#713f12','#fde047','fa-clock','Pendente'];
-                return `<div style="background:#f8fafc;border:1.5px solid ${u.atualizouEsteMes?'#bbf7d0':'#fde68a'};border-radius:12px;padding:16px;transition:all .2s;cursor:pointer" onclick="APP.abrirUnidade('${u.id}')">
+                const statusFalto = !slaLiberado ? 'aguardando' : u.atualizouEsteMes ? 'atualizado' : 'pendente';
+                const [sfBg,sfColor,sfBorder,sfIcon,sfLabel] = !slaLiberado
+                  ? ['#e0f2fe','#0f548c','#7dd3fc','fa-hourglass-half','Aguardando']
+                  : u.atualizouEsteMes
+                    ? ['#dcfce7','#166534','#86efac','fa-check-circle','Atualizado']
+                    : ['#fef9c3','#713f12','#fde047','fa-clock','Pendente'];
+                return `<div style="background:#f8fafc;border:1.5px solid ${!slaLiberado?'#7dd3fc':u.atualizouEsteMes?'#bbf7d0':'#fde68a'};border-radius:12px;padding:16px;transition:all .2s;cursor:pointer" onclick="APP.abrirUnidade('${u.id}')">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
                     <div style="font-size:14px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px" title="${sanitize(u.nome)}">${sanitize(u.nome)}</div>
                     <span style="background:${sfBg};color:${sfColor};border:1px solid ${sfBorder};font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:4px"><i class="fas ${sfIcon}" style="font-size:9px"></i>${sfLabel}</span>
@@ -2243,6 +2659,10 @@ function renderMonitorGrafana(logs) {
                   <div style="margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:5px">
                     <i class="fas fa-history" style="font-size:9px"></i>
                     ${u.ultima_atualizacao ? `Atualizado em ${new Date(u.ultima_atualizacao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}` : 'Nunca atualizado'}
+                  </div>
+                  <div style="margin-top:6px;font-size:10px;color:#64748b;display:flex;align-items:center;gap:5px">
+                    <i class="fas fa-business-time" style="font-size:9px"></i>
+                    ${u.tempoSla}
                   </div>
                 </div>`;
               }).join('')}
@@ -2323,9 +2743,9 @@ function renderMonitorGrafana(logs) {
     </div>`;
 }
 
-// ─────────────────────────────────────────────
-// OPERAÇÕES DE DADOS
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// OPERAÃ‡Ã•ES DE DADOS
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function salvarFirebase() {
   const agora = Date.now();
   dadosUnidade.ultima_atualizacao = agora;
@@ -2401,15 +2821,16 @@ function carregarTodasUnidades(cb) {
   });
 }
 
-// ─────────────────────────────────────────────
-// API PÚBLICA (APP)
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// API PÃšBLICA (APP)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.APP = {
 
   openLogin() { auth.openLogin(); },
   verificarLogin() { auth.verificarLogin(); },
   entrarPainel() { auth.entrarPainel(); },
   trocarUsuario() { auth.trocarUsuario(); },
+  aplicarTema(id) { themeMgr.apply(id); },
 
   expandirPreview() {
     const cfg = apresentSys.config || apresentSys.defaultConfig;
@@ -2423,8 +2844,10 @@ window.APP = {
     if (prev) prev.remove();
     const modal = document.createElement('div');
     modal.id = 'previewModal';
+    modal.className = 'apres-preview-modal';
     modal.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);animation:notifIn .25s ease-out';
     const inner = document.createElement('div');
+    inner.className = 'apres-preview-modal-inner';
     inner.style.cssText = 'width:92vw;max-width:1440px;height:88vh;background:#030c18;border-radius:20px;overflow:hidden;border:1px solid rgba(0,230,118,.25);box-shadow:0 32px 80px rgba(0,0,0,.95);display:flex;flex-direction:column;position:relative;font-family:Outfit,sans-serif';
     const espHtml = esp.slice(0,7).map((e,i)=>{
       const pct = Math.round(Math.max((parseInt(e.faltas)||0)/maxF*100,3));
@@ -2443,31 +2866,31 @@ window.APP = {
         <span style="font-size:16px;color:rgba(255,255,255,.8);line-height:1.5">${sanitize(t)}</span>
       </div>`).join('');
     inner.innerHTML = `
-      <div style="background:rgba(0,0,0,.55);padding:14px 28px;border-bottom:1px solid rgba(0,230,118,.12);display:flex;align-items:center;gap:16px;flex-shrink:0">
+      <div class="apres-preview-topbar" style="background:rgba(0,0,0,.55);padding:14px 28px;border-bottom:1px solid rgba(0,230,118,.12);display:flex;align-items:center;gap:16px;flex-shrink:0">
         <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00e676,#00c853);display:flex;align-items:center;justify-content:center"><i class="fas fa-hospital-alt" style="font-size:17px;color:#020b19"></i></div>
         <div>
-          <div style="font-size:16px;font-weight:700;color:#fff">${sanitize(dadosUnidade.unidade.nome||'Unidade de Saúde')}</div>
+          <div class="apres-preview-modal-title" style="font-size:16px;font-weight:700;color:#fff">${sanitize(dadosUnidade.unidade.nome||'Unidade de Saúde')}</div>
           <div style="font-size:12px;color:rgba(255,255,255,.4)">Preview da Apresentação Comunitária · ${durStr}</div>
         </div>
         <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
-          <div style="background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:11px;padding:5px 14px;border-radius:12px;letter-spacing:1px;font-weight:700">INFORMAÇÃO À COMUNIDADE</div>
+          <div class="apres-preview-badge" style="background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff8a80;font-size:11px;padding:5px 14px;border-radius:12px;letter-spacing:1px;font-weight:700">INFORMAÇÃO À COMUNIDADE</div>
           <button onclick="document.getElementById('previewModal').remove()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
         </div>
       </div>
       <div style="flex:1;display:grid;grid-template-columns:1fr 1.5fr;overflow:hidden">
         <div style="padding:30px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,.05);overflow-y:auto;background:linear-gradient(170deg,rgba(239,83,80,.04),transparent)">
-          <div style="font-size:11px;letter-spacing:2px;color:rgba(239,83,80,.8);font-weight:700;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px"><span style="width:18px;height:2px;background:#ef5350;display:inline-block"></span>Dados do mês anterior</div>
-          <div style="font-family:'Bebas Neue',monospace;font-size:46px;color:#ef5350;letter-spacing:2px;line-height:1;margin-bottom:18px">FALTÔMETRO</div>
-          <div style="background:linear-gradient(135deg,rgba(239,83,80,.14),rgba(239,83,80,.06));border:1px solid rgba(239,83,80,.25);border-radius:16px;padding:18px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden">
+          <div class="apres-preview-eyebrow" style="font-size:11px;letter-spacing:2px;color:rgba(239,83,80,.8);font-weight:700;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px"><span style="width:18px;height:2px;background:#ef5350;display:inline-block"></span>Dados do mês anterior</div>
+          <div class="apres-preview-falto-title" style="font-family:'Bebas Neue',monospace;font-size:46px;color:#ef5350;letter-spacing:2px;line-height:1;margin-bottom:18px">FALTÔMETRO</div>
+          <div class="apres-preview-total-box" style="background:linear-gradient(135deg,rgba(239,83,80,.14),rgba(239,83,80,.06));border:1px solid rgba(239,83,80,.25);border-radius:16px;padding:18px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden">
             <div style="font-family:'Bebas Neue',monospace;font-size:90px;color:#ef5350;line-height:1;text-shadow:0 0 50px rgba(239,83,80,.4)">${total}</div>
             <div style="font-size:14px;color:rgba(255,255,255,.4);margin-top:4px">consultas não realizadas no mês</div>
           </div>
           ${espHtml}
         </div>
         <div style="padding:30px 36px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto">
-          <div style="font-size:12px;letter-spacing:2.5px;color:#00e676;font-weight:700;margin-bottom:14px;text-transform:uppercase;display:flex;align-items:center;gap:10px"><span style="width:26px;height:2px;background:#00e676;display:inline-block"></span>Compromisso com a saúde</div>
-          <div style="font-family:'Bebas Neue',monospace;font-size:64px;color:#fff;line-height:1;margin-bottom:16px;text-shadow:0 0 80px rgba(0,230,118,.15)">${sanitize((cfg.titulo||'').replace(/\n/g,'<br>'))}</div>
-          <div style="font-size:17px;color:rgba(255,255,255,.7);line-height:1.7;border-left:3px solid rgba(0,230,118,.4);padding-left:16px;margin-bottom:22px">${sanitize(cfg.mensagemPrincipal||'')}</div>
+          <div class="apres-preview-eyebrow" style="font-size:12px;letter-spacing:2.5px;color:#00e676;font-weight:700;margin-bottom:14px;text-transform:uppercase;display:flex;align-items:center;gap:10px"><span style="width:26px;height:2px;background:#00e676;display:inline-block"></span>Compromisso com a saúde</div>
+          <div class="apres-preview-title" style="font-family:'Bebas Neue',monospace;font-size:64px;color:#fff;line-height:1;margin-bottom:16px;text-shadow:0 0 80px rgba(0,230,118,.15)">${sanitize((cfg.titulo||'').replace(/\n/g,'<br>'))}</div>
+          <div class="apres-preview-message" style="font-size:17px;color:rgba(255,255,255,.7);line-height:1.7;border-left:3px solid rgba(0,230,118,.4);padding-left:16px;margin-bottom:22px">${sanitize(cfg.mensagemPrincipal||'')}</div>
           ${textosHtml}
         </div>
       </div>
@@ -2490,7 +2913,7 @@ window.APP = {
   },
   forcarPlayback() {
     toggleAutoplayOverlay(false);
-    atualizarStatusRotacao('recuperacao', 'ForÃ§ando reinÃ­cio da exibiÃ§Ã£o');
+    atualizarStatusRotacao('recuperacao', 'Forçando reinício da exibição');
     playbackRecoveryCount = 0;
     try {
       if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
@@ -2520,14 +2943,15 @@ window.APP = {
   showSection(id) {
     const n = permissoesUsuario?.nivel;
     const bloqueado = {
-      visualizador: ['unidade','faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','log','backup'],
-      admin_unidade: IS_MATRIZ ? [] : ['unidade','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','log','backup']
+      visualizador: ['unidade','faltometro','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','temas','log','backup'],
+      admin_unidade: IS_MATRIZ ? [] : ['unidade','apresentacao','flayers','video','sincronizacao','usuarios','unidades','monitor','temas','log','backup']
     };
     const bl = bloqueado[n] || [];
     if (bl.includes(id)) { notif('Sem permissão para esta seção.','error'); return; }
     document.querySelectorAll('.adm-nav-item').forEach(i => i.classList.remove('active'));
     const navEl = document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1));
     if (navEl) navEl.classList.add('active');
+    secaoAtual = id;
     if (sections[id]) sections[id]();
     else notif('Seção não encontrada.','warning');
     auth.resetSessionTimer?.();
@@ -2629,6 +3053,19 @@ window.APP = {
         sections.avisos();
       }).catch(() => notif('Erro!','error'));
   },
+  editarAvisoCentral(i,v) {
+    if (!dadosGerais.avisos) dadosGerais.avisos = [];
+    if (dadosGerais.avisos[i] !== undefined) dadosGerais.avisos[i] = (v || '').trim();
+  },
+  salvarAvisosCentrais() {
+    dadosGerais.avisos = (dadosGerais.avisos || []).map(a => (a || '').trim()).filter(Boolean);
+    db.ref('paineis/geral/avisos').set(dadosGerais.avisos)
+      .then(() => {
+        registrarLog('salvar','Avisos SMS atualizados ('+(dadosGerais.avisos||[]).length+' avisos)');
+        notif('Avisos SMS salvos!','success');
+        sections.avisos();
+      }).catch(() => notif('Erro!','error'));
+  },
   adicionarAvisoLocal() {
     const el = document.getElementById('novoAvisoLocal');
     if (!el || !el.value.trim()) return;
@@ -2647,17 +3084,89 @@ window.APP = {
       }).catch(() => notif('Erro!','error'));
   },
 
+  adicionarCampoVideo() {
+    if (!dadosGerais.unidade.videoUrls) dadosGerais.unidade.videoUrls = [];
+    dadosGerais.unidade.videoUrls.push('');
+    sections.video();
+  },
+  editarVideoUrl(i,v) {
+    if (!dadosGerais.unidade.videoUrls) dadosGerais.unidade.videoUrls = [];
+    dadosGerais.unidade.videoUrls[i] = v;
+  },
+  removerCampoVideo(i) {
+    if (!dadosGerais.unidade.videoUrls) dadosGerais.unidade.videoUrls = [];
+    dadosGerais.unidade.videoUrls.splice(i,1);
+    if (dadosGerais.unidade.videoUrls.length === 0) dadosGerais.unidade.videoUrls.push('');
+    sections.video();
+  },
+
   salvarVideos() {
-    dadosGerais.unidade.videoUrls = document.getElementById('vUrls').value.split('\n').filter(u=>u.trim()!=='');
+    dadosGerais.unidade.videoUrls = [...document.querySelectorAll('.video-url-input')]
+      .map(input => input.value.trim())
+      .filter(Boolean);
     registrarLog('salvar','URLs de vídeos globais atualizadas ('+dadosGerais.unidade.videoUrls.length+' vídeos)');
     this.salvarDados();
   },
 
+  adicionarCampoFlayer() {
+    if (!flayerSys.flayers) flayerSys.flayers = [];
+    flayerSys.flayers.push({ url:'', duracao:30 });
+    sections.flayers();
+  },
+  editarFlayerUrl(i,v) {
+    if (!flayerSys.flayers) flayerSys.flayers = [];
+    const atual = flayerSys.normalizarItem(flayerSys.flayers[i]);
+    atual.url = v;
+    flayerSys.flayers[i] = atual;
+  },
+  atualizarPreviewFlayer(i,v) {
+    this.editarFlayerUrl(i, v);
+    const img = document.getElementById('flayerPreviewImg'+i);
+    const fallback = document.getElementById('flayerPreviewFallback'+i);
+    const txt = document.getElementById('flayerPreviewUrl'+i);
+    const valor = (v || '').trim();
+    if (txt) txt.textContent = valor ? (valor.length > 35 ? valor.substring(0,35) + '…' : valor) : 'Sem link informado';
+    if (!img || !fallback) return;
+    if (!valor) {
+      img.style.display = 'none';
+      img.removeAttribute('src');
+      fallback.style.display = 'flex';
+      return;
+    }
+    fallback.style.display = 'none';
+    img.style.display = 'block';
+    img.src = valor;
+  },
+  editarDuracaoFlayer(i,v) {
+    if (!flayerSys.flayers) flayerSys.flayers = [];
+    const atual = flayerSys.normalizarItem(flayerSys.flayers[i]);
+    atual.duracao = [30,60,90].includes(parseInt(v)) ? parseInt(v) : 30;
+    flayerSys.flayers[i] = atual;
+  },
+  selecionarDuracaoFlayer(i,v,el) {
+    this.editarDuracaoFlayer(i, v);
+    const grupo = el?.closest('.flayer-duration-group');
+    if (!grupo) return;
+    grupo.querySelectorAll('.flayer-duration-btn').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
+    const hidden = grupo.querySelector('.flayer-duration-input');
+    if (hidden) hidden.value = String(v);
+  },
+  removerCampoFlayer(i) {
+    if (!flayerSys.flayers) flayerSys.flayers = [];
+    flayerSys.flayers.splice(i,1);
+    if (flayerSys.flayers.length === 0) flayerSys.flayers.push({ url:'', duracao:30 });
+    sections.flayers();
+  },
+
   salvarFlayers() {
-    const urls = document.getElementById('flayerUrls').value.split('\n').map(u=>u.trim()).filter(u=>u!=='');
-    flayerSys.salvar(urls).then(() => {
-      registrarLog('salvar','Encartes atualizados ('+urls.length+' encarte(s))');
-      notif(`${urls.length} encarte(s) salvos!`,'success');
+    const items = [...document.querySelectorAll('.flayer-url-input')].map((input, i) => ({
+      url: input.value.trim(),
+      duracao: parseInt(document.querySelectorAll('.flayer-duration-input')[i]?.value) || 30
+    })).filter(item => item.url);
+    flayerSys.salvar(items).then(() => {
+      registrarLog('salvar','Encartes atualizados ('+items.length+' encarte(s))');
+      notif(`${items.length} encarte(s) salvos!`,'success');
       sections.flayers();
     });
   },
@@ -2680,7 +3189,7 @@ window.APP = {
     }
   },
   testarFlayers() {
-    if (!flayerSys.flayers.length) { notif('Sem encartes configurados!','warning'); return; }
+    if (!(flayerSys.flayers || []).some(item => flayerSys.normalizarItem(item).url.trim())) { notif('Sem encartes configurados!','warning'); return; }
     document.getElementById('adminPanel').style.display = 'none';
     flayerSys.parar(false);
     setTimeout(() => { flayerSys.iniciarCiclo(() => notif('Encartes concluídos.','info')); }, 300);
@@ -2693,8 +3202,23 @@ window.APP = {
     const idx = c.querySelectorAll('.texto-row').length + 1;
     const d = document.createElement('div');
     d.className = 'texto-row';
-    d.innerHTML = `<input type="text" class="adm-input texto-adicional-input" placeholder="Texto adicional ${idx}"><button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove()"><i class="fas fa-trash"></i></button>`;
+    d.innerHTML = `<input type="text" class="adm-input texto-adicional-input" placeholder="Texto adicional ${idx}" oninput="APP.atualizarPreviewApresentacao()"><button class="adm-btn-icon adm-btn-icon-danger" onclick="this.closest('.texto-row').remove();APP.atualizarPreviewApresentacao()"><i class="fas fa-trash"></i></button>`;
     c.appendChild(d);
+    this.atualizarPreviewApresentacao();
+  },
+
+  atualizarPreviewApresentacao() {
+    const titulo = (document.getElementById('apresTitulo')?.value || 'Sua Consulta Faz a Diferença!').trim();
+    const mensagem = (document.getElementById('apresMensagem')?.value || 'Configure a mensagem principal para visualizar o resultado.').trim();
+    const duracaoEl = document.querySelector('[name="apres_duracao"]:checked');
+    const duracaoMap = { '30':'30 seg (padrão)', '60':'1 min', '90':'1:30 min', '120':'2 min' };
+    const duracaoTxt = duracaoMap[duracaoEl?.value || '30'] || '30 seg (padrão)';
+    const tituloEl = document.getElementById('apresPreviewTitulo');
+    const mensagemEl = document.getElementById('apresPreviewMensagem');
+    const duracaoPreviewEl = document.getElementById('apresPreviewDuracao');
+    if (tituloEl) tituloEl.innerHTML = sanitize(titulo).replace(/\n/g,'<br>');
+    if (mensagemEl) mensagemEl.textContent = mensagem.length > 110 ? mensagem.substring(0,110)+'…' : mensagem;
+    if (duracaoPreviewEl) duracaoPreviewEl.textContent = 'Duração: '+duracaoTxt+' — aparece no início do ciclo';
   },
 
   salvarApresentacao() {
@@ -2840,7 +3364,7 @@ window.APP = {
         <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-plus-circle"></i> Nova Unidade</div></div>
         <div style="max-width:500px">
           <label class="adm-label">Nome da Unidade</label><input id="nUnitNome" class="adm-input adm-input-lg" placeholder="Nome completo da unidade" style="margin-bottom:16px">
-          <label class="adm-label">ID Único <span class="adm-label-sub">Apenas letras minúsculas, números e underscore</span></label><input id="nUnitId" class="adm-input" placeholder="ex: ubs_norte">
+          <label class="adm-label">ID Ãšnico <span class="adm-label-sub">Apenas letras minúsculas, números e underscore</span></label><input id="nUnitId" class="adm-input" placeholder="ex: ubs_norte">
           <div class="adm-action-bar">
             <button class="adm-btn-green" onclick="APP.criarUnidade()"><i class="fas fa-save"></i> Criar</button>
             <button class="adm-btn-muted" onclick="APP.showSection('unidades')"><i class="fas fa-times"></i> Cancelar</button>
@@ -2937,7 +3461,7 @@ window.APP = {
       a.download = `backup_pmpf_${new Date().toISOString().slice(0,19).replace(/[:.]/g,'-')}.json`;
       document.body.appendChild(a); a.click();
       document.body.removeChild(a); URL.revokeObjectURL(url);
-      if (progMsg) progMsg.textContent = '✓ Arquivo baixado com sucesso!';
+      if (progMsg) progMsg.textContent = 'âœ“ Arquivo baixado com sucesso!';
       registrarLog('criar', 'Backup exportado (download local)');
       notif('Backup baixado!','success');
       setTimeout(() => { if (prog) prog.style.display = 'none'; }, 4000);
@@ -3008,7 +3532,7 @@ window.APP = {
         await db.ref('usuarios').set(dados.usuarios);
       }
       if (prog) { prog.style.background = '#f0fdf4'; prog.style.borderColor = '#86efac'; }
-      if (progMsg) progMsg.textContent = '✓ Restauração concluída! Recarregando em 3s...';
+      if (progMsg) progMsg.textContent = 'âœ“ Restauração concluída! Recarregando em 3s...';
       registrarLog('config', 'Restauração de backup: ' + (dados.exportado_em||'—'));
       notif('Dados restaurados com sucesso!','success');
       this._dadosBkp = null;
@@ -3066,26 +3590,9 @@ document.addEventListener('DOMContentLoaded', iniciar);
 </script>
 </body>
 </html>
-oveChild(el), 300);
-  }, 4500);
-}
 
-function garantirAdminInicial() {
-  if (localStorage.getItem('admin_init_ok')) return;
-  db.ref('usuarios').once('value').then(snap => {
-    const us = snap.val() || {};
-    if (Object.keys(us).length > 0) { localStorage.setItem('admin_init_ok','1'); return; }
-    db.ref('usuarios/admin_gti').set({
-      nome: 'Administrador GTI', login: 'gti', senha: 'Itatilac2009',
-      nivel: 'super_admin', unidades_permitidas: ['todas'], status: 'ativo',
-      criado_em: new Date().toISOString()
-    }).then(() => localStorage.setItem('admin_init_ok','1'));
-  }).catch(() => {});
-}
 
-document.addEventListener('DOMContentLoaded', iniciar);
 
-})();
-</script>
-</body>
-</html>
+
+
+
