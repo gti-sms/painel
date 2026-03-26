@@ -1549,9 +1549,8 @@ const syncMgr = {
   // Todos os saves e force-syncs empurram para esse unico ponto
   _ouvirSinalPush() {
     const ref = db.ref('paineis/geral/ultima_solicitacao_sync');
-    let primeiroDisparo = true; // .on() sempre dispara imediatamente ao ser registrado
     const handler = snap => {
-      if (primeiroDisparo) { primeiroDisparo = false; return; } // ignora o fire inicial
+      if (!this.done) return; // ignora disparo inicial do .on()
       const ts = snap.val();
       if (ts && typeof ts === 'number') this.sync();
     };
@@ -1563,9 +1562,10 @@ const syncMgr = {
     if (this.syncing) return;
     this.syncing = true;
     try {
-      // IS_MATRIZ: UNIDADE_ID === 'geral', evita leitura duplicada do mesmo nó
-      const geralSnap = await db.ref('paineis/geral').once('value');
-      const unitSnap  = IS_MATRIZ ? geralSnap : await db.ref('paineis/'+UNIDADE_ID).once('value');
+      const [unitSnap, geralSnap] = await Promise.all([
+        db.ref('paineis/'+UNIDADE_ID).once('value'),
+        db.ref('paineis/geral').once('value')
+      ]);
       let d = unitSnap.val();
       const gerais = geralSnap.val();
       if (!d) d = {unidade:{nome:IS_MATRIZ?'Matriz':'Unidade '+UNIDADE_ID,especialidades:[]},avisos:[]};
