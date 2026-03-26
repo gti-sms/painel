@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <style>
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -186,7 +187,7 @@ body::after{
   border:1px solid rgba(255,193,7,.3);flex-shrink:0;
 }
 
-/* â”€â”€ FALTÃ”METRO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€ FALTÔMETRO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .right-column{
   position:relative;z-index:1;
   border-radius:var(--radius-lg);overflow:hidden;
@@ -225,7 +226,7 @@ body::after{
 .item-nome{font-size:19px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.88);padding-left:14px;letter-spacing:.1px}
 .item-valor{font-size:28px;font-weight:900;font-family:var(--font-mono);color:var(--red);letter-spacing:1px;line-height:1;min-width:58px;text-align:right;text-shadow:0 0 16px rgba(239,83,80,.35)}
 
-/* â”€â”€ APRESENTAÃ‡ÃƒO FULLSCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€ APRESENTAÇÃO FULLSCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #apresentacaoFullscreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:none;flex-direction:column;background:#030c18;overflow:hidden;font-family:var(--font)}
 #apresentacaoFullscreen.apres-entrada{animation:apresEntrar .9s cubic-bezier(.22,1,.36,1) forwards}
 #apresentacaoFullscreen.apres-saida{animation:apresSair .7s ease-in forwards}
@@ -852,10 +853,10 @@ body[data-theme="pmpf"] .ticker-item{color:rgba(255,255,255,.94)!important}
   <div class="login-box">
     <div class="login-icon-wrap"><i class="fas fa-shield-alt" id="loginIcon"></i></div>
     <h2 id="loginTitle">Acesso Administrativo</h2>
-    <p id="loginDesc">Identificação e senha necessários</p>
+    <p id="loginDesc">Identificação e senha necessárias</p>
     <div id="loginAttemptBox" class="login-attempts"></div>
     <div id="loginForm">
-      <input type="text" id="loginUser" class="login-input" placeholder="Usuário" autocomplete="username">
+      <input type="email" id="loginUser" class="login-input" placeholder="E-mail" autocomplete="email">
       <input type="password" id="loginPass" class="login-input" placeholder="Senha" autocomplete="current-password">
       <div id="loginError" class="login-error"></div>
       <button class="login-btn" onclick="APP.verificarLogin()"><i class="fas fa-sign-in-alt"></i> Entrar</button>
@@ -1290,7 +1291,7 @@ const flayerSys = {
 };
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// APRESENTAÃ‡ÃƒO COMUNITÃRIA - PADRÃƒO 30 SEGUNDOS
+// APRESENTAÇÃO COMUNITÁRIA - PADRÃO 30 SEGUNDOS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const apresentSys = {
   isPlaying: false,
@@ -1512,62 +1513,75 @@ const apresentSys = {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // SYNC MANAGER
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ─────────────────────────────────────────────
+// SYNC MANAGER — push-only (sem polling)
+// ─────────────────────────────────────────────
 const syncMgr = {
-  timer: null, syncing: false, done: false, started: false,
+  syncing: false, done: false, started: false,
+  _listeners: [],   // referências dos listeners Firebase para cleanup
+
   init() {
     if (this.started) return;
     this.started = true;
-    this.loadCache();
-    this.startAuto();
-    window.addEventListener('online', () => this.sync(true));
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) this.sync(true);
-    });
+    this.loadCacheEiniciar();
   },
-  async loadCache() {
+
+  // 1) Carrega cache local imediatamente → sobe a interface sem tocar Firebase
+  // 2) Faz a leitura inicial única do Firebase
+  // 3) Após isso, escuta APENAS o campo-sinal ultima_solicitacao_sync
+  async loadCacheEiniciar() {
+    // Tenta carregar do cache local primeiro (zero Firebase)
     const c = await cache.get(UNIDADE_ID);
     if (c && c.data) { dadosUnidade = c.data; processarInterface(); }
-    if (c && c.stale) this.sync();
-    else if (!c) this.sync();
+
+    // Leitura inicial obrigatória do Firebase
+    await this.sync();
+
+    // Depois do startup: escuta passiva via real-time listener
+    // Firebase mantém uma conexão persistente e só empurra quando o campo muda
+    // Custo: praticamente zero (sem polling, sem reads repetidas)
+    this._ouvirSinalPush();
   },
-  startAuto() {
-    if (this.timer) clearInterval(this.timer);
-    syncConfig.interval = 30;
-    const ms = 30 * 60000;
-    let hash=0;
-    for (let i=0;i<UNIDADE_ID.length;i++){hash=((hash<<5)-hash)+UNIDADE_ID.charCodeAt(i);hash=hash&hash;}
-    const offset = Math.abs(hash % 30);
-    setTimeout(() => {
-      this.sync();
-      this.timer = setInterval(() => this.sync(), ms);
-    }, offset * 60000);
+
+  // Escuta APENAS o campo-sinal central em paineis/geral/ultima_solicitacao_sync
+  // Uma unica conexao por TV (50 TVs = 50 conexoes, abaixo do limite de 100 do Spark)
+  // Todos os saves e force-syncs empurram para esse unico ponto
+  _ouvirSinalPush() {
+    const ref = db.ref('paineis/geral/ultima_solicitacao_sync');
+    let primeiroDisparo = true; // .on() sempre dispara imediatamente ao ser registrado
+    const handler = snap => {
+      if (primeiroDisparo) { primeiroDisparo = false; return; } // ignora o fire inicial
+      const ts = snap.val();
+      if (ts && typeof ts === 'number') this.sync();
+    };
+    ref.on('value', handler);
+    this._listeners.push({ ref, handler });
   },
+
   async sync() {
     if (this.syncing) return;
     this.syncing = true;
     try {
-      const [unitSnap, geralSnap] = await Promise.all([
-        db.ref('paineis/'+UNIDADE_ID).once('value'),
-        db.ref('paineis/geral').once('value')
-      ]);
+      // IS_MATRIZ: UNIDADE_ID === 'geral', evita leitura duplicada do mesmo nó
+      const geralSnap = await db.ref('paineis/geral').once('value');
+      const unitSnap  = IS_MATRIZ ? geralSnap : await db.ref('paineis/'+UNIDADE_ID).once('value');
       let d = unitSnap.val();
       const gerais = geralSnap.val();
       if (!d) d = {unidade:{nome:IS_MATRIZ?'Matriz':'Unidade '+UNIDADE_ID,especialidades:[]},avisos:[]};
-      if (gerais) {
-        dadosGerais = gerais;
-        await cache.set('geral', dadosGerais);
-      }
+      if (gerais) { dadosGerais = gerais; await cache.set('geral', dadosGerais); }
       const cached = await cache.get(UNIDADE_ID);
       const cachedTs = (cached && cached.data) ? (cached.data.ultima_atualizacao || 0) : 0;
       const novoTs   = d.ultima_atualizacao || 0;
       const mudou    = novoTs > cachedTs || !this.done;
       const heartbeat = Date.now();
       d.ultima_sincronizacao = heartbeat;
-      await Promise.all([
-        cache.set(UNIDADE_ID, d),
-        db.ref('paineis/'+UNIDADE_ID+'/ultima_sincronizacao').set(heartbeat)
-      ]);
+      await cache.set(UNIDADE_ID, d);
       if (mudou || !this.done || gerais) { dadosUnidade = d; processarInterface(); }
+      // Grava ultima_sincronizacao no Firebase apenas uma vez (startup)
+      if (!this.done) {
+        db.ref('paineis/'+UNIDADE_ID+'/ultima_sincronizacao').set(heartbeat).catch(()=>{});
+      }
       this.done = true;
       ocultarLoading();
     } catch(e) {
@@ -1576,12 +1590,7 @@ const syncMgr = {
       this.syncing = false;
     }
   },
-  setInterval(n) {
-    syncConfig.interval = 30;
-    syncConfig.save();
-    this.startAuto();
-    notif('Intervalo fixado em 30 minutos','success');
-  },
+
   forceSync() { this.sync(); }
 };
 
@@ -1591,7 +1600,7 @@ const syncMgr = {
 function registrarLog() {}
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// INICIALIZAÃ‡ÃƒO
+// INICIALIZAÇÃO
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ocultarLoading() {
   const o = document.getElementById('loadingOverlay');
@@ -1617,11 +1626,10 @@ async function iniciar() {
   setInterval(atualizarRelogio, 1000);
   iniciarWatchdogPlayback();
 
+  // Carrega dados gerais do cache local imediatamente (sem consultar Firebase agora)
+  // O syncMgr.sync() já lê paineis/geral junto com paineis/UNIDADE_ID logo abaixo
   const cgCache = await cache.get('geral');
-  if (cgCache && cgCache.data) dadosGerais = cgCache.data;
-  db.ref('paineis/geral').once('value').then(s => {
-    if (s.val()) { dadosGerais = s.val(); cache.set('geral',dadosGerais); processarInterface(); }
-  }).catch(()=>{});
+  if (cgCache && cgCache.data) { dadosGerais = cgCache.data; processarInterface(); }
 
   setTimeout(() => {
     syncMgr.init();
@@ -1633,8 +1641,7 @@ async function iniciar() {
     setTimeout(ocultarLoading, 8000);
   }, 100);
 
-  if (IS_MATRIZ) carregarTodosUsuarios();
-  garantirAdminInicial();
+  garantirAdminInicial(); // carregarTodosUsuarios() agora so e chamado ao abrir painel admin
 }
 
 function processarInterface() {
@@ -1908,7 +1915,7 @@ function atualizarAvisos() {
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// AUTENTICAÃ‡ÃƒO
+// AUTENTICAÇÃO
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const auth = {
   openLogin() {
@@ -1920,20 +1927,38 @@ const auth = {
   },
   async verificarLogin() {
     if (loginBloqueado) { notif('Aguarde antes de tentar novamente.','error'); return; }
-    const u = document.getElementById('loginUser').value.trim();
+    const email = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value;
-    if (!u||!p) { this.showError('Preencha usuário e senha.'); return; }
+    if (!email||!p) { this.showError('Preencha e-mail e senha.'); return; }
     try {
+      // Autenticação via Firebase Authentication
+      await firebase.auth().signInWithEmailAndPassword(email, p);
+
+      // Buscar permissões no Realtime Database pelo e-mail (campo email) ou login (retrocompatibilidade)
       const snap = await db.ref('usuarios').once('value');
       const us = snap.val() || {};
       let uf = null, uk = null;
-      Object.entries(us).forEach(([k,d]) => { if(d.login===u){uf=d;uk=k;} });
-      if (!uf || uf.status==='inativo') { this.failLogin(); return; }
-      if (uf.senha !== p) { this.failLogin(); return; }
+      Object.entries(us).forEach(([k,d]) => {
+        if (d.email === email || d.login === email) { uf = d; uk = k; }
+      });
+
+      // Se não encontrado no DB → super admin criado diretamente no Firebase Console
+      if (!uf) {
+        uf = { nome: 'Super Administrador', email, nivel: 'super_admin', unidades_permitidas: ['todas'], status: 'ativo' };
+        uk = 'super_admin_firebase';
+      }
+
+      if (uf.status === 'inativo') {
+        await firebase.auth().signOut();
+        this.showError('Usuário inativo. Contate o administrador.');
+        return;
+      }
+
       loginAttempts = 0;
-      usuarioAtual = { login:u, nome:uf.nome, key:uk };
+      usuarioAtual = { login: email, nome: uf.nome, key: uk };
       permissoesUsuario = uf;
       if (!this.temAcesso()) {
+        await firebase.auth().signOut();
         notif('Sem permissão para esta unidade.','error');
         usuarioAtual = null; permissoesUsuario = null;
         return;
@@ -1942,7 +1967,12 @@ const auth = {
       this.iniciarSessionTimer();
       registrarLog('login', 'Acesso ao sistema');
     } catch(e) {
-      this.showError('Erro de conexão. Tente novamente.');
+      const codigosCredencial = ['auth/invalid-credential','auth/wrong-password','auth/user-not-found','auth/invalid-email'];
+      if (codigosCredencial.includes(e.code)) {
+        this.failLogin();
+      } else {
+        this.showError('Erro de conexão. Tente novamente.');
+      }
     }
   },
   failLogin() {
@@ -1983,6 +2013,8 @@ const auth = {
     document.getElementById('adminPanel').style.display = 'flex';
     themeMgr.apply(themeMgr.current, false);
     document.getElementById('admUserLabel').textContent = usuarioAtual.nome || usuarioAtual.login;
+    // Carrega dados administrativos apenas quando o admin acessa o painel (nao no startup)
+    if (IS_MATRIZ) { carregarTodosUsuarios(); carregarTodasUnidades(()=>{}); }
     APP.showSection(IS_MATRIZ ? 'unidade' : 'faltometro');
     this.resetSessionTimer();
     rotacao.emCiclo = true;
@@ -2001,6 +2033,7 @@ const auth = {
     }, { signal: this._sessionAbort.signal });
   },
   trocarUsuario() {
+    firebase.auth().signOut().catch(()=>{});
     usuarioAtual = null; permissoesUsuario = null;
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('userInfoBox').style.display = 'none';
@@ -2045,7 +2078,7 @@ function configurarMenus() {
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// SEÃ‡Ã•ES DO PAINEL
+// SEÇÕES DO PAINEL
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const sections = {
 
@@ -2423,7 +2456,7 @@ const sections = {
           <button class="adm-btn-primary" onclick="APP.novoUsuario()"><i class="fas fa-user-plus"></i> Novo Usuário</button>
         </div>
         <table class="adm-table">
-          <thead><tr><th>Nome</th><th>Login</th><th>Nível</th><th>Unidades</th><th>Status</th><th>AçÃµes</th></tr></thead>
+          <thead><tr><th>Nome</th><th>Login</th><th>Nível</th><th>Unidades</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody>
             ${listaUsuarios.length===0?`<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:30px">Carregando usuários...</td></tr>`
             :listaUsuarios.map(u=>{
@@ -2609,13 +2642,13 @@ function renderMonitorGrafana(logs) {
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#d97706,#f59e0b)"></div>
         <div class="grafana-kpi-val" style="color:#d97706">${cnt.atencao}</div>
-        <div class="grafana-kpi-label">Atenção (1â€“3 dias)</div>
+        <div class="grafana-kpi-label">Atenção (1–3 dias)</div>
         <div class="grafana-kpi-sub">Verificar conectividade</div>
       </div>
       <div class="grafana-kpi">
         <div class="grafana-kpi-accent" style="background:linear-gradient(90deg,#ea580c,#f97316)"></div>
         <div class="grafana-kpi-val" style="color:#ea580c">${cnt.alerta}</div>
-        <div class="grafana-kpi-label">Alerta (3â€“7 dias)</div>
+        <div class="grafana-kpi-label">Alerta (3–7 dias)</div>
         <div class="grafana-kpi-sub">Intervenção necessária</div>
       </div>
       <div class="grafana-kpi">
@@ -2632,7 +2665,7 @@ function renderMonitorGrafana(logs) {
           <div style="width:36px;height:36px;border-radius:9px;background:rgba(239,83,80,.2);border:1px solid rgba(239,83,80,.4);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-times" style="color:#ff8a80;font-size:15px"></i></div>
           <div>
             <div style="font-size:15px;font-weight:700;color:#fff">Faltômetro Mensal das Unidades</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5)">Referência: <strong style="color:rgba(255,255,255,.75)">${mesAnterior}</strong> · SLA mensal a partir do 1Âº dia útil (${prazoSlaLabel})</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Referência: <strong style="color:rgba(255,255,255,.75)">${mesAnterior}</strong> · SLA mensal a partir do 1º dia útil (${prazoSlaLabel})</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:16px">
@@ -2657,14 +2690,14 @@ function renderMonitorGrafana(logs) {
           </div>
         </div>
         <div style="padding:16px 22px;border-right:1px solid #f1f5f9">
-          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-clock" style="color:#d97706;margin-right:4px"></i>Pendentes após 1Âº dia útil</div>
+          <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-clock" style="color:#d97706;margin-right:4px"></i>Pendentes após 1º dia útil</div>
           <div style="font-size:32px;font-weight:800;color:${pendentes>0?'#d97706':'#16a34a'}">${pendentes}</div>
           <div style="font-size:11px;color:#9ca3af;margin-top:4px">${!slaLiberado ? 'O prazo ainda não abriu neste mês.' : pendentes===0 ? 'Todas as unidades regularizadas no ciclo atual.' : 'Unidade(s) ainda sem ajuste após a abertura do SLA.'}</div>
         </div>
         <div style="padding:16px 22px">
           <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px"><i class="fas fa-calendar-alt" style="color:#1565c0;margin-right:4px"></i>Marco do SLA mensal</div>
           <div style="font-size:18px;font-weight:700;color:#1e293b;text-transform:capitalize;margin-top:4px">${mesAnterior}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Contagem iniciada no 1Âº dia útil do mes</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Contagem iniciada no 1º dia útil do mês</div>
         </div>
       </div>
       <div style="padding:18px 22px">
@@ -2799,7 +2832,7 @@ function renderMonitorGrafana(logs) {
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// OPERAÃ‡Ã•ES DE DADOS
+// OPERAÇÕES DE DADOS
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function salvarFirebase() {
   const agora = Date.now();
@@ -2813,9 +2846,16 @@ function salvarFirebase() {
   if (IS_MATRIZ) {
     dadosGerais.ultima_atualizacao = agora;
     cache.set('geral', dadosGerais);
-    return p1.then(() => db.ref('paineis/geral').set(dadosGerais));
+    // Apos salvar, empurra sinal para todas as unidades atualizarem automaticamente
+    return p1
+      .then(() => db.ref('paineis/geral').set(dadosGerais))
+      .then(() => {
+        // Uma unica escrita em geral dispara o listener em todas as 50 TVs
+        return db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now());
+      });
   }
-  return p1;
+  // Unidade nao-matriz: empurra o sinal no ponto central (geral) que todas as TVs escutam
+  return p1.then(() => db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()));
 }
 
 function renderizarGridUnidades() {
@@ -2877,7 +2917,7 @@ function carregarTodasUnidades(cb) {
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// API PÃšBLICA (APP)
+// API PÚBLICA (APP)
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.APP = {
 
@@ -2985,6 +3025,7 @@ window.APP = {
   },
   logout() {
     registrarLog('logout','Sessão encerrada');
+    firebase.auth().signOut().catch(()=>{});
     usuarioAtual = null; permissoesUsuario = null;
     if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
     if (auth._sessionAbort) { auth._sessionAbort.abort(); auth._sessionAbort = null; }
@@ -3051,7 +3092,8 @@ window.APP = {
     db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').set(msgs)
       .then(() => {
         FALTO_MSGS = msgs;
-        registrarLog('salvar','Mensagens de conscientização atualizadas ('+msgs.length+' mensagens)');
+        db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()).catch(()=>{});
+        registrarLog('salvar','Mensagens de conscientizacao atualizadas ('+msgs.length+' mensagens)');
         notif('Mensagens salvas!','success');
       }).catch(() => notif('Erro ao salvar!','error'));
   },
@@ -3060,7 +3102,8 @@ window.APP = {
     db.ref('paineis/'+UNIDADE_ID+'/faltoMsgs').remove()
       .then(() => {
         FALTO_MSGS = [...FALTO_MSGS_DEFAULT];
-        registrarLog('config','Mensagens de conscientização restauradas para o padrão');
+        db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()).catch(()=>{});
+        registrarLog('config','Mensagens de conscientizacao restauradas para o padrao');
         notif('Mensagens restauradas!','success');
         sections.faltometro();
       }).catch(() => notif('Erro!','error'));
@@ -3116,6 +3159,7 @@ window.APP = {
     dadosGerais.avisos = (dadosGerais.avisos || []).map(a => (a || '').trim()).filter(Boolean);
     db.ref('paineis/geral/avisos').set(dadosGerais.avisos)
       .then(() => {
+        db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()).catch(()=>{});
         registrarLog('salvar','Avisos SMS atualizados ('+(dadosGerais.avisos||[]).length+' avisos)');
         notif('Avisos SMS salvos!','success');
         sections.avisos();
@@ -3134,6 +3178,7 @@ window.APP = {
   salvarAvisosLocais() {
     db.ref('paineis/'+UNIDADE_ID+'/avisos').set(dadosUnidade.avisos||[])
       .then(() => {
+        db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()).catch(()=>{});
         registrarLog('salvar','Avisos locais da unidade atualizados ('+( dadosUnidade.avisos||[]).length+' avisos)');
         notif('Avisos locais salvos!','success');
       }).catch(() => notif('Erro!','error'));
@@ -3220,6 +3265,7 @@ window.APP = {
       duracao: parseInt(document.querySelectorAll('.flayer-duration-input')[i]?.value) || 30
     })).filter(item => item.url);
     flayerSys.salvar(items).then(() => {
+      db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now()).catch(()=>{});
       registrarLog('salvar','Encartes atualizados ('+items.length+' encarte(s))');
       notif(`${items.length} encarte(s) salvos!`,'success');
       sections.flayers();
@@ -3419,7 +3465,7 @@ window.APP = {
         <div class="adm-card-header"><div class="adm-card-title"><i class="fas fa-plus-circle"></i> Nova Unidade</div></div>
         <div style="max-width:500px">
           <label class="adm-label">Nome da Unidade</label><input id="nUnitNome" class="adm-input adm-input-lg" placeholder="Nome completo da unidade" style="margin-bottom:16px">
-          <label class="adm-label">ID Ãšnico <span class="adm-label-sub">Apenas letras minúsculas, números e underscore</span></label><input id="nUnitId" class="adm-input" placeholder="ex: ubs_norte">
+          <label class="adm-label">ID Único <span class="adm-label-sub">Apenas letras minúsculas, números e underscore</span></label><input id="nUnitId" class="adm-input" placeholder="ex: ubs_norte">
           <div class="adm-action-bar">
             <button class="adm-btn-green" onclick="APP.criarUnidade()"><i class="fas fa-save"></i> Criar</button>
             <button class="adm-btn-muted" onclick="APP.showSection('unidades')"><i class="fas fa-times"></i> Cancelar</button>
@@ -3600,19 +3646,17 @@ window.APP = {
   },
 
   forceSync1(id) {
-    db.ref('paineis/'+id+'/ultima_solicitacao_sync').set(Date.now())
-      .then(()=>notif('Solicitação de sync enviada!','success'));
+    // Empurra no ponto central que todas as TVs escutam
+    db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now())
+      .then(()=>notif('Solicitacao de sync enviada!','success'));
   },
   forceSyncAll() {
-    if (!confirm('Forçar sincronização de TODAS as unidades?')) return;
-    const agora = Date.now();
-    Promise.all([
-      ...listaUnidades.map(u=>db.ref('paineis/'+u.id+'/ultima_solicitacao_sync').set(agora)),
-      db.ref('paineis/geral/ultima_solicitacao_sync').set(agora)
-    ])
+    if (!confirm('Forcar sincronizacao de TODAS as unidades?')) return;
+    // Uma unica escrita em geral dispara o listener em todas as TVs simultaneamente
+    db.ref('paineis/geral/ultima_solicitacao_sync').set(Date.now())
       .then(()=>{
-        registrarLog('config','Sync forçado para todas as unidades ('+listaUnidades.length+')');
-        notif(`Sync enviado para ${listaUnidades.length+1} unidades!`,'success');
+        registrarLog('config','Sync forcado para todas as unidades');
+        notif('Sync enviado para todas as unidades!','success');
       });
   }
 };
@@ -3634,10 +3678,12 @@ function garantirAdminInicial() {
   db.ref('usuarios').once('value').then(snap => {
     const us = snap.val() || {};
     if (Object.keys(us).length > 0) { localStorage.setItem('admin_init_ok','1'); return; }
+    // Cria registro inicial no DB sem senha (autenticação gerenciada pelo Firebase Auth)
     db.ref('usuarios/admin_gti').set({
-      nome: 'Administrador GTI', login: 'gti', senha: 'Itatilac2009',
+      nome: 'Super Administrador GTI', email: '', login: 'gti',
       nivel: 'super_admin', unidades_permitidas: ['todas'], status: 'ativo',
-      criado_em: new Date().toISOString()
+      criado_em: new Date().toISOString(),
+      obs: 'Senha gerenciada pelo Firebase Authentication'
     }).then(() => localStorage.setItem('admin_init_ok','1'));
   }).catch(() => {});
 }
@@ -3648,9 +3694,3 @@ document.addEventListener('DOMContentLoaded', iniciar);
 </script>
 </body>
 </html>
-
-
-
-
-
-
